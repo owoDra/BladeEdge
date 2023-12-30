@@ -19,10 +19,11 @@ public class ProjectBE : ModuleRules
         PublicDependencyModuleNames.AddRange(
             new string[]
             {
-                "Core",
-                "CoreUObject",
-                "Engine",
+                "Core", "CoreUObject", "Engine",
+
                 "AIModule",
+
+                "GameplayTags", "GameplayAbilities",
             }
         );
 

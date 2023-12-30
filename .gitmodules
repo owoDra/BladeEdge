@@ -41,6 +41,9 @@
 [submodule "Plugins/Extension/GameUIExtension"]
 	path = Plugins/Extension/GameUIExtension
 	url = https://github.com/owoDra/GameUIExtension.git
+[submodule "Plugins/Extension/GameViewExtension"]
+	path = Plugins/Extension/GameViewExtension
+	url = https://github.com/owoDra/GameViewExtension.git
 
 
 [submodule "Plugins/Integration/GameCharacterAbilityIntegration"]
