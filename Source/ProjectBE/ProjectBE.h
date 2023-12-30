@@ -1,6 +1,16 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+﻿// Copyright (C) 2023 owoDra
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Modules/ModuleManager.h"
 
+/**
+ *  Modules for the main features of the ProjectBE plugin
+ */
+class FProjectBEModule : public FDefaultGameModuleImpl
+{
+public:
+	virtual void StartupModule() override {}
+	virtual void ShutdownModule() override {}
+
+};

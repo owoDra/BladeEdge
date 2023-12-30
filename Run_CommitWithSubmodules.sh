@@ -1,9 +1,16 @@
-if [[ "$#" -ne 1 ]]; then
-	echo "You must specify a commit message as an argument."
-	exit 1
+# if [[ "$#" -ne 1 ]]; then
+# 	echo "You must specify a commit message as an argument."
+# 	exit 1
+# fi
+
+echo -n Commit Message: 
+read COMMIT_MESSAGE 
+
+if [ -z $COMMIT_MESSAGE ]; then
+	echo "You must specify a commit message."
+	exit
 fi
 
-COMMIT_MESSAGE="$1"
 git submodule foreach "echo 'Adding all files.'; git add ."
 git submodule foreach "echo 'Stashing.'; git stash"
 git submodule foreach "echo 'Checking out master branch.'; git checkout main || :"

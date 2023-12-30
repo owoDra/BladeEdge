@@ -1,6 +1,5 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+﻿// Copyright (C) 2023 owoDra
 
 #include "ProjectBE.h"
-#include "Modules/ModuleManager.h"
 
-IMPLEMENT_PRIMARY_GAME_MODULE( FDefaultGameModuleImpl, ProjectBE, "ProjectBE" );
+IMPLEMENT_PRIMARY_GAME_MODULE(FProjectBEModule, ProjectBE, "ProjectBE");

@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+﻿// Copyright (C) 2023 owoDra
 
 using UnrealBuildTool;
 using System.Collections.Generic;
