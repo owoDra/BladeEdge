@@ -15,6 +15,11 @@
 	url = https://github.com/owoDra/GameLocomotionHumanAddon.git
 
 
+[submodule "Plugins/Blueprint/GameLocomotionHumanBlueprint"]
+	path = Plugins/Blueprint/GameLocomotionHumanBlueprint
+	url = https://github.com/owoDra/GameLocomotionHumanBlueprint.git
+
+
 [submodule "Plugins/Core/GameFrameworkCore"]
 	path = Plugins/Core/GameFrameworkCore
 	url = https://github.com/owoDra/GameFrameworkCore.git
