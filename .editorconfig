@@ -1,0 +1,8 @@
+# top-most editorconfig files
+root = true
+
+# based on epic's coding standards
+[*]
+
+end_of_line = crlf
+charset = utf-8-bom
