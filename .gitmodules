@@ -58,6 +58,9 @@
 [submodule "Plugins/Integration/GameCharacterInputIntegration"]
 	path = Plugins/Integration/GameCharacterInputIntegration
 	url = https://github.com/owoDra/GameCharacterInputIntegration.git
+[submodule "Plugins/Integration/GameCharacterViewIntegration"]
+	path = Plugins/Integration/GameCharacterViewIntegration
+	url = https://github.com/owoDra/GameCharacterViewIntegration.git
 [submodule "Plugins/Integration/GameInputAbilityIntegration"]
 	path = Plugins/Integration/GameInputAbilityIntegration
 	url = https://github.com/owoDra/GameInputAbilityIntegration.git
