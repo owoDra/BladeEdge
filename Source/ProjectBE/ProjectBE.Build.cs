@@ -21,9 +21,17 @@ public class ProjectBE : ModuleRules
             {
                 "Core", "CoreUObject", "Engine",
 
-                "AIModule",
+                "Slate", "SlateCore", "RenderCore",
 
-                "GameplayTags", "GameplayAbilities",
+                "AIModule", "ApplicationCore", "PhysicsCore",
+
+                "InputCore", "EnhancedInput",
+
+                "AudioMixer", "AudioModulation",
+
+                "CommonUI", "CommonInput",
+
+                "GameplayTags", "GameplayAbilities", "ModularGameplay",
             }
         );
 
@@ -32,11 +40,12 @@ public class ProjectBE : ModuleRules
             new string[]
             {
                 // Game XXX Core
-                "GFCore", "GSCore",
+                "GFCore", "GSCore", "GACore",
 
                 // Game XXX Extension
                 "GCExt", "GAExt", "GEExt",
                 "GIExt", "GTExt", "GUIExt",
+                "GVExt",
 
                 // Game XXX: YYY Addon
                 "GAHAddon",
@@ -44,7 +53,8 @@ public class ProjectBE : ModuleRules
                 "GCLAddon", "GLHAddon",
 
                 // Game XXX: YYY Integration
-                "GCAIntg", "GCEIntg", "GCHIntg", "GCIIntg",
+                "GCAIntg", "GCEIntg", "GCHIntg", 
+                "GCIIntg", "GCVIntg",
                 "GIAIntg", "GLAIntg",
                 "GSIIntg",
             }

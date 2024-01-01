@@ -1,0 +1,27 @@
+// Copyright owoDra
+
+#pragma once
+
+#include "NativeGameplayTags.h"
+
+
+////////////////////////////////////
+// Platform.Trait
+
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Platform_Trait_SupportsChangingAudioOutputDevice);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Platform_Trait_SupportsBackgroundAudio);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Platform_Trait_SupportsWindowedMode);
+
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Platform_Trait_NeedsBrightnessAdjustment);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Platform_Trait_BinauralSettingControlledByOS);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Platform_Trait_SingleOnlineUser);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Platform_Trait_CanExitApplication);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Platform_Trait_PlayInEditor);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Platform_Trait_RequiresStrictControllerMapping);
+
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Platform_Trait_Input_HardwareCursor);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Platform_Trait_Input_PrimarilyControlled);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Platform_Trait_Input_PrimarilyTouchScreen);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Platform_Trait_Input_SupportsMouseAndKeyboard);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Platform_Trait_Input_SupportsGamepad);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Platform_Trait_Input_SupportsTriggerHaptics);

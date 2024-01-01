@@ -21,6 +21,9 @@
 [submodule "Plugins/Core/GameSettingCore"]
 	path = Plugins/Core/GameSettingCore
 	url = https://github.com/owoDra/GameSettingCore.git
+[submodule "Plugins/Core/GameAudioCore"]
+	path = Plugins/Core/GameAudioCore
+	url = https://github.com/owoDra/GameAudioCore.git
 
 
 [submodule "Plugins/Extension/GameAbilityExtension"]
