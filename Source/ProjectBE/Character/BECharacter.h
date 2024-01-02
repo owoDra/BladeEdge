@@ -58,12 +58,10 @@ protected:
 	 *	- AbilityPlayableComponent
 	 *	| [オーナー] Character
 	 *	| [　理由　] 個々のキャラクターの入力処理を行うため。
-	 *	| [　補足　] このコンポーネントは CharacterData を通して追加される。
 	 * 
 	 *	- BEViewerComponent
 	 *	| [オーナー] Character
 	 *	| [　理由　] 個々のキャラクターの視点を表現するため。
-	 *	| [　補足　] このコンポーネントは CharacterData を通して追加される。
 	 */
 
 	//

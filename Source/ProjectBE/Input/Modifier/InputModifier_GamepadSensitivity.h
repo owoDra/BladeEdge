@@ -13,7 +13,7 @@ class UGamepadSensitivityData;
  * 適用させる感度のターゲティングタイプ
  */
 UENUM()
-enum class EInputTargetingType : uint8
+enum class EGamepadTargetingType : uint8
 {
 	// 通常時
 	Normal = 0,
@@ -35,7 +35,7 @@ public:
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sensitivity")
-	EInputTargetingType TargetingType{ EInputTargetingType::Normal };
+	EGamepadTargetingType TargetingType{ EGamepadTargetingType::Normal };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sensitivity", meta=(AssetBundles="Client,Server"))
 	TObjectPtr<const UGamepadSensitivityData> SensitivityLevelTable;
