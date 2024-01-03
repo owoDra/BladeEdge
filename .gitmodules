@@ -49,6 +49,12 @@
 	url = https://github.com/owoDra/GameViewExtension.git
 
 
+[submodule "Plugins/Integration/GameAbilitySettingIntegration"]
+	path = Plugins/Integration/GameAbilitySettingIntegration
+	url = https://github.com/owoDra/GameAbilitySettingIntegration.git
+[submodule "Plugins/Integration/GameAbilityUIIntegration"]
+	path = Plugins/Integration/GameAbilityUIIntegration
+	url = https://github.com/owoDra/GameAbilityUIIntegration.git
 [submodule "Plugins/Integration/GameCharacterAbilityIntegration"]
 	path = Plugins/Integration/GameCharacterAbilityIntegration
 	url = https://github.com/owoDra/GameCharacterAbilityIntegration.git

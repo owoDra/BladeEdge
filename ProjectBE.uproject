@@ -22,5 +22,8 @@
 			"Name": "BEGFTest",
 			"Enabled": true
 		}
+	],
+	"TargetPlatforms": [
+		"Windows"
 	]
 }
