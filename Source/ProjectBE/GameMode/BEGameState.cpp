@@ -2,6 +2,8 @@
 
 #include "BEGameState.h"
 
+#include "ProjectBELogs.h"
+
 // Game Experience Extension
 #include "ExperienceDataComponent.h"
 

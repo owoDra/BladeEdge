@@ -2,19 +2,22 @@
 
 #pragma once
 
-#include "GAEGameplayAbility.h"
+#include "GameplayAbilityWithWidget.h"
 
 #include "BEGameplayAbility_Dodge.generated.h"
 
 class ULocomotionComponent;
 class UAnimMontage;
+class APlayerCameraManager;
+class UCameraShakeBase;
+class AActor;
 
 
 /**
  * キャラクターの回避アクションに必要な基本機能を追加した GameplayAbility クラス
  */
 UCLASS(Abstract)
-class PROJECTBE_API UBEGameplayAbility_Dodge : public UGAEGameplayAbility
+class PROJECTBE_API UBEGameplayAbility_Dodge : public UGameplayAbilityWithWidget
 {
 	GENERATED_BODY()
 public:
@@ -64,12 +67,36 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Config|Ability")
 	float AbilityCooltime{ 0.3f };
 
+	//
+	// 実行する GameplayCue のタグ。
+	// 
+	// Tips:
+	//	実行された GameplayCue のパラメーターはそれぞれ次の値に対応している。
+	// 
+	//	- NormalizedMagnitude = RootMotionStrength
+	//	- RawMagnitude = RootMotionDuration
+	//	- Normal = Direction
+	//
+	UPROPERTY(EditDefaultsOnly, Category = "Config|GameplayCue", meta = (Categories = "GameplayCue"))
+	FGameplayTag GameplayCueTag;
+
 protected:
 	void StartDash();
 
+	/**
+	 * 現在のキャラクターステートに基づいて回避する方向を決定する
+	 */
 	void GetDesiredDirection(FVector& OutDirection, float& OutAngle) const;
 
+	/**
+	 * Angle がら適切な AnimMontage を取得する
+	 */
 	UAnimMontage* GetDesiredMontage(float Angle) const;
+
+	/**
+	 * ゲームプレイキューを実行する
+	 */
+	void ProcessExecuteGameplayCue(FVector InDirection);
 
 protected:
 	/**
@@ -80,6 +107,12 @@ protected:
 	 */
 	UFUNCTION(BlueprintImplementableEvent, Category = "Dash")
 	void ProcessPlayMontage(UAnimMontage* Montage);
+
+	/**
+	 * このイベントを使用してクールダウン処理実装する。
+	 */
+	UFUNCTION(BlueprintImplementableEvent, Category = "Dash")
+	void ProcessSendMessage(AActor* Instigator, float Duration);
 
 	/**
 	 * このイベントを使用して RootMotion による移動処理を実装する。

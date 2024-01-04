@@ -42,7 +42,13 @@ void UBEGameplayAbility_Dodge::ActivateAbility(const FGameplayAbilitySpecHandle 
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
-	if (HasAuthority(&ActivationInfo) || IsLocallyControlled())
+	if (ActorInfo->IsLocallyControlled())
+	{
+		ProcessSendMessage(ActorInfo->OwnerActor.Get(), RootMotionDuration + AbilityCooltime);
+
+		StartDash();
+	}
+	else if (ActorInfo->IsNetAuthority())
 	{
 		StartDash();
 	}
@@ -55,6 +61,8 @@ void UBEGameplayAbility_Dodge::StartDash()
 	auto Angle{ 0.0f };
 
 	GetDesiredDirection(Direction, Angle);
+
+	ProcessExecuteGameplayCue(Direction);
 
 	ProcessRootMotion(Direction, RootMotionStrength, RootMotionDuration);
 
@@ -111,6 +119,19 @@ UAnimMontage* UBEGameplayAbility_Dodge::GetDesiredMontage(float Angle) const
 	else
 	{
 		return DashMontage_R;
+	}
+}
+
+void UBEGameplayAbility_Dodge::ProcessExecuteGameplayCue(FVector InDirection)
+{
+	if (GameplayCueTag.IsValid())
+	{
+		FGameplayCueParameters Param;
+		Param.NormalizedMagnitude = RootMotionStrength;
+		Param.RawMagnitude = RootMotionDuration;
+		Param.Normal = InDirection;
+
+		K2_ExecuteGameplayCueWithParams(GameplayCueTag, Param);
 	}
 }
 

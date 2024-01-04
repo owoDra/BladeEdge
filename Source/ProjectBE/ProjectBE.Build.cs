@@ -55,6 +55,7 @@ public class ProjectBE : ModuleRules
                 // Game XXX: YYY Integration
                 "GCAIntg", "GCEIntg", "GCHIntg", 
                 "GCIIntg", "GCVIntg",
+                "GASIntg", "GAUIIntg",
                 "GIAIntg", "GLAIntg",
                 "GSIIntg",
             }

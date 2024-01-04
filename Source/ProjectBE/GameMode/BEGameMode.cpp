@@ -9,6 +9,11 @@
 #include "GameMode/BEGameState.h"
 #include "UI/BEHUD.h"
 #include "System/BEGameSession.h"
+#include "ProjectBELogs.h"
+
+#include "InitState/InitStateTags.h"
+
+#include "Components/GameFrameworkInitStateInterface.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(BEGameMode)
 
