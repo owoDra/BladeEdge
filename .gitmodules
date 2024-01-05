@@ -66,7 +66,7 @@
 	url = https://github.com/owoDra/GameCharacterEquipmentIntegration.git
 [submodule "Plugins/Integration/GameCharacterEffectIntegration"]
 	path = Plugins/Integration/GameCharacterEffectIntegration
-	url = https://github.com/owoDra/GameCharacterEffectIntegration
+	url = https://github.com/owoDra/GameCharacterEffectIntegration.git
 [submodule "Plugins/Integration/GameCharacterHealthIntegration"]
 	path = Plugins/Integration/GameCharacterHealthIntegration
 	url = https://github.com/owoDra/GameCharacterHealthIntegration.git
@@ -85,3 +85,6 @@
 [submodule "Plugins/Integration/GameSettingInputIntegration"]
 	path = Plugins/Integration/GameSettingInputIntegration
 	url = https://github.com/owoDra/GameSettingInputIntegration.git
+[submodule "Plugins/Integration/GameHumanEffectIntegration"]
+	path = Plugins/Integration/GameHumanEffectIntegration
+	url = https://github.com/owoDra/GameHumanEffectIntegration.git
