@@ -127,6 +127,7 @@ void UBEGameplayAbility_Dodge::ProcessExecuteGameplayCue(FVector InDirection)
 	if (GameplayCueTag.IsValid())
 	{
 		FGameplayCueParameters Param;
+		Param.Instigator = GetOwningActorFromActorInfo();
 		Param.NormalizedMagnitude = RootMotionStrength;
 		Param.RawMagnitude = RootMotionDuration;
 		Param.Normal = InDirection;

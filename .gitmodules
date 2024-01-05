@@ -32,6 +32,9 @@
 [submodule "Plugins/Extension/GameCharacterExtension"]
 	path = Plugins/Extension/GameCharacterExtension
 	url = https://github.com/owoDra/GameCharacterExtension.git
+[submodule "Plugins/Extension/GameEffectExtension"]
+	path = Plugins/Extension/GameEffectExtension
+	url = https://github.com/owoDra/GameEffectExtension
 [submodule "Plugins/Extension/GameExperienceExtension"]
 	path = Plugins/Extension/GameExperienceExtension
 	url = https://github.com/owoDra/GameExperienceExtension.git
@@ -61,6 +64,9 @@
 [submodule "Plugins/Integration/GameCharacterEquipmentIntegration"]
 	path = Plugins/Integration/GameCharacterEquipmentIntegration
 	url = https://github.com/owoDra/GameCharacterEquipmentIntegration.git
+[submodule "Plugins/Integration/GameCharacterEffectIntegration"]
+	path = Plugins/Integration/GameCharacterEffectIntegration
+	url = https://github.com/owoDra/GameCharacterEffectIntegration
 [submodule "Plugins/Integration/GameCharacterHealthIntegration"]
 	path = Plugins/Integration/GameCharacterHealthIntegration
 	url = https://github.com/owoDra/GameCharacterHealthIntegration.git
