@@ -9,8 +9,14 @@
 #include "TeamFunctionLibrary.h"
 #include "TeamMemberComponent.h"
 
+// Game Character Extension
+#include "CharacterDataComponent.h"
+
 // Game Ability Extension
 #include "GAEAbilitySystemComponent.h"
+
+// Game UI Extension
+#include "LoadingScreen/LoadingProcessTask.h"
 
 // Game Ability: Health Addon
 #include "HealthComponent.h"
@@ -24,6 +30,8 @@
 #include UE_INLINE_GENERATED_CPP_BY_NAME(BECharacter)
 
 
+const FString ABECharacter::CharacterLoadingReason("Loading Character Data");
+
 ABECharacter::ABECharacter(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
@@ -31,6 +39,24 @@ ABECharacter::ABECharacter(const FObjectInitializer& ObjectInitializer)
 	HealthComponent = ObjectInitializer.CreateDefaultSubobject<UHealthComponent>(this, TEXT("Health"));
 	EquipmentManagerComponent = ObjectInitializer.CreateDefaultSubobject<UEquipmentManagerComponent>(this, TEXT("EquipmentManager"));
 	ContextEffectComponent = ObjectInitializer.CreateDefaultSubobject<UContextEffectComponent>(this, TEXT("ContextEffect"));
+
+	CharacterDataComponent->OnGameReady_Register(FSimpleMulticastDelegate::FDelegate::CreateUObject(this, &ThisClass::HandleGameReady));
+}
+
+
+void ABECharacter::BeginPlay()
+{
+	LoadingProcessTask = ULoadingProcessTask::CreateLoadingScreenProcessTask(this, ABECharacter::CharacterLoadingReason);
+
+	Super::BeginPlay();
+}
+
+void ABECharacter::HandleGameReady()
+{
+	if (LoadingProcessTask)
+	{
+		LoadingProcessTask->Unregister();
+	}
 }
 
 

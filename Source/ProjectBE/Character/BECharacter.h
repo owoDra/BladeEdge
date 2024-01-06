@@ -15,6 +15,7 @@ class UGAEAbilitySystemComponent;
 class UHealthComponent;
 class UEquipmentManagerComponent;
 class UContextEffectComponent;
+class ULoadingProcessTask;
 
 
 /** 
@@ -32,6 +33,8 @@ class PROJECTBE_API ABECharacter
 	GENERATED_BODY()
 public:
 	explicit ABECharacter(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+
+	static const FString CharacterLoadingReason;
 
 protected:
 	/**
@@ -94,6 +97,16 @@ protected:
 	//
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Components")
 	TObjectPtr<UContextEffectComponent> ContextEffectComponent;
+
+	UPROPERTY(Transient)
+	TObjectPtr<ULoadingProcessTask> LoadingProcessTask{ nullptr };
+
+public:
+	virtual void BeginPlay() override;
+
+protected:
+	void HandleGameReady();
+
 
 public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
