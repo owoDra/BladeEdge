@@ -10,6 +10,9 @@
 [submodule "Plugins/Addon/GameEquipmentMeleeAddon"]
 	path = Plugins/Addon/GameEquipmentMeleeAddon
 	url = https://github.com/owoDra/GameEquipmentMeleeAddon.git
+[submodule "Plugins/Addon/GameEquipmentSkillAddon"]
+	path = Plugins/Addon/GameEquipmentSkillAddon
+	url = https://github.com/owoDra/GameEquipmentSkillAddon.git
 [submodule "Plugins/Addon/GameLocomotionHumanAddon"]
 	path = Plugins/Addon/GameLocomotionHumanAddon
 	url = https://github.com/owoDra/GameLocomotionHumanAddon.git
