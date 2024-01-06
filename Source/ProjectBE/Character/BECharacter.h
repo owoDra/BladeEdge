@@ -7,12 +7,14 @@
 #include "TeamMemberComponentInterface.h"
 #include "EquipmentManagerComponentInterface.h"
 #include "HealthComponentInterface.h"
+#include "ContextEffectInterface.h"
 
 #include "BECharacter.generated.h"
 
 class UGAEAbilitySystemComponent;
 class UHealthComponent;
 class UEquipmentManagerComponent;
+class UContextEffectComponent;
 
 
 /** 
@@ -25,6 +27,7 @@ class PROJECTBE_API ABECharacter
 	, public ITeamMemberComponentInterface
 	, public IEquipmentManagerComponentInterface
 	, public IHealthComponentInterface
+	, public IContextEffectInterface
 {
 	GENERATED_BODY()
 public:
@@ -62,6 +65,10 @@ protected:
 	 *	- BEViewerComponent
 	 *	| [オーナー] Character
 	 *	| [　理由　] 個々のキャラクターの視点を表現するため。
+	 * 
+	 *	- ContextEffectComponent
+	 *	| [オーナー] Character
+	 *	| [　理由　] 個々のキャラクターの出すエフェクトを表現するため。
 	 */
 
 	//
@@ -82,10 +89,28 @@ protected:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Components")
 	TObjectPtr<UEquipmentManagerComponent> EquipmentManagerComponent;
 
+	//
+	// このキャラクターのエフェクトを管理するコンポーネント
+	//
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Components")
+	TObjectPtr<UContextEffectComponent> ContextEffectComponent;
+
 public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	virtual UTeamMemberComponent* GetTeamMemberComponent() const override;
 	virtual UEquipmentManagerComponent* GetEquipmentManagerComponent() const override;
 	virtual UHealthComponent* GetHealthComponent() const override;
 
+	void PlayEffects_Implementation(
+		FGameplayTag EffectTag
+		, FGameplayTagContainer Contexts
+		, USceneComponent* AttachToComponent	= nullptr
+		, FName AttachPointName					= NAME_None
+		, FVector LocationOffset				= FVector(0.0, 0.0, 0.0)
+		, FRotator RotationOffset				= FRotator(0.0, 0.0, 0.0)
+		, EAttachLocation::Type LocationType	= EAttachLocation::KeepRelativeOffset
+		, float VolumeMultiplier				= 1.0f
+		, float PitchMultiplier					= 1.0f
+		, FVector VFXScale						= FVector(1.0, 1.0, 1.0)
+	) override;
 };

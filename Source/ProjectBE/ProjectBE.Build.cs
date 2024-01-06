@@ -45,7 +45,7 @@ public class ProjectBE : ModuleRules
                 // Game XXX Extension
                 "GCExt", "GAExt", "GEExt",
                 "GIExt", "GTExt", "GUIExt",
-                "GVExt",
+                "GVExt", "GFXExt",
 
                 // Game XXX: YYY Addon
                 "GAHAddon",
@@ -54,10 +54,11 @@ public class ProjectBE : ModuleRules
 
                 // Game XXX: YYY Integration
                 "GCAIntg", "GCEIntg", "GCHIntg", 
-                "GCIIntg", "GCVIntg",
+                "GCIIntg", "GCVIntg", "GCFXIntg",
                 "GASIntg", "GAUIIntg",
                 "GIAIntg", "GLAIntg",
                 "GSIIntg",
+                "GHFXIntg",
             }
         );
 
