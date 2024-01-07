@@ -64,9 +64,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Config|RootMotion")
 	float RootMotionDuration{ 0.25f };
 
-	UPROPERTY(EditDefaultsOnly, Category = "Config|Ability")
-	float AbilityCooltime{ 0.3f };
-
 	//
 	// 実行する GameplayCue のタグ。
 	// 
@@ -109,30 +106,9 @@ protected:
 	void ProcessPlayMontage(UAnimMontage* Montage);
 
 	/**
-	 * このイベントを使用してクールダウン処理実装する。
-	 */
-	UFUNCTION(BlueprintImplementableEvent, Category = "Dash")
-	void ProcessSendMessage(AActor* Instigator, float Duration);
-
-	/**
 	 * このイベントを使用して RootMotion による移動処理を実装する。
 	 */
 	UFUNCTION(BlueprintImplementableEvent, Category = "Dash")
 	void ProcessRootMotion(FVector Direction, float Strength, float Duration);
-
-	/**
-	 * RootMotion による移動処理が終了したらこの関数を実行する。
-	 * 
-	 * Tips:
-	 *	アビリティコストの消費及びクールダウン処理の開始を行う。
-	 */
-	UFUNCTION(BlueprintCallable, Category = "Dash")
-	void HandleRootMotionFinish();
-
-	/**
-	 * このイベントを使用してクールダウン処理実装する。
-	 */
-	UFUNCTION(BlueprintImplementableEvent, Category = "Dash")
-	void ProcessCooldown(float Cooltime);
 
 };

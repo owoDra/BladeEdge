@@ -42,16 +42,12 @@ void UBEGameplayAbility_Dodge::ActivateAbility(const FGameplayAbilitySpecHandle 
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
-	if (ActorInfo->IsLocallyControlled())
+	if (ActorInfo->IsLocallyControlled() || ActorInfo->IsNetAuthority())
 	{
-		ProcessSendMessage(ActorInfo->OwnerActor.Get(), RootMotionDuration + AbilityCooltime);
+		StartDash();
+	}
 
-		StartDash();
-	}
-	else if (ActorInfo->IsNetAuthority())
-	{
-		StartDash();
-	}
+	CommitAbility(Handle, ActorInfo, ActivationInfo);
 }
 
 
@@ -134,11 +130,4 @@ void UBEGameplayAbility_Dodge::ProcessExecuteGameplayCue(FVector InDirection)
 
 		K2_ExecuteGameplayCueWithParams(GameplayCueTag, Param);
 	}
-}
-
-void UBEGameplayAbility_Dodge::HandleRootMotionFinish()
-{
-	K2_CommitAbility();
-
-	ProcessCooldown(AbilityCooltime);
 }
