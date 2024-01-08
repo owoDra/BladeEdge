@@ -15,7 +15,6 @@ class UGAEAbilitySystemComponent;
 class UHealthComponent;
 class UEquipmentManagerComponent;
 class UContextEffectComponent;
-class ULoadingProcessTask;
 
 
 /** 
@@ -98,16 +97,29 @@ protected:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Components")
 	TObjectPtr<UContextEffectComponent> ContextEffectComponent;
 
-	UPROPERTY(Transient)
-	TObjectPtr<ULoadingProcessTask> LoadingProcessTask{ nullptr };
 
-public:
-	virtual void BeginPlay() override;
-
+	//////////////////////////////////////////////////////////////////////////
+	// Death
+#pragma region Death
 protected:
-	void HandleGameReady();
+	UFUNCTION()
+	virtual void HandleDeathStart();
+
+	UFUNCTION()
+	virtual void HandleDeathFinish();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Death")
+	void OnDeathStarted();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Death")
+	void OnDeathFinished();
+
+#pragma endregion
 
 
+	//////////////////////////////////////////////////////////////////////////
+	// Interface
+#pragma region Interface
 public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	virtual UTeamMemberComponent* GetTeamMemberComponent() const override;
@@ -126,4 +138,7 @@ public:
 		, float PitchMultiplier					= 1.0f
 		, FVector VFXScale						= FVector(1.0, 1.0, 1.0)
 	) override;
+
+#pragma endregion
+
 };

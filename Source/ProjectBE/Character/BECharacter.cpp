@@ -15,9 +15,6 @@
 // Game Ability Extension
 #include "GAEAbilitySystemComponent.h"
 
-// Game UI Extension
-#include "LoadingScreen/LoadingProcessTask.h"
-
 // Game Ability: Health Addon
 #include "HealthComponent.h"
 
@@ -40,25 +37,36 @@ ABECharacter::ABECharacter(const FObjectInitializer& ObjectInitializer)
 	EquipmentManagerComponent = ObjectInitializer.CreateDefaultSubobject<UEquipmentManagerComponent>(this, TEXT("EquipmentManager"));
 	ContextEffectComponent = ObjectInitializer.CreateDefaultSubobject<UContextEffectComponent>(this, TEXT("ContextEffect"));
 
-	CharacterDataComponent->OnGameReady_Register(FSimpleMulticastDelegate::FDelegate::CreateUObject(this, &ThisClass::HandleGameReady));
+	FScriptDelegate NewDeathStartedDelegate;
+	NewDeathStartedDelegate.BindUFunction(this, GET_FUNCTION_NAME_STRING_CHECKED(ABECharacter, HandleDeathStart));
+	HealthComponent->OnDeathStarted.Add(NewDeathStartedDelegate);
+
+	FScriptDelegate NewDeathFinishedDelegate;
+	NewDeathFinishedDelegate.BindUFunction(this, GET_FUNCTION_NAME_STRING_CHECKED(ABECharacter, HandleDeathFinish));
+	HealthComponent->OnDeathFinished.Add(NewDeathFinishedDelegate);
 }
 
 
-void ABECharacter::BeginPlay()
+#pragma region Death
+
+void ABECharacter::HandleDeathStart()
 {
-	LoadingProcessTask = ULoadingProcessTask::CreateLoadingScreenProcessTask(this, ABECharacter::CharacterLoadingReason);
+	DisableMovementAndCollision();
 
-	Super::BeginPlay();
+	OnDeathStarted();
 }
 
-void ABECharacter::HandleGameReady()
+void ABECharacter::HandleDeathFinish()
 {
-	if (LoadingProcessTask)
-	{
-		LoadingProcessTask->Unregister();
-	}
+	UninitAndDestroy();
+
+	OnDeathFinished();
 }
 
+#pragma region
+
+
+#pragma region Interface
 
 UAbilitySystemComponent* ABECharacter::GetAbilitySystemComponent() const
 {
@@ -108,3 +116,5 @@ void ABECharacter::PlayEffects_Implementation(
 		, VFXScale
 	);
 }
+
+#pragma endregion
