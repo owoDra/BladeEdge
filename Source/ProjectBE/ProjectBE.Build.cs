@@ -21,7 +21,7 @@ public class ProjectBE : ModuleRules
             {
                 "Core", "CoreUObject", "Engine",
 
-                "Slate", "SlateCore", "RenderCore",
+                "Slate", "SlateCore", "RenderCore", "UMG",
 
                 "AIModule", "ApplicationCore", "PhysicsCore",
 
@@ -49,7 +49,7 @@ public class ProjectBE : ModuleRules
 
                 // Game XXX: YYY Addon
                 "GAHAddon",
-                "GAEAddon", "GEMAddon",
+                "GAEAddon", "GEMAddon", "GESAddon",
                 "GCLAddon", "GLHAddon",
 
                 // Game XXX: YYY Integration

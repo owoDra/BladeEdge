@@ -9,6 +9,7 @@
 #include "Engine/AssetManager.h"
 #include "Engine/AssetManagerTypes.h"
 #include "Components/MeshComponent.h"
+#include "Components/Image.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(BESystemStatics)
 
@@ -66,6 +67,51 @@ void UBESystemStatics::SetVectorParameterValueOnAllMeshComponents(AActor* Target
 void UBESystemStatics::SetColorParameterValueOnAllMeshComponents(AActor* TargetActor, const FName ParameterName, const FLinearColor ParameterValue, bool bIncludeChildActors)
 {
 	SetVectorParameterValueOnAllMeshComponents(TargetActor, ParameterName, FVector(ParameterValue), bIncludeChildActors);
+}
+
+
+void UBESystemStatics::SetScalarParameterValueOnImage(UImage* Image, const FName ParameterName, const float ParameterValue)
+{
+	if (auto* DynamicMaterial{ Image ? Image->GetDynamicMaterial() : nullptr })
+	{
+		DynamicMaterial->SetScalarParameterValue(ParameterName, ParameterValue);
+	}
+}
+
+void UBESystemStatics::SetScalarParameterValueOnImages(const TArray<UImage*>& Images, const FName ParameterName, const float ParameterValue)
+{
+	for (const auto& Image : Images)
+	{
+		if (auto* DynamicMaterial{ Image ? Image->GetDynamicMaterial() : nullptr })
+		{
+			DynamicMaterial->SetScalarParameterValue(ParameterName, ParameterValue);
+		}
+	}
+}
+
+void UBESystemStatics::SetScalarParametersValueOnImage(UImage* Image, const TMap<FName, float>& Parameters)
+{
+	if (auto* DynamicMaterial{ Image ? Image->GetDynamicMaterial() : nullptr })
+	{
+		for (const auto& KVP : Parameters)
+		{
+			DynamicMaterial->SetScalarParameterValue(KVP.Key, KVP.Value);
+		}
+	}
+}
+
+void UBESystemStatics::SetScalarParametersValueOnImages(const TArray<UImage*>& Images, const TMap<FName, float>& Parameters)
+{
+	for (const auto& Image : Images)
+	{
+		if (auto* DynamicMaterial{ Image ? Image->GetDynamicMaterial() : nullptr })
+		{
+			for (const auto& KVP : Parameters)
+			{
+				DynamicMaterial->SetScalarParameterValue(KVP.Key, KVP.Value);
+			}
+		}
+	}
 }
 
 

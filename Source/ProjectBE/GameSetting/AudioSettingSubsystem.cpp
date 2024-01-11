@@ -3,7 +3,8 @@
 #include "AudioSettingSubsystem.h"
 
 #include "Audio/BEAudioMixSubsystem.h"
-#include "GameplayTag/BETags_Platform.h"
+
+#include "Platform/PlatformTags.h"
 
 #include "GameplayTag/GACTags_Audio.h"
 
