@@ -4,6 +4,7 @@
 
 #include "Actor/GFCPlayerState.h"
 #include "AbilitySystemInterface.h"
+#include "GameplayTag/GameplayTagStackInterface.h"
 
 #include "BEPlayerState.generated.h"
 
@@ -18,10 +19,13 @@ UCLASS(Blueprintable)
 class PROJECTBE_API ABEPlayerState 
 	: public AGFCPlayerState
 	, public IAbilitySystemInterface
+	, public IGameplayTagStackInterface
 {
 	GENERATED_BODY()
 public:
 	ABEPlayerState(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 protected:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Components")
@@ -30,7 +34,14 @@ protected:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Components")
 	TObjectPtr<UGAEAbilitySystemComponent> AbilitySystemComponent;
 
-public:
+protected:
+	UPROPERTY(Replicated)
+	FGameplayTagStackContainer StatTags;
+
+protected:
+	virtual FGameplayTagStackContainer* GetStatTags() override { return &StatTags; }
+	virtual const FGameplayTagStackContainer* GetStatTagsConst() const override { return &StatTags; }
+
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
 };

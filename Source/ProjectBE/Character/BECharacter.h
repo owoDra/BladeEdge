@@ -8,6 +8,8 @@
 #include "EquipmentManagerComponentInterface.h"
 #include "HealthComponentInterface.h"
 #include "ContextEffectInterface.h"
+#include "GameplayTag/GameplayTagStackInterface.h"
+
 
 #include "BECharacter.generated.h"
 
@@ -28,10 +30,13 @@ class PROJECTBE_API ABECharacter
 	, public IEquipmentManagerComponentInterface
 	, public IHealthComponentInterface
 	, public IContextEffectInterface
+	, public IGameplayTagStackInterface
 {
 	GENERATED_BODY()
 public:
 	explicit ABECharacter(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	static const FString CharacterLoadingReason;
 
@@ -97,6 +102,10 @@ protected:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Components")
 	TObjectPtr<UContextEffectComponent> ContextEffectComponent;
 
+protected:
+	UPROPERTY(Replicated)
+	FGameplayTagStackContainer StatTags;
+
 
 	//////////////////////////////////////////////////////////////////////////
 	// Death
@@ -120,7 +129,10 @@ protected:
 	//////////////////////////////////////////////////////////////////////////
 	// Interface
 #pragma region Interface
-public:
+protected:
+	virtual FGameplayTagStackContainer* GetStatTags() override { return &StatTags; }
+	virtual const FGameplayTagStackContainer* GetStatTagsConst() const override { return &StatTags; }
+
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	virtual UTeamMemberComponent* GetTeamMemberComponent() const override;
 	virtual UEquipmentManagerComponent* GetEquipmentManagerComponent() const override;

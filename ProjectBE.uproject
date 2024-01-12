@@ -21,6 +21,10 @@
 		{
 			"Name": "BEGFTest",
 			"Enabled": true
+		},
+		{
+			"Name": "BEGFEquipment",
+			"Enabled": true
 		}
 	],
 	"TargetPlatforms": [

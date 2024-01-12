@@ -22,6 +22,7 @@
 #include "EquipmentManagerComponent.h"
 
 // Engine Features
+#include "Net/UnrealNetwork.h"
 #include "GameFramework/PlayerState.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(BECharacter)
@@ -31,6 +32,7 @@ const FString ABECharacter::CharacterLoadingReason("Loading Character Data");
 
 ABECharacter::ABECharacter(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
+	, StatTags(this)
 {
 	AbilitySystemComponent = ObjectInitializer.CreateDefaultSubobject<UGAEAbilitySystemComponent>(this, TEXT("AbilitySystem"));
 	HealthComponent = ObjectInitializer.CreateDefaultSubobject<UHealthComponent>(this, TEXT("Health"));
@@ -44,6 +46,13 @@ ABECharacter::ABECharacter(const FObjectInitializer& ObjectInitializer)
 	FScriptDelegate NewDeathFinishedDelegate;
 	NewDeathFinishedDelegate.BindUFunction(this, GET_FUNCTION_NAME_STRING_CHECKED(ABECharacter, HandleDeathFinish));
 	HealthComponent->OnDeathFinished.Add(NewDeathFinishedDelegate);
+}
+
+void ABECharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ThisClass, StatTags);
 }
 
 
