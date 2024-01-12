@@ -1,0 +1,8 @@
+{
+	"RemapUnityFiles": 
+	{
+		"Module.BEGFEquipmentRuntime.cpp.obj": [
+			"BEGFEquipmentRuntimeModule.cpp.obj"
+		]
+	}
+}

@@ -1,0 +1,15 @@
+{
+    "Version": "1.2",
+    "Data": {
+        "Source": "e:\\20_creator\\20_projects\\unreal\\projectbe\\plugins\\gamefeatures\\begfequipment\\intermediate\\build\\win64\\x64\\unrealeditor\\development\\begfequipmentruntime\\module.begfequipmentruntime.cpp",
+        "ProvidedModule": "",
+        "PCH": "e:\\20_creator\\20_projects\\unreal\\projectbe\\intermediate\\build\\win64\\x64\\projectbeeditor\\development\\engine\\sharedpch.engine.cpp20.h.pch",
+        "Includes": [
+            "e:\\20_creator\\20_projects\\unreal\\projectbe\\plugins\\gamefeatures\\begfequipment\\intermediate\\build\\win64\\x64\\unrealeditor\\development\\begfequipmentruntime\\definitions.begfequipmentruntime.h",
+            "e:\\20_creator\\20_projects\\unreal\\projectbe\\plugins\\gamefeatures\\begfequipment\\source\\begfequipmentruntime\\private\\begfequipmentruntimemodule.cpp",
+            "e:\\20_creator\\20_projects\\unreal\\projectbe\\plugins\\gamefeatures\\begfequipment\\source\\begfequipmentruntime\\public\\begfequipmentruntimemodule.h"
+        ],
+        "ImportedModules": [],
+        "ImportedHeaderUnits": []
+    }
+}
