@@ -17,6 +17,9 @@ UBEGameplayAbility_Dodge::UBEGameplayAbility_Dodge(const FObjectInitializer& Obj
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::LocalPredicted;
 
+	CooltimeOverride = 0.6f;
+	bUseCooldown = true;
+
 	AbilityTags.AddTag(TAG_Ability_Type_Action);
 }
 
