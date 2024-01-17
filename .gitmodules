@@ -4,9 +4,6 @@
 [submodule "Plugins/Addon/GameAbilityHealthAddon"]
 	path = Plugins/Addon/GameAbilityHealthAddon
 	url = https://github.com/owoDra/GameAbilityHealthAddon.git
-[submodule "Plugins/Addon/GameCharacterLocomotionAddon"]
-	path = Plugins/Addon/GameCharacterLocomotionAddon
-	url = https://github.com/owoDra/GameCharacterLocomotionAddon.git
 [submodule "Plugins/Addon/GameEquipmentMeleeAddon"]
 	path = Plugins/Addon/GameEquipmentMeleeAddon
 	url = https://github.com/owoDra/GameEquipmentMeleeAddon.git
@@ -53,6 +50,9 @@
 [submodule "Plugins/Extension/GameViewExtension"]
 	path = Plugins/Extension/GameViewExtension
 	url = https://github.com/owoDra/GameViewExtension.git
+[submodule "Plugins/Extension/GameLocomotionExtension"]
+	path = Plugins/Extension/GameLocomotionExtension
+	url = https://github.com/owoDra/GameLocomotionExtension.git
 
 
 [submodule "Plugins/Integration/GameAbilitySettingIntegration"]
@@ -79,6 +79,9 @@
 [submodule "Plugins/Integration/GameCharacterViewIntegration"]
 	path = Plugins/Integration/GameCharacterViewIntegration
 	url = https://github.com/owoDra/GameCharacterViewIntegration.git
+[submodule "Plugins/Integration/GameCharacterLocomotionIntegration"]
+	path = Plugins/Integration/GameCharacterLocomotionIntegration
+	url = https://github.com/owoDra/GameCharacterLocomotionIntegration.git
 [submodule "Plugins/Integration/GameInputAbilityIntegration"]
 	path = Plugins/Integration/GameInputAbilityIntegration
 	url = https://github.com/owoDra/GameInputAbilityIntegration.git

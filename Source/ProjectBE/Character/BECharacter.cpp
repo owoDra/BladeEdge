@@ -10,7 +10,7 @@
 #include "TeamMemberComponent.h"
 
 // Game Character Extension
-#include "CharacterDataComponent.h"
+#include "CharacterInitStateComponent.h"
 
 // Game Ability Extension
 #include "GAEAbilitySystemComponent.h"
@@ -34,6 +34,7 @@ ABECharacter::ABECharacter(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 	, StatTags(this)
 {
+	CharacterInitStateComponent = ObjectInitializer.CreateDefaultSubobject<UCharacterInitStateComponent>(this, TEXT("InitState"));
 	AbilitySystemComponent = ObjectInitializer.CreateDefaultSubobject<UGAEAbilitySystemComponent>(this, TEXT("AbilitySystem"));
 	HealthComponent = ObjectInitializer.CreateDefaultSubobject<UHealthComponent>(this, TEXT("Health"));
 	EquipmentManagerComponent = ObjectInitializer.CreateDefaultSubobject<UEquipmentManagerComponent>(this, TEXT("EquipmentManager"));

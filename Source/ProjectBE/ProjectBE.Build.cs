@@ -50,7 +50,7 @@ public class ProjectBE : ModuleRules
                 // Game XXX: YYY Addon
                 "GAHAddon",
                 "GAEAddon", "GEMAddon", "GESAddon",
-                "GCLAddon", "GLHAddon",
+                "GLExt", "GLHAddon",
 
                 // Game XXX: YYY Integration
                 "GCAIntg", "GCEIntg", "GCHIntg", 

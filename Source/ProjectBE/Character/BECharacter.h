@@ -13,6 +13,7 @@
 
 #include "BECharacter.generated.h"
 
+class UCharacterInitStateComponent;
 class UGAEAbilitySystemComponent;
 class UHealthComponent;
 class UEquipmentManagerComponent;
@@ -77,6 +78,12 @@ protected:
 	 *	| [オーナー] Character
 	 *	| [　理由　] 個々のキャラクターの出すエフェクトを表現するため。
 	 */
+
+	//
+	// このキャラクターの初期化を管理するコンポーネント
+	//
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Components")
+	TObjectPtr<UCharacterInitStateComponent> CharacterInitStateComponent;
 
 	//
 	// このキャラクターの能力を管理するコンポーネント
