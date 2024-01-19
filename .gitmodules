@@ -1,96 +1,126 @@
-[submodule "Plugins/Addon/GameAbilityEquipmentAddon"]
-	path = Plugins/Addon/GameAbilityEquipmentAddon
-	url = https://github.com/owoDra/GameAbilityEquipmentAddon.git
+##################################################
+# Game XXX: YYY Addon
+
 [submodule "Plugins/Addon/GameAbilityHealthAddon"]
 	path = Plugins/Addon/GameAbilityHealthAddon
 	url = https://github.com/owoDra/GameAbilityHealthAddon.git
-[submodule "Plugins/Addon/GameEquipmentMeleeAddon"]
-	path = Plugins/Addon/GameEquipmentMeleeAddon
-	url = https://github.com/owoDra/GameEquipmentMeleeAddon.git
-[submodule "Plugins/Addon/GameEquipmentSkillAddon"]
-	path = Plugins/Addon/GameEquipmentSkillAddon
-	url = https://github.com/owoDra/GameEquipmentSkillAddon.git
+
+[submodule "Plugins/Addon/GameAbilityMeleeAddon"]
+	path = Plugins/Addon/GameAbilityMeleeAddon
+	url = https://github.com/owoDra/GameAbilityMeleeAddon.git
+
 [submodule "Plugins/Addon/GameLocomotionHumanAddon"]
 	path = Plugins/Addon/GameLocomotionHumanAddon
 	url = https://github.com/owoDra/GameLocomotionHumanAddon.git
 
 
+##################################################
+# Game XXX Core
+
 [submodule "Plugins/Core/GameFrameworkCore"]
 	path = Plugins/Core/GameFrameworkCore
 	url = https://github.com/owoDra/GameFrameworkCore.git
+
 [submodule "Plugins/Core/GameSettingCore"]
 	path = Plugins/Core/GameSettingCore
 	url = https://github.com/owoDra/GameSettingCore.git
+
 [submodule "Plugins/Core/GameAudioCore"]
 	path = Plugins/Core/GameAudioCore
 	url = https://github.com/owoDra/GameAudioCore.git
 
+[submodule "Plugins/Core/GameItemCore"]
+	path = Plugins/Core/GameItemCore
+	url = https://github.com/owoDra/GameItemCore.git
+
+
+##################################################
+# Game XXX Extension
 
 [submodule "Plugins/Extension/GameAbilityExtension"]
 	path = Plugins/Extension/GameAbilityExtension
 	url = https://github.com/owoDra/GameAbilityExtension.git
+
 [submodule "Plugins/Extension/GameCharacterExtension"]
 	path = Plugins/Extension/GameCharacterExtension
 	url = https://github.com/owoDra/GameCharacterExtension.git
+
 [submodule "Plugins/Extension/GameEffectExtension"]
 	path = Plugins/Extension/GameEffectExtension
-	url = https://github.com/owoDra/GameEffectExtension
+	url = https://github.com/owoDra/GameEffectExtension.git
+
 [submodule "Plugins/Extension/GameExperienceExtension"]
 	path = Plugins/Extension/GameExperienceExtension
 	url = https://github.com/owoDra/GameExperienceExtension.git
+
+[submodule "Plugins/Extension/GameEquipmentExtension"]
+	path = Plugins/Extension/GameEquipmentExtension
+	url = https://github.com/owoDra/GameEquipmentExtension.git
+
 [submodule "Plugins/Extension/GameInputExtension"]
 	path = Plugins/Extension/GameInputExtension
 	url = https://github.com/owoDra/GameInputExtension.git
+
 [submodule "Plugins/Extension/GameTeamExtension"]
 	path = Plugins/Extension/GameTeamExtension
 	url = https://github.com/owoDra/GameTeamExtension.git
+
 [submodule "Plugins/Extension/GameUIExtension"]
 	path = Plugins/Extension/GameUIExtension
 	url = https://github.com/owoDra/GameUIExtension.git
+	
 [submodule "Plugins/Extension/GameViewExtension"]
 	path = Plugins/Extension/GameViewExtension
 	url = https://github.com/owoDra/GameViewExtension.git
+
 [submodule "Plugins/Extension/GameLocomotionExtension"]
 	path = Plugins/Extension/GameLocomotionExtension
 	url = https://github.com/owoDra/GameLocomotionExtension.git
 
 
-[submodule "Plugins/Integration/GameAbilitySettingIntegration"]
-	path = Plugins/Integration/GameAbilitySettingIntegration
-	url = https://github.com/owoDra/GameAbilitySettingIntegration.git
+##################################################
+# Game XXX: YYY Integration
+
 [submodule "Plugins/Integration/GameAbilityUIIntegration"]
 	path = Plugins/Integration/GameAbilityUIIntegration
 	url = https://github.com/owoDra/GameAbilityUIIntegration.git
+
 [submodule "Plugins/Integration/GameCharacterAbilityIntegration"]
 	path = Plugins/Integration/GameCharacterAbilityIntegration
 	url = https://github.com/owoDra/GameCharacterAbilityIntegration.git
+
 [submodule "Plugins/Integration/GameCharacterEquipmentIntegration"]
 	path = Plugins/Integration/GameCharacterEquipmentIntegration
 	url = https://github.com/owoDra/GameCharacterEquipmentIntegration.git
+
 [submodule "Plugins/Integration/GameCharacterEffectIntegration"]
 	path = Plugins/Integration/GameCharacterEffectIntegration
 	url = https://github.com/owoDra/GameCharacterEffectIntegration.git
+
 [submodule "Plugins/Integration/GameCharacterHealthIntegration"]
 	path = Plugins/Integration/GameCharacterHealthIntegration
 	url = https://github.com/owoDra/GameCharacterHealthIntegration.git
-[submodule "Plugins/Integration/GameCharacterInputIntegration"]
-	path = Plugins/Integration/GameCharacterInputIntegration
-	url = https://github.com/owoDra/GameCharacterInputIntegration.git
+
 [submodule "Plugins/Integration/GameCharacterViewIntegration"]
 	path = Plugins/Integration/GameCharacterViewIntegration
 	url = https://github.com/owoDra/GameCharacterViewIntegration.git
+
 [submodule "Plugins/Integration/GameCharacterLocomotionIntegration"]
 	path = Plugins/Integration/GameCharacterLocomotionIntegration
 	url = https://github.com/owoDra/GameCharacterLocomotionIntegration.git
+
 [submodule "Plugins/Integration/GameInputAbilityIntegration"]
 	path = Plugins/Integration/GameInputAbilityIntegration
 	url = https://github.com/owoDra/GameInputAbilityIntegration.git
+
 [submodule "Plugins/Integration/GameLocomotionAbilityIntegration"]
 	path = Plugins/Integration/GameLocomotionAbilityIntegration
 	url = https://github.com/owoDra/GameLocomotionAbilityIntegration.git
-[submodule "Plugins/Integration/GameSettingInputIntegration"]
-	path = Plugins/Integration/GameSettingInputIntegration
-	url = https://github.com/owoDra/GameSettingInputIntegration.git
+
 [submodule "Plugins/Integration/GameHumanEffectIntegration"]
 	path = Plugins/Integration/GameHumanEffectIntegration
 	url = https://github.com/owoDra/GameHumanEffectIntegration.git
+	
+[submodule "Plugins/Integration/GameEquipmentAbilityIntegration"]
+	path = Plugins/Integration/GameEquipmentAbilityIntegration
+	url = https://github.com/owoDra/GameEquipmentAbilityIntegration.git
