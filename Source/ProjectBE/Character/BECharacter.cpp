@@ -18,7 +18,7 @@
 // Game Ability: Health Addon
 #include "HealthComponent.h"
 
-// Game Ability: Equipment Addon
+// Game Equipment Extension
 #include "EquipmentManagerComponent.h"
 
 // Engine Features

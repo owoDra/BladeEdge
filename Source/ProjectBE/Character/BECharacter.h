@@ -23,7 +23,7 @@ class UContextEffectComponent;
 /** 
  * このプロジェクトにおける Character のベースクラス
  */
-UCLASS(Blueprintable)
+UCLASS(Abstract, Blueprintable)
 class PROJECTBE_API ABECharacter 
 	: public AAbilityLocomotionCharacter
 	, public IAbilitySystemInterface
@@ -82,31 +82,31 @@ protected:
 	//
 	// このキャラクターの初期化を管理するコンポーネント
 	//
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Components")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Components")
 	TObjectPtr<UCharacterInitStateComponent> CharacterInitStateComponent;
 
 	//
 	// このキャラクターの能力を管理するコンポーネント
 	//
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Components")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Components")
 	TObjectPtr<UGAEAbilitySystemComponent> AbilitySystemComponent;
 
 	//
 	// このキャラクターのヘルスを管理するコンポーネント
 	//
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Components")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Components")
 	TObjectPtr<UHealthComponent> HealthComponent;
 
 	//
 	// このキャラクターの装備を管理するコンポーネント
 	//
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Components")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Components")
 	TObjectPtr<UEquipmentManagerComponent> EquipmentManagerComponent;
 
 	//
 	// このキャラクターのエフェクトを管理するコンポーネント
 	//
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Components")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Components")
 	TObjectPtr<UContextEffectComponent> ContextEffectComponent;
 
 protected:

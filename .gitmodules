@@ -124,3 +124,7 @@
 [submodule "Plugins/Integration/GameEquipmentAbilityIntegration"]
 	path = Plugins/Integration/GameEquipmentAbilityIntegration
 	url = https://github.com/owoDra/GameEquipmentAbilityIntegration.git
+
+[submodule "Plugins/Integration/GameUIEquipmentIntegration"]
+	path = Plugins/Integration/GameUIEquipmentIntegration
+	url = https://github.com/owoDra/GameUIEquipmentIntegration.git
