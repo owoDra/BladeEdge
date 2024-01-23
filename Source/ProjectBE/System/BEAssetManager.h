@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "System/GFCAssetManager.h"
+#include "AssetManager/GFCAssetManager.h"
 
 #include "BEAssetManager.generated.h"
 

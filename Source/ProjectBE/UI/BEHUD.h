@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "Actor/GFCHUD.h"
+#include "UI/GFCHUD.h"
 
 #include "BEHUD.generated.h"
 

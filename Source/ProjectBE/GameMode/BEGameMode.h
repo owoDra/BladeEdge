@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "Actor/GFCGameMode.h"
+#include "GameMode/GFCGameMode.h"
 
 #include "BEGameMode.generated.h"
 

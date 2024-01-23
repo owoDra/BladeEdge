@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "Actor/GFCPlayerState.h"
+#include "Player/GFCPlayerState.h"
 #include "AbilitySystemInterface.h"
 #include "GameplayTag/GameplayTagStackInterface.h"
 

@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "Actor/GFCLocalPlayer.h"
+#include "Player/GFCLocalPlayer.h"
 
 #include "BELocalPlayer.generated.h"
 

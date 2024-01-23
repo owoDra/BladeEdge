@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "Actor/GFCAIController.h"
+#include "AI/GFCAIController.h"
 
 #include "BEAIController.generated.h"
 

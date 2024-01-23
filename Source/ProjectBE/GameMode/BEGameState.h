@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "Actor/GFCGameState.h"
+#include "GameMode/GFCGameState.h"
 #include "AbilitySystemInterface.h"
 
 #include "BEGameState.generated.h"
