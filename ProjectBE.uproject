@@ -25,6 +25,11 @@
 		{
 			"Name": "BEGFEquipment",
 			"Enabled": true
+		},
+		{
+			"Name": "IconHandler",
+			"Enabled": true,
+			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/product/8ab50c0d12f0427b847a443f8dfd7f94"
 		}
 	],
 	"TargetPlatforms": [

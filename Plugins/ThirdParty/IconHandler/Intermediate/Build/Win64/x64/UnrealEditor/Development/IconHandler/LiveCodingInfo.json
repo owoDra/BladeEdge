@@ -1,0 +1,11 @@
+{
+	"RemapUnityFiles": 
+	{
+		"Module.IconHandler.cpp.obj": [
+			"IconHandler.init.gen.cpp.obj",
+			"IconHandlerSettings.gen.cpp.obj",
+			"IconHandler.cpp.obj",
+			"IconHandlerSettings.cpp.obj"
+		]
+	}
+}
