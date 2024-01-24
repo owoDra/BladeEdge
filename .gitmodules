@@ -77,6 +77,10 @@
 	path = Plugins/Extension/GameLocomotionExtension
 	url = https://github.com/owoDra/GameLocomotionExtension.git
 
+[submodule "Plugins/Extension/GamePhaseExtension"]
+	path = Plugins/Extension/GamePhaseExtension
+	url = https://github.com/owoDra/GamePhaseExtension.git
+
 
 ##################################################
 # Game XXX: YYY Integration
