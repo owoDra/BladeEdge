@@ -33,6 +33,10 @@
 	path = Plugins/Core/GameItemCore
 	url = https://github.com/owoDra/GameItemCore.git
 
+[submodule "Plugins/Core/GameSaveCore"]
+	path = Plugins/Core/GameSaveCore
+	url = https://github.com/owoDra/GameSaveCore.git
+
 
 ##################################################
 # Game XXX Extension
