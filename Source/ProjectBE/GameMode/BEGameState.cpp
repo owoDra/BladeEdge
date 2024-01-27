@@ -4,11 +4,12 @@
 
 #include "ProjectBELogs.h"
 
+// Game Loading Core
+#include "LoadingScreenSubsystem.h"
+#include "GameplayTag/GCLoadingTags_LoadingType.h"
+
 // Game Experience Extension
 #include "ExperienceDataComponent.h"
-
-// Game UI Extension
-#include "LoadingScreen/LoadingProcessTask.h"
 
 // Game Ability Extension
 #include "GAEAbilitySystemComponent.h"
@@ -16,7 +17,7 @@
 #include UE_INLINE_GENERATED_CPP_BY_NAME(BEGameState)
 
 
-const FString ABEGameState::GameStateLoadingReason("Loading Game Experience");
+const FName ABEGameState::NAME_GameStateLoading("LoadingGameState");
 
 ABEGameState::ABEGameState(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -25,21 +26,26 @@ ABEGameState::ABEGameState(const FObjectInitializer& ObjectInitializer)
 	AbilitySystemComponent = ObjectInitializer.CreateDefaultSubobject<UGAEAbilitySystemComponent>(this, TEXT("AbilitySystem"));
 
 	ExperienceDataComponent->OnGameReady_Register(FSimpleMulticastDelegate::FDelegate::CreateUObject(this, &ThisClass::HandleGameReady));
+
+	GameStateLoadingReason = FText(NSLOCTEXT("LoadingScreen", "GameStateLoadingReason", "Loading Game State"));
 }
 
 
 void ABEGameState::BeginPlay()
 {
-	LoadingProcessTask = ULoadingProcessTask::CreateLoadingScreenProcessTask(this, ABEGameState::GameStateLoadingReason);
+	if (auto* Subsystem{ UGameInstance::GetSubsystem<ULoadingScreenSubsystem>(GetGameInstance()) })
+	{
+		Subsystem->AddLoadingProcess(ABEGameState::NAME_GameStateLoading, TAG_LoadingType_Fullscreen, GameStateLoadingReason);
+	}
 
 	Super::BeginPlay();
 }
 
 void ABEGameState::HandleGameReady()
 {
-	if (LoadingProcessTask)
+	if (auto* Subsystem{ UGameInstance::GetSubsystem<ULoadingScreenSubsystem>(GetGameInstance()) })
 	{
-		LoadingProcessTask->Unregister();
+		Subsystem->RemoveLoadingProcess(ABEGameState::NAME_GameStateLoading);
 	}
 }
 

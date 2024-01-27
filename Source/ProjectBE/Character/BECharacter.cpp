@@ -28,8 +28,6 @@
 #include UE_INLINE_GENERATED_CPP_BY_NAME(BECharacter)
 
 
-const FString ABECharacter::CharacterLoadingReason("Loading Character Data");
-
 ABECharacter::ABECharacter(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 	, StatTags(this)

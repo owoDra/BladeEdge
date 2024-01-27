@@ -44,6 +44,8 @@ public class ProjectBE : ModuleRules
                 "GFCore",           // 基本アクター のため
                 "GCItem",           // アイテム実装 のため
                 "GSCore",           // ゲーム設定 のため
+                "GCSave",           // ロードアウト保存のため
+                "GCLoading",        // ロード画面作成のため
 
                 // Game XXX Extension
                 "GAExt",            // アビリティ実装 のため
@@ -61,6 +63,7 @@ public class ProjectBE : ModuleRules
                 "GAHAddon",         // ヘルス管理 のため
                 "GAAbilityMelee",   // 近接戦闘用アビリティ作成 のため
                 "GLHAddon",         // 人型キャラクターのアニメーション制御のため
+                "GAUIDialog",       // チュートリアルダイアログ用
                 
                 // Game XXX: YYY Integration
                 "GAUIIntg",         // アビリティ関係のUI作成 のため

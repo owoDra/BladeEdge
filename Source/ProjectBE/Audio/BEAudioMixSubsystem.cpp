@@ -12,7 +12,7 @@
 #include "GameplayTag/GACTags_Audio.h"
 
 // Game UI Extension
-#include "LoadingScreen/LoadingScreenManager.h"
+#include "LoadingScreenSubsystem.h"
 
 // Engine Features
 #include "AudioModulationStatics.h"
@@ -23,9 +23,9 @@
 
 void UBEAudioMixSubsystem::Deinitialize()
 {
-	if (auto* LoadingScreenManager{ UGameInstance::GetSubsystem<ULoadingScreenManager>(GetWorld()->GetGameInstance()) })
+	if (auto* LoadingScreenSubsystem{ UGameInstance::GetSubsystem<ULoadingScreenSubsystem>(GetWorld()->GetGameInstance()) })
 	{
-		LoadingScreenManager->LoadingScreenVisibilityChanged.RemoveAll(this);
+		LoadingScreenSubsystem->OnLoadingScreenVisibilityChanged.RemoveAll(this);
 		ApplyOrRemoveLoadingScreenMix(false);
 	}
 
@@ -36,10 +36,10 @@ void UBEAudioMixSubsystem::PostInitialize()
 {
 	Super::PostInitialize();
 
-	if (auto* LoadingScreenManager{ UGameInstance::GetSubsystem<ULoadingScreenManager>(GetWorld()->GetGameInstance()) })
+	if (auto* LoadingScreenSubsystem{ UGameInstance::GetSubsystem<ULoadingScreenSubsystem>(GetWorld()->GetGameInstance()) })
 	{
-		LoadingScreenManager->LoadingScreenVisibilityChanged.AddUObject(this, &ThisClass::OnLoadingScreenStatusChanged);
-		ApplyOrRemoveLoadingScreenMix(LoadingScreenManager->IsCurrentlyShowingLoadingScreen());
+		LoadingScreenSubsystem->OnLoadingScreenVisibilityChanged.AddUObject(this, &ThisClass::OnLoadingScreenStatusChanged);
+		ApplyOrRemoveLoadingScreenMix(LoadingScreenSubsystem->IsLoadingWidgetDisplayed());
 	}
 }
 

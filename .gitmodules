@@ -13,6 +13,10 @@
 	path = Plugins/Addon/GameLocomotionHumanAddon
 	url = https://github.com/owoDra/GameLocomotionHumanAddon.git
 
+[submodule "Plugins/Addon/GameUIDialogAddon"]
+	path = Plugins/Addon/GameUIDialogAddon
+	url = https://github.com/owoDra/GameUIDialogAddon.git
+
 
 ##################################################
 # Game XXX Core
@@ -36,6 +40,10 @@
 [submodule "Plugins/Core/GameSaveCore"]
 	path = Plugins/Core/GameSaveCore
 	url = https://github.com/owoDra/GameSaveCore.git
+
+[submodule "Plugins/Core/GameLoadingCore"]
+	path = Plugins/Core/GameLoadingCore
+	url = https://github.com/owoDra/GameLoadingCore.git
 
 
 ##################################################

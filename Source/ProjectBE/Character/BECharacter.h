@@ -39,8 +39,6 @@ public:
 
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-	static const FString CharacterLoadingReason;
-
 protected:
 	/**
 	 * このプロジェクトにおいて Character は以下のコンポーネントを使用するが、

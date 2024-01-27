@@ -24,7 +24,10 @@ class PROJECTBE_API ABEGameState
 public:
 	ABEGameState(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
-	static const FString GameStateLoadingReason;
+	static const FName NAME_GameStateLoading;
+
+	UPROPERTY()
+	FText GameStateLoadingReason;
 
 protected:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Components")
@@ -32,9 +35,6 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Components")
 	TObjectPtr<UGAEAbilitySystemComponent> AbilitySystemComponent;
-
-	UPROPERTY(Transient)
-	TObjectPtr<ULoadingProcessTask> LoadingProcessTask{ nullptr };
 
 public:
 	virtual void BeginPlay() override;
