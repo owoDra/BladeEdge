@@ -30,7 +30,7 @@ TSoftObjectPtr<UObject> UBESystemStatics::GetTypedSoftObjectReferenceFromPrimary
 			}
 			else
 			{
-				UE_LOG(LogBE, Warning, TEXT("GetTypedSoftObjectReferenceFromPrimaryAssetId(%s, %s) - AssetBaseClassLoaded was unset so we couldn't validate it, returning null"),
+				UE_LOG(LogBE_System, Warning, TEXT("GetTypedSoftObjectReferenceFromPrimaryAssetId(%s, %s) - AssetBaseClassLoaded was unset so we couldn't validate it, returning null"),
 					*PrimaryAssetId.ToString(),
 					*GetPathNameSafe(*ExpectedAssetType));
 			}
