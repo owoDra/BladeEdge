@@ -18,11 +18,13 @@
 			"Name": "IconHandler",
 			"Type": "Editor",
 			"LoadingPhase": "PostDefault",
-			"WhitelistPlatforms": [
+			"PlatformAllowList": [
 				"Win64",
 				"Mac",
 				"Linux"
 			]
 		}
-	]
+	],
+	"IsBetaVersion": false,
+	"IsExperimentalVersion": false
 }
