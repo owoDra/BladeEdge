@@ -2,24 +2,25 @@
 
 #pragma once
 
-#include "ItemData.h"
+#include "Item/BEEquipmentItemData.h"
 
-#include "ItemData_SubSkill.generated.h"
+#include "BEItemData_SubSkill.generated.h"
 
 
 /**
  * キャラクターが使用可能なサブスキルを表すデータ
  */
 UCLASS(meta = (DisplayName = "Sub Skill Data"))
-class PROJECTBE_API UItemData_SubSkill : public UItemData
+class PROJECTBE_API UBEItemData_SubSkill : public UBEEquipmentItemData
 {
 	GENERATED_BODY()
 public:
-	UItemData_SubSkill(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	UBEItemData_SubSkill(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	//
 	// このデータを表す PrimaryAssetType 名
 	//
 	inline static const FName NAME_SubSkillDataType{ TEXTVIEW("SubSkill") };
 
+	virtual FGameplayTag GetSlotTag() const override;
 };

@@ -3,15 +3,20 @@
 #include "BELoadoutSubsystem.h"
 
 #include "GameSave/BEPlayerLoadoutSave.h"
+#include "GameplayTag/BETags_LoadingType.h"
 #include "DeveloperSettings/BELoadoutDeveloperSettings.h"
-#include "System/BEAssetManager.h"
+#include "Item/BEEquipmentItemData.h"
 #include "ProjectBELogs.h"
+
+// Game Framework Core
+#include "AssetManager/GFCAssetManager.h"
 
 // Game Save Core
 #include "PlayerSaveSubsystem.h"
 
-// Game Item Core
-#include "ItemData.h"
+// Game Loading Core
+#include "LoadingScreenSubsystem.h"
+#include "GameplayTag/GCLoadingTags_LoadingType.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(BELoadoutSubsystem)
 
@@ -29,365 +34,236 @@ void UBELoadoutSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 
 void UBELoadoutSubsystem::InitializeLoadout(UPlayerSaveSubsystem* SaveSubsystem)
 {
-	const auto* LoadoutSave{ SaveSubsystem->GetSave<UBEPlayerLoadoutSave>() };
-	check(LoadoutSave);
+	// ロードアウトセーブを非同期ロード開始
 
-	SetFighterData(LoadoutSave->Fighter);
-	SetWeaponData(LoadoutSave->Weapon);
-	SetMainSkillData(LoadoutSave->MainSkill);
-	SetSubSkillData(LoadoutSave->SubSkill);
-	SetUltimateSkillData(LoadoutSave->UltimateSkill);
+	auto NewDelegate
+	{
+		FPlayerSaveEventDelegate::CreateUObject(this, &ThisClass::HandleLoadoutSaveLoaded)
+	};
+
+	SaveSubsystem->AsyncLoadPlayerSave(
+		UBEPlayerLoadoutSave::StaticClass()
+		, /* SlotName	= */ FString()
+		, /* ForceLoad	= */ true
+		, /* Callback	= */ NewDelegate);
+
+	// ロード画面を表示
+
+	HandleShowLoadingLoadoutScreen();
+}
+
+void UBELoadoutSubsystem::HandleLoadoutSaveLoaded(UPlayerSave* Save, bool bSuccess)
+{
+	EquipmentItems.Reset();
+
+	// ロードされたセーブからデータを取得
+
+	auto* LoadoutSave{ Cast<UBEPlayerLoadoutSave>(Save) };
+
+	if (ensure(LoadoutSave))
+	{
+		// 保存されていた装備情報をロードアウトに設定
+
+		for (const auto& KVP : LoadoutSave->EquipmentItems)
+		{
+			const auto& SlotTag{ KVP.Key };
+			const auto& AssetId{ KVP.Value };
+
+			SetLoadoutItem(SlotTag, AssetId);
+		}
+
+		// 保存されていたスキン情報をロードアウトに設定
+
+		FighterSkin = LoadoutSave->FighterSkin;
+		WeaponSkin = LoadoutSave->WeaponSkin;
+	}
+
+	// ロード画面を非表示
+
+	HandleHideLoadingLoadoutScreen();
+}
+
+
+// Loading Screen
+
+void UBELoadoutSubsystem::HandleShowLoadingLoadoutScreen()
+{
+	auto* GameInstance{ GetLocalPlayer()->GetGameInstance() };
+	auto* LSSubsystem{ UGameInstance::GetSubsystem<ULoadingScreenSubsystem>(GameInstance) };
+
+	if (LSSubsystem)
+	{
+		LSSubsystem->AddLoadingProcess(
+			UBELoadoutSubsystem::NAME_LoadoutLoading
+			, TAG_LoadingType_Fullscreen
+			, FText(NSLOCTEXT("LoadingScreen", "LoadoutLoadingReason", "Loading Loadout From Save")));
+	}
+}
+
+void UBELoadoutSubsystem::HandleHideLoadingLoadoutScreen()
+{
+	auto* GameInstance{ GetLocalPlayer()->GetGameInstance() };
+	auto* LSSubsystem{ UGameInstance::GetSubsystem<ULoadingScreenSubsystem>(GameInstance) };
+
+	if (LSSubsystem)
+	{
+		LSSubsystem->RemoveLoadingProcess(UBELoadoutSubsystem::NAME_LoadoutLoading);
+	}
+}
+
+void UBELoadoutSubsystem::HandleShowSavingLoadoutIndicator()
+{
+	auto* GameInstance{ GetLocalPlayer()->GetGameInstance() };
+	auto* LSSubsystem{ UGameInstance::GetSubsystem<ULoadingScreenSubsystem>(GameInstance) };
+
+	if (LSSubsystem)
+	{
+		LSSubsystem->AddLoadingProcess(
+			UBELoadoutSubsystem::NAME_LoadoutSaving
+			, TAG_LoadingType_AsyncIndicator
+			, FText(NSLOCTEXT("LoadingScreen", "LoadoutSavingReason", "Saving Loadout Changes")));
+	}
+}
+
+void UBELoadoutSubsystem::HandleHideSavingLoadoutIndicator()
+{
+	auto* GameInstance{ GetLocalPlayer()->GetGameInstance() };
+	auto* LSSubsystem{ UGameInstance::GetSubsystem<ULoadingScreenSubsystem>(GameInstance) };
+
+	if (LSSubsystem)
+	{
+		LSSubsystem->RemoveLoadingProcess(UBELoadoutSubsystem::NAME_LoadoutSaving);
+	}
 }
 
 
 // Skin
 
-void UBELoadoutSubsystem::SetFighterSkin(FPrimaryAssetId AssetId, FName FighterSkinName)
+void UBELoadoutSubsystem::SetSkin(EBESkinAccessorType Type, FPrimaryAssetId AssetId, FName SkinName)
 {
-	if (auto* LoadoutSave{ GetSave() })
-	{
-		LoadoutSave->FighterSkin.Add(AssetId, FighterSkinName);
-	}
+	auto& SelectedMap{ (Type == EBESkinAccessorType::Fighter) ? FighterSkin : WeaponSkin };
+
+	SelectedMap.Add(AssetId, SkinName);
 }
 
-FName UBELoadoutSubsystem::GetFighterSkin(FPrimaryAssetId AssetId) const
+FName UBELoadoutSubsystem::GetSkin(EBESkinAccessorType Type, FPrimaryAssetId AssetId) const
 {
-	if (auto* LoadoutSave{ GetSave() })
-	{
-		return LoadoutSave->FighterSkin.FindRef(AssetId);
-	}
+	auto& SelectedMap{ (Type == EBESkinAccessorType::Fighter) ? FighterSkin : WeaponSkin };
 
-	return FName();
-}
-
-void UBELoadoutSubsystem::SetWeaponSkin(FPrimaryAssetId AssetId, FName WeaponSkinName)
-{
-	if (auto* LoadoutSave{ GetSave() })
-	{
-		LoadoutSave->WeaponSkin.Add(AssetId, WeaponSkinName);
-	}
-}
-
-FName UBELoadoutSubsystem::GetWeaponSkin(FPrimaryAssetId AssetId) const
-{
-	if (auto* LoadoutSave{ GetSave() })
-	{
-		return LoadoutSave->WeaponSkin.FindRef(AssetId);
-	}
-
-	return FName();
+	return SelectedMap.FindRef(AssetId);
 }
 
 
-// Fighter Data
+// Equipment Item Data
 
-void UBELoadoutSubsystem::SetFighterData(FPrimaryAssetId AssetId)
+void UBELoadoutSubsystem::SetLoadoutItem(FGameplayTag SlotTag, FPrimaryAssetId AssetId)
 {
-	// Get asset from argument PrimaryAssetId
-
-	if (auto* DataByArg{ GetItemDataFromPrimaryAssetId(AssetId) })
+	if (SlotTag.IsValid())
 	{
-		SetFighterDataInternal(AssetId, DataByArg);
-		return;
-	}
+		// 初めに引数のアセットIdからデータを取得
 
-	// Get asset from PrimaryAssetId in DeveSettings
-
-	UE_LOG(LogBE_Loadout, Warning, TEXT("SetFighterData(): Could not find a valid asset from Argument's Id(%s)"), *AssetId.ToString());
-	UE_LOG(LogBE_Loadout, Warning, TEXT("Try get asset from PrimaryAssetId in DeveSettings"));
-
-	auto AssetIdFromDevSetting{ GetDefault<UBELoadoutDeveloperSettings>()->DefaultFighter };
-	if (auto* DataByDevSetting{ GetItemDataFromPrimaryAssetId(AssetIdFromDevSetting) })
-	{
-		SetFighterDataInternal(AssetIdFromDevSetting, DataByDevSetting);
-		return;
-	}
-
-	// Error if asset not found
-	
-	UE_LOG(LogBE_Loadout, Error, TEXT("SetFighterData(): Could not find a valid asset from either Argument's Id(%s) or DevSetting's Id(%s)."), *AssetId.ToString(), *AssetIdFromDevSetting.ToString());
-}
-
-const UItemData* UBELoadoutSubsystem::GetFighterData() const
-{
-	return Fighter;
-}
-
-FPrimaryAssetId UBELoadoutSubsystem::GetFighterDataId() const
-{
-	return Fighter ? Fighter->GetPrimaryAssetId() : FPrimaryAssetId();
-}
-
-void UBELoadoutSubsystem::SetFighterDataInternal(FPrimaryAssetId AssetId, const UItemData* Data)
-{
-	if (Data && (Fighter != Data))
-	{
-		Fighter = Data;
-
-		// Set to save
-
-		if (auto* LoadoutSave{ GetSave() })
+		if (auto* Data_FromArg{ ProcessEquipmentItemData(SlotTag, AssetId) })
 		{
-			LoadoutSave->Fighter = AssetId;
+			EquipmentItems.Emplace(SlotTag, Data_FromArg);
+			return;
+		}
+
+		// 引数のアセットIdでは取得できなかった場合はデフォルト設定から設定する
+
+		UE_LOG(LogBE_Loadout, Warning, TEXT("SetLoadoutItem(): Cannot get Data from arg(Tag: %s, Id: %s)"), *SlotTag.GetTagName().ToString(), *AssetId.ToString());
+
+		auto AssetId_Default{ UBELoadoutDeveloperSettings::GetEquipmentItemByTag(SlotTag) };
+		if (AssetId_Default.IsValid())
+		{
+			if (auto* Data_Default{ ProcessEquipmentItemData(SlotTag, AssetId_Default) })
+			{
+				EquipmentItems.Emplace(SlotTag, Data_Default);
+				return;
+			}
+		}
+
+		// デフォルトからも取得できなかった場合はエラーを出す
+
+		UE_LOG(LogBE_Loadout, Error, TEXT("SetLoadoutItem(): Cannot get Data from defaul(Tag: %s, Id: %s)"), *SlotTag.GetTagName().ToString(), *AssetId_Default.ToString());
+	}
+	else
+	{
+		UE_LOG(LogBE_Loadout, Error, TEXT("SetLoadoutItem(): Invalid Slota Tag"));
+	}
+}
+
+FPrimaryAssetId UBELoadoutSubsystem::GetLoadoutItemAssetId(FGameplayTag SlotTag)
+{
+	auto ItemData{ GetLoadoutItemData(SlotTag) };
+	return ItemData ? ItemData->GetPrimaryAssetId() : FPrimaryAssetId();
+}
+
+const UBEEquipmentItemData* UBELoadoutSubsystem::GetLoadoutItemData(FGameplayTag SlotTag)
+{
+	return EquipmentItems.FindRef(SlotTag);
+}
+
+const UBEEquipmentItemData* UBELoadoutSubsystem::ProcessEquipmentItemData(const FGameplayTag& SlotTag, const FPrimaryAssetId& AssetId) const
+{
+	if (const auto* Data{ UGFCAssetManager::GetAsset<UBEEquipmentItemData>(AssetId) })
+	{
+		if (Data->GetSlotTag() == SlotTag)
+		{
+			return Data;
 		}
 	}
-}
 
-
-// Weapon
-
-void UBELoadoutSubsystem::SetWeaponData(FPrimaryAssetId AssetId)
-{
-	// Get asset from argument PrimaryAssetId
-
-	if (auto* DataByArg{ GetItemDataFromPrimaryAssetId(AssetId) })
-	{
-		SetWeaponDataInternal(AssetId, DataByArg);
-		return;
-	}
-
-	// Get asset from PrimaryAssetId in DeveSettings
-
-	UE_LOG(LogBE_Loadout, Warning, TEXT("SetWeaponData(): Could not find a valid asset from Argument's Id(%s)"), *AssetId.ToString());
-	UE_LOG(LogBE_Loadout, Warning, TEXT("Try get asset from PrimaryAssetId in DeveSettings"));
-
-	auto AssetIdFromDevSetting{ GetDefault<UBELoadoutDeveloperSettings>()->DefaultWeapon };
-	if (auto* DataByDevSetting{ GetItemDataFromPrimaryAssetId(AssetIdFromDevSetting) })
-	{
-		SetWeaponDataInternal(AssetIdFromDevSetting, DataByDevSetting);
-		return;
-	}
-
-	// Error if asset not found
-
-	UE_LOG(LogBE_Loadout, Error, TEXT("SetWeaponData(): Could not find a valid asset from either Argument's Id(%s) or DevSetting's Id(%s)."), *AssetId.ToString(), *AssetIdFromDevSetting.ToString());
-}
-
-const UItemData* UBELoadoutSubsystem::GetWeaponData() const
-{
-	return Weapon;
-}
-
-FPrimaryAssetId UBELoadoutSubsystem::GetWeaponDataId() const
-{
-	return Weapon ? Weapon->GetPrimaryAssetId() : FPrimaryAssetId();
-}
-
-void UBELoadoutSubsystem::SetWeaponDataInternal(FPrimaryAssetId AssetId, const UItemData* Data)
-{
-	if (Data && (Weapon != Data))
-	{
-		Weapon = Data;
-
-		// Set to save
-
-		if (auto* LoadoutSave{ GetSave() })
-		{
-			LoadoutSave->Weapon = AssetId;
-		}
-	}
-}
-
-
-// Main Skill
-
-void UBELoadoutSubsystem::SetMainSkillData(FPrimaryAssetId AssetId)
-{
-	// Get asset from argument PrimaryAssetId
-
-	if (auto* DataByArg{ GetItemDataFromPrimaryAssetId(AssetId) })
-	{
-		SetMainSkillDataInternal(AssetId, DataByArg);
-		return;
-	}
-
-	// Get asset from PrimaryAssetId in DeveSettings
-
-	UE_LOG(LogBE_Loadout, Warning, TEXT("SetMainSkillData(): Could not find a valid asset from Argument's Id(%s)"), *AssetId.ToString());
-	UE_LOG(LogBE_Loadout, Warning, TEXT("Try get asset from PrimaryAssetId in DeveSettings"));
-
-	auto AssetIdFromDevSetting{ GetDefault<UBELoadoutDeveloperSettings>()->DefaultMainSkill };
-	if (auto* DataByDevSetting{ GetItemDataFromPrimaryAssetId(AssetIdFromDevSetting) })
-	{
-		SetMainSkillDataInternal(AssetIdFromDevSetting, DataByDevSetting);
-		return;
-	}
-
-	// Error if asset not found
-
-	UE_LOG(LogBE_Loadout, Error, TEXT("SetMainSkillData(): Could not find a valid asset from either Argument's Id(%s) or DevSetting's Id(%s)."), *AssetId.ToString(), *AssetIdFromDevSetting.ToString());
-}
-
-const UItemData* UBELoadoutSubsystem::GetMainSkillData() const
-{
-	return MainSkill;
-}
-
-FPrimaryAssetId UBELoadoutSubsystem::GetMainSkillDataId() const
-{
-	return MainSkill ? MainSkill->GetPrimaryAssetId() : FPrimaryAssetId();
-}
-
-void UBELoadoutSubsystem::SetMainSkillDataInternal(FPrimaryAssetId AssetId, const UItemData* Data)
-{
-	if (Data && (MainSkill != Data))
-	{
-		MainSkill = Data;
-
-		// Set to save
-
-		if (auto* LoadoutSave{ GetSave() })
-		{
-			LoadoutSave->MainSkill = AssetId;
-		}
-	}
-}
-
-
-// Sub Skill
-
-void UBELoadoutSubsystem::SetSubSkillData(FPrimaryAssetId AssetId)
-{
-	// Get asset from argument PrimaryAssetId
-
-	if (auto* DataByArg{ GetItemDataFromPrimaryAssetId(AssetId) })
-	{
-		SetSubSkillDataInternal(AssetId, DataByArg);
-		return;
-	}
-
-	// Get asset from PrimaryAssetId in DeveSettings
-
-	UE_LOG(LogBE_Loadout, Warning, TEXT("SetSubSKillData(): Could not find a valid asset from Argument's Id(%s)"), *AssetId.ToString());
-	UE_LOG(LogBE_Loadout, Warning, TEXT("Try get asset from PrimaryAssetId in DeveSettings"));
-
-	auto AssetIdFromDevSetting{ GetDefault<UBELoadoutDeveloperSettings>()->DefaultSubSkill };
-	if (auto* DataByDevSetting{ GetItemDataFromPrimaryAssetId(AssetIdFromDevSetting) })
-	{
-		SetSubSkillDataInternal(AssetIdFromDevSetting, DataByDevSetting);
-		return;
-	}
-
-	// Error if asset not found
-
-	UE_LOG(LogBE_Loadout, Error, TEXT("SetSubSKillData(): Could not find a valid asset from either Argument's Id(%s) or DevSetting's Id(%s)."), *AssetId.ToString(), *AssetIdFromDevSetting.ToString());
-}
-
-const UItemData* UBELoadoutSubsystem::GetSubSkillData() const
-{
-	return SubSkill;
-}
-
-FPrimaryAssetId UBELoadoutSubsystem::GetSubSkillDataId() const
-{
-	return SubSkill ? SubSkill->GetPrimaryAssetId() : FPrimaryAssetId();
-}
-
-void UBELoadoutSubsystem::SetSubSkillDataInternal(FPrimaryAssetId AssetId, const UItemData* Data)
-{
-	if (Data && (SubSkill != Data))
-	{
-		SubSkill = Data;
-
-		// Set to save
-
-		if (auto* LoadoutSave{ GetSave() })
-		{
-			LoadoutSave->SubSkill = AssetId;
-		}
-	}
-}
-
-
-// Ultimate Skill
-
-void UBELoadoutSubsystem::SetUltimateSkillData(FPrimaryAssetId AssetId)
-{
-	// Get asset from argument PrimaryAssetId
-
-	if (auto* DataByArg{ GetItemDataFromPrimaryAssetId(AssetId) })
-	{
-		SetUltimateSkillDataInternal(AssetId, DataByArg);
-		return;
-	}
-
-	// Get asset from PrimaryAssetId in DeveSettings
-
-	UE_LOG(LogBE_Loadout, Warning, TEXT("SetUltimateSkillData(): Could not find a valid asset from Argument's Id(%s)"), *AssetId.ToString());
-	UE_LOG(LogBE_Loadout, Warning, TEXT("Try get asset from PrimaryAssetId in DeveSettings"));
-
-	auto AssetIdFromDevSetting{ GetDefault<UBELoadoutDeveloperSettings>()->DefaultUltimateSkill };
-	if (auto* DataByDevSetting{ GetItemDataFromPrimaryAssetId(AssetIdFromDevSetting) })
-	{
-		SetUltimateSkillDataInternal(AssetIdFromDevSetting, DataByDevSetting);
-		return;
-	}
-
-	// Error if asset not found
-
-	UE_LOG(LogBE_Loadout, Error, TEXT("SetUltimateSkillData(): Could not find a valid asset from either Argument's Id(%s) or DevSetting's Id(%s)."), *AssetId.ToString(), *AssetIdFromDevSetting.ToString());
-}
-
-const UItemData* UBELoadoutSubsystem::GetUltimateSkillData() const
-{
-	return UltimateSkill;
-}
-
-FPrimaryAssetId UBELoadoutSubsystem::GetUltimateSkillDataId() const
-{
-	return UltimateSkill ? UltimateSkill->GetPrimaryAssetId() : FPrimaryAssetId();
-}
-
-void UBELoadoutSubsystem::SetUltimateSkillDataInternal(FPrimaryAssetId AssetId, const UItemData* Data)
-{
-	if (Data && (UltimateSkill != Data))
-	{
-		UltimateSkill = Data;
-
-		// Set to save
-
-		if (auto* LoadoutSave{ GetSave() })
-		{
-			LoadoutSave->UltimateSkill = AssetId;
-		}
-	}
-}
-
-
-// Utilities
-
-UBEPlayerLoadoutSave* UBELoadoutSubsystem::GetSave() const
-{
-	auto* LocalPlayer{ GetLocalPlayer() };
-	auto* SaveSubsystem{ LocalPlayer ? LocalPlayer->GetSubsystem<UPlayerSaveSubsystem>() : nullptr };
-	return SaveSubsystem ? SaveSubsystem->GetSave<UBEPlayerLoadoutSave>() : nullptr;
-}
-
-const UItemData* UBELoadoutSubsystem::GetItemDataFromPrimaryAssetId(FPrimaryAssetId AssetId) const
-{
-	if (!AssetId.IsValid())
-	{
-		UE_LOG(LogBE_Loadout, Error, TEXT("GetItemDataFromPrimaryAssetId(): Invalid AssetId passed"));
-		return nullptr;
-	}
-
-	if (auto* Data{ UBEAssetManager::GetAsset<UItemData>(AssetId) })
-	{
-		return Data;
-	}
-
-	UE_LOG(LogBE_Loadout, Error, TEXT("GetItemDataFromPrimaryAssetId(): Cannot get Data from PrimaryAssetId(%s)"), *AssetId.ToString());
 	return nullptr;
 }
+
+
+// Save
 
 bool UBELoadoutSubsystem::SaveLoadout()
 {
 	auto* LocalPlayer{ GetLocalPlayer() };
-	
-	if (auto* SaveSubsystem{ LocalPlayer ? LocalPlayer->GetSubsystem<UPlayerSaveSubsystem>() : nullptr })
+	auto* SaveSubsystem{ LocalPlayer ? LocalPlayer->GetSubsystem<UPlayerSaveSubsystem>() : nullptr };
+	auto* LoadoutSave{ SaveSubsystem ? SaveSubsystem->GetSave<UBEPlayerLoadoutSave>() : nullptr };
+
+	if (LoadoutSave)
 	{
-		return SaveSubsystem->AsyncSaveGameToSlot(UBEPlayerLoadoutSave::StaticClass(), FString());
+		// 現在のロードアウトの値をセーブオブジェクトに書き込み
+
+		LoadoutSave->FighterSkin = FighterSkin;
+		LoadoutSave->WeaponSkin = WeaponSkin;
+
+		auto& SavedEquipmentItems{ LoadoutSave->EquipmentItems };
+		SavedEquipmentItems.Reset();
+
+		for (const auto& KVP : EquipmentItems)
+		{
+			const auto& Tag{ KVP.Key };
+			const auto AssetId{ KVP.Value ? KVP.Value->GetPrimaryAssetId() : FPrimaryAssetId() };
+
+			SavedEquipmentItems.Emplace(Tag, AssetId);
+		}
+
+		// Delegate を作成
+
+		auto NewDelegate
+		{
+			FPlayerSaveEventDelegate::CreateUObject(this, &ThisClass::HandleLoadoutSaved)
+		};
+
+		if (SaveSubsystem->AsyncSaveGameToSlot(UBEPlayerLoadoutSave::StaticClass(), FString(), NewDelegate))
+		{
+			// ローディングインジケーターを表示
+
+			HandleShowSavingLoadoutIndicator();
+
+			return true;
+		}
 	}
 
 	return false;
+}
+
+void UBELoadoutSubsystem::HandleLoadoutSaved(UPlayerSave* Save, bool bSuccess)
+{
+	HandleHideSavingLoadoutIndicator();
 }

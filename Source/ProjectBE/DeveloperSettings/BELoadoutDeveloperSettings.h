@@ -4,6 +4,8 @@
 
 #include "Engine/DeveloperSettings.h"
 
+#include "GameplayTagContainer.h"
+
 #include "BELoadoutDeveloperSettings.generated.h"
 
 
@@ -21,20 +23,15 @@ public:
 	///////////////////////////////////////////////
 	// デフォルトデータ
 public:
-	UPROPERTY(Config, BlueprintReadWrite, EditAnywhere, Category = "Loadout", meta = (AllowedTypes = "Fighter"))
-	FPrimaryAssetId DefaultFighter;
+	UPROPERTY(Config, BlueprintReadWrite, EditAnywhere, Category = "Loadout",
+		meta = (AllowedTypes = "Fighter, Weapon, MainSkill, SubSkill, UltimateSkill", Categories = "Equipment.Slot"))
+	TMap<FGameplayTag, FPrimaryAssetId> DefaultEquipmentItems;
 
-	UPROPERTY(Config, BlueprintReadWrite, EditAnywhere, Category = "Loadout", meta = (AllowedTypes = "Weapon"))
-	FPrimaryAssetId DefaultWeapon;
-
-	UPROPERTY(Config, BlueprintReadWrite, EditAnywhere, Category = "Loadout", meta = (AllowedTypes = "MainSkill"))
-	FPrimaryAssetId DefaultMainSkill;
-
-	UPROPERTY(Config, BlueprintReadWrite, EditAnywhere, Category = "Loadout", meta = (AllowedTypes = "SubSKill"))
-	FPrimaryAssetId DefaultSubSkill;
-
-	UPROPERTY(Config, BlueprintReadWrite, EditAnywhere, Category = "Loadout", meta = (AllowedTypes = "UltimateSkill"))
-	FPrimaryAssetId DefaultUltimateSkill;
+public:
+	/**
+	 * DeveloperSettings で設定した各装備スロットに対応するデフォルト装備アイテムの PrimaryAssetId を返す。
+	 */
+	static FPrimaryAssetId GetEquipmentItemByTag(const FGameplayTag& SlotTag);
 
 };
 

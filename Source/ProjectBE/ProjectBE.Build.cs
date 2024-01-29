@@ -23,7 +23,7 @@ public class ProjectBE : ModuleRules
 
                 "Slate", "SlateCore", "RenderCore", "UMG",
 
-                "AIModule", "ApplicationCore", "PhysicsCore",
+                "AIModule", "ApplicationCore", "PhysicsCore", "NetCore",
 
                 "InputCore", "EnhancedInput",
 

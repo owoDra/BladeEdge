@@ -4,6 +4,8 @@
 
 #include "PlayerSave.h"
 
+#include "GameplayTagContainer.h"
+
 #include "BEPlayerLoadoutSave.generated.h"
 
 
@@ -18,9 +20,6 @@ public:
 public:
 	UBEPlayerLoadoutSave() {}
 
-	static const FName NAME_LoadoutLoading;
-
-
 	/////////////////////////////////////////////////////////////////////////////////////
 	// セーブデータ
 public:
@@ -31,28 +30,15 @@ public:
 	TMap<FPrimaryAssetId, FName> WeaponSkin;
 
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Loadout", meta = (AllowedTypes = "Fighter"))
-	FPrimaryAssetId Fighter;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Loadout", meta = (AllowedTypes = "Weapon"))
-	FPrimaryAssetId Weapon;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Loadout", meta = (AllowedTypes = "MainSkill"))
-	FPrimaryAssetId MainSkill;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Loadout", meta = (AllowedTypes = "SubSKill"))
-	FPrimaryAssetId SubSkill;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Loadout", meta = (AllowedTypes = "UltimateSkill"))
-	FPrimaryAssetId UltimateSkill;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Loadout",
+		meta = (AllowedTypes = "Fighter, Weapon, MainSkill, SubSKill, UltimateSkill", Categories = "Equipment.Slot"))
+	TMap<FGameplayTag, FPrimaryAssetId> EquipmentItems;
 
 
 	/////////////////////////////////////////////////////////////////////////////////////
 	// 初期化など
 public:
 	virtual void ResetToDefault() override;
-	virtual void HandlePreSave() override;
-	virtual void HandlePostSave(bool bSuccess) override;
 
 };
 

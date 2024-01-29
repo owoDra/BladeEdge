@@ -2,24 +2,25 @@
 
 #pragma once
 
-#include "ItemData.h"
+#include "Item/BEEquipmentItemData.h"
 
-#include "ItemData_MainSkill.generated.h"
+#include "BEItemData_MainSkill.generated.h"
 
 
 /**
  * キャラクターが使用可能なメインスキルを表すデータ
  */
 UCLASS(meta = (DisplayName = "Main Skill Data"))
-class PROJECTBE_API UItemData_MainSkill : public UItemData
+class PROJECTBE_API UBEItemData_MainSkill : public UBEEquipmentItemData
 {
 	GENERATED_BODY()
 public:
-	UItemData_MainSkill(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	UBEItemData_MainSkill(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	//
 	// このデータを表す PrimaryAssetType 名
 	//
 	inline static const FName NAME_MainSkillDataType{ TEXTVIEW("MainSkill") };
 
+	virtual FGameplayTag GetSlotTag() const override;
 };
