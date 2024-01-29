@@ -85,6 +85,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Loadout", meta = (GameplayTagFilter = "Equipment.Slot"))
 	const FName GetSkinNameBySlot(FGameplayTag SlotTag) const;
 
+	/**
+	 * 現在のロードアウトを返す
+	 */
+	virtual const FBELoadout& GetLoadout() const { return Loadout; }
+
 	////////////////////////////////////////////////////////////////////////////////////
 	// Utilities
 public:
