@@ -26,15 +26,19 @@ public:
 	// セーブデータ
 public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Skin", meta = (AllowedTypes = "Fighter"))
-	TMap<FPrimaryAssetId, FName> FighterSkin;
+	FPrimaryAssetId Fighter;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Skin", meta = (AllowedTypes = "Weapon"))
-	TMap<FPrimaryAssetId, FName> WeaponSkin;
+	FPrimaryAssetId Weapon;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Skin", meta = (AllowedTypes = "MainSkill"))
+	FPrimaryAssetId MainSkill;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Loadout", meta = (Categories = "Equipment.Slot"))
-	TMap<FGameplayTag, FPrimaryAssetId> EquipmentItems;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Skin", meta = (AllowedTypes = "SubSkill"))
+	FPrimaryAssetId SubSkill;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Skin", meta = (AllowedTypes = "UltimateSkill"))
+	FPrimaryAssetId UltimateSkill;
 
 	/////////////////////////////////////////////////////////////////////////////////////
 	// 初期化など

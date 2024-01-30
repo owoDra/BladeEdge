@@ -4,13 +4,41 @@
 
 #include "Equipment/Fragment/EquipmentFragment.h"
 
-#include "Cosmetic/BEDataRow_WeaponSkin.h"
-
 #include "BEEquipmentFragment_WeaponSkin.generated.h"
 
 class USkeletalMeshComponent;
-class UDataTable;
+class USkeletalMesh;
+class UAnimInstance;
 class APawn;
+
+
+/**
+ * スポーンするメッシュのデータ
+ */
+USTRUCT(BlueprintType)
+struct FBEEquipmentMeshToSpawn
+{
+	GENERATED_BODY()
+public:
+	FBEEquipmentMeshToSpawn() = default;
+
+public:
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TObjectPtr<USkeletalMesh> MeshToSpawn;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TSubclassOf<UAnimInstance> MeshAnimInstance;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FName AttachSocket;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FTransform AttachTransform;
+
+public:
+	bool IsValid() const;
+
+};
 
 
 /**
@@ -40,20 +68,14 @@ public:
 	//////////////////////////////////////////////////////////////////////////////////////
 	// Skin Data
 protected:
-	//
-	// スキンのデータテーブル
-	//
-	UPROPERTY(EditDefaultsOnly, Category = "Weapon Skin", meta = (RowType = "BEDataRow_WeaponSkin"))
-	TObjectPtr<const UDataTable> DataTable{ nullptr };
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon Skin")
+	TArray<FBEEquipmentMeshToSpawn> MeshesToSpawn;
 
-	//
-	// 現在適用中のスキンのデータ
-	//
-	UPROPERTY(Transient);
-	FBEDataRow_WeaponSkin SkinData;
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon Skin")
+	TSubclassOf<UAnimInstance> FPPAnimOverlay;
 
-protected:
-	void StoreSkinData(APawn* Pawn);
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon Skin")
+	TSubclassOf<UAnimInstance> TPPAnimOverlay;
 
 
 	//////////////////////////////////////////////////////////////////////////////////////
@@ -70,14 +92,11 @@ protected:
 	//////////////////////////////////////////////////////////////////////////////////////
 	// Apply Anim Overlay
 protected:
-	struct FApplyingOverlay
-	{
-		TWeakObjectPtr<USkeletalMeshComponent> TargetMesh{ nullptr };
-		TSubclassOf<UAnimInstance> ApplingOverlayClass{ nullptr };
-	};
+	UPROPERTY(Transient)
+	TWeakObjectPtr<USkeletalMeshComponent> AppliedTPPMesh{ nullptr };
 
-	FApplyingOverlay ApplingOverlay_TPP;
-	FApplyingOverlay ApplingOverlay_FPP;
+	UPROPERTY(Transient)
+	TWeakObjectPtr<USkeletalMeshComponent> AppliedFPPMesh{ nullptr };
 
 protected:
 	void SetAnimOverlay_TPP(USkeletalMeshComponent* TargetMesh);

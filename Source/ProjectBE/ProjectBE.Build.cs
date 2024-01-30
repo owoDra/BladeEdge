@@ -31,7 +31,7 @@ public class ProjectBE : ModuleRules
 
                 "CommonUI", "CommonInput",
 
-                "GameplayTags", "GameplayAbilities", "ModularGameplay",
+                "GameplayTags", "GameplayAbilities", "ModularGameplay", "GameFeatures",
 
                 "DeveloperSettings",
             }

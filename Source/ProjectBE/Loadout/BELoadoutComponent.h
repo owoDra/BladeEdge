@@ -4,7 +4,7 @@
 
 #include "Component/GFCPlayerStateComponent.h"
 
-#include "Loadout/Type/BELoadout.h"
+#include "Loadout/BELoadoutRequest.h"
 
 #include "BELoadoutComponent.generated.h"
 
@@ -36,6 +36,9 @@ public:
 public:
 	virtual FName GetFeatureName() const override { return NAME_ActorFeatureName; }
 
+protected:
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
 
 	////////////////////////////////////////////////////////////////////////////////////
 	// Replication
@@ -44,13 +47,10 @@ public:
 
 
 	////////////////////////////////////////////////////////////////////////////////////
-	// Loadout
-private:
-	UPROPERTY(ReplicatedUsing = "OnRep_Loadout")
-	FBELoadout Loadout;
-
+	// Loadout Request
 public:
-	FBELoadoutChangeDelegate OnLoadoutChange;
+	UPROPERTY(ReplicatedUsing = "OnRep_Loadout")
+	TArray<TObjectPtr<const UBEEquipmentItemData>> Loadout;
 
 protected:
 	UFUNCTION()
@@ -68,27 +68,33 @@ protected:
 
 	virtual void ReciveLoadoutRequest(const FBELoadoutRequest& Request);
 
-	virtual void HandleLoadoutChange();
-	
-	void RebuildIndexMap();
 
+	////////////////////////////////////////////////////////////////////////////////////
+	// Loadout Asset Bundle
+protected:
+	virtual void LoadLoadoutAssetBundle(const TArray<const UBEEquipmentItemData*>& CurrentLoadout);
+
+	virtual void HandleLoadoutAssetBundleLoaded();
+
+
+	////////////////////////////////////////////////////////////////////////////////////
+	// Loading Screen
+protected:
+	inline static const FName NAME_LoadoutAssetLoading{ TEXTVIEW("LoadoutAssetLoading") };
+
+protected:
+	void HandleShowLoadingLoadoutAssetScreen();
+	void HandleHideLoadingLoadoutAssetScreen();
+
+
+	////////////////////////////////////////////////////////////////////////////////////
+	// Notify Change
 public:
-	/**
-	 * 指定したスロットの ItemData を返す
-	 */
-	UFUNCTION(BlueprintCallable, Category = "Loadout", meta = (GameplayTagFilter = "Equipment.Slot"))
-	const UBEEquipmentItemData* GetItemDataBySlot(FGameplayTag SlotTag) const;
+	FBELoadoutChangeDelegate OnLoadoutChange;
 
-	/**
-	 * 指定したスロットのスキン名を返す
-	 */
-	UFUNCTION(BlueprintCallable, Category = "Loadout", meta = (GameplayTagFilter = "Equipment.Slot"))
-	const FName GetSkinNameBySlot(FGameplayTag SlotTag) const;
+protected:
+	virtual void BroadcastLoadoutChange();
 
-	/**
-	 * 現在のロードアウトを返す
-	 */
-	virtual const FBELoadout& GetLoadout() const { return Loadout; }
 
 	////////////////////////////////////////////////////////////////////////////////////
 	// Utilities

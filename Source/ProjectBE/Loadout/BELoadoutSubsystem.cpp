@@ -6,6 +6,7 @@
 #include "GameplayTag/BETags_LoadingType.h"
 #include "DeveloperSettings/BELoadoutDeveloperSettings.h"
 #include "Item/BEEquipmentItemData.h"
+#include "Loadout/BELoadoutComponent.h"
 #include "ProjectBELogs.h"
 
 // Game Framework Core
@@ -17,6 +18,11 @@
 // Game Loading Core
 #include "LoadingScreenSubsystem.h"
 #include "GameplayTag/GCLoadingTags_LoadingType.h"
+
+// Engine Feature
+#include "Engine/LocalPlayer.h"
+#include "GameFramework/PlayerController.h"
+#include "GameFramework/PlayerState.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(BELoadoutSubsystem)
 
@@ -38,6 +44,15 @@ void UBELoadoutSubsystem::InitializeLoadout(UPlayerSaveSubsystem* SaveSubsystem)
 
 	HandleShowLoadingLoadoutScreen();
 
+	// デフォルト値を設定する
+
+	const auto* DevSettings{ GetDefault<UBELoadoutDeveloperSettings>() };
+	SetFighterData(DevSettings->Fighter);
+	SetWeaponData(DevSettings->Weapon);
+	SetMainSkillData(DevSettings->MainSkill);
+	SetSubSkillData(DevSettings->SubSkill);
+	SetUltimateSkillData(DevSettings->UltimateSkill);
+
 	// ロードアウトセーブを非同期ロード開始
 
 	auto NewDelegate
@@ -56,14 +71,14 @@ void UBELoadoutSubsystem::InitializeLoadout(UPlayerSaveSubsystem* SaveSubsystem)
 
 	if (!bSuccess)
 	{
-		HandleLoadoutSaveLoaded(nullptr, false);
+		// ロード画面を非表示
+
+		HandleHideLoadingLoadoutScreen();
 	}
 }
 
 void UBELoadoutSubsystem::HandleLoadoutSaveLoaded(UPlayerSave* Save, bool bSuccess)
 {
-	EquipmentItems.Reset();
-
 	// ロードされたセーブからデータを取得
 
 	auto* LoadoutSave{ Cast<UBEPlayerLoadoutSave>(Save) };
@@ -72,18 +87,11 @@ void UBELoadoutSubsystem::HandleLoadoutSaveLoaded(UPlayerSave* Save, bool bSucce
 	{
 		// 保存されていた装備情報をロードアウトに設定
 
-		for (const auto& KVP : LoadoutSave->EquipmentItems)
-		{
-			const auto& SlotTag{ KVP.Key };
-			const auto& AssetId{ KVP.Value };
-
-			SetLoadoutItem(SlotTag, AssetId);
-		}
-
-		// 保存されていたスキン情報をロードアウトに設定
-
-		FighterSkin = LoadoutSave->FighterSkin;
-		WeaponSkin = LoadoutSave->WeaponSkin;
+		SetFighterData(LoadoutSave->Fighter);
+		SetWeaponData(LoadoutSave->Weapon);
+		SetMainSkillData(LoadoutSave->MainSkill);
+		SetSubSkillData(LoadoutSave->SubSkill);
+		SetUltimateSkillData(LoadoutSave->UltimateSkill);
 	}
 
 	// ロード画面を非表示
@@ -145,83 +153,30 @@ void UBELoadoutSubsystem::HandleHideSavingLoadoutIndicator()
 }
 
 
-// Skin
-
-void UBELoadoutSubsystem::SetSkin(EBESkinAccessorType Type, FPrimaryAssetId AssetId, FName SkinName)
-{
-	auto& SelectedMap{ (Type == EBESkinAccessorType::Fighter) ? FighterSkin : WeaponSkin };
-
-	SelectedMap.Add(AssetId, SkinName);
-}
-
-FName UBELoadoutSubsystem::GetSkin(EBESkinAccessorType Type, FPrimaryAssetId AssetId) const
-{
-	auto& SelectedMap{ (Type == EBESkinAccessorType::Fighter) ? FighterSkin : WeaponSkin };
-
-	return SelectedMap.FindRef(AssetId);
-}
-
-
 // Equipment Item Data
 
-void UBELoadoutSubsystem::SetLoadoutItem(FGameplayTag SlotTag, FPrimaryAssetId AssetId)
+void UBELoadoutSubsystem::ProcessItemDataFromId(FPrimaryAssetId AssetId, TObjectPtr<const UBEEquipmentItemData>& OutItemData)
 {
-	if (SlotTag.IsValid())
+	if (AssetId.IsValid())
 	{
-		// 初めに引数のアセットIdからデータを取得
-
-		if (auto* Data_FromArg{ ProcessEquipmentItemData(SlotTag, AssetId) })
+		if (const auto* Data{ UGFCAssetManager::GetAsset<UBEEquipmentItemData>(AssetId, false) })
 		{
-			EquipmentItems.Emplace(SlotTag, Data_FromArg);
-			return;
+			OutItemData = Data;
 		}
-
-		// 引数のアセットIdでは取得できなかった場合はデフォルト設定から設定する
-
-		UE_LOG(LogBE_Loadout, Warning, TEXT("SetLoadoutItem(): Cannot get Data from arg(Tag: %s, Id: %s)"), *SlotTag.GetTagName().ToString(), *AssetId.ToString());
-
-		auto AssetId_Default{ UBELoadoutDeveloperSettings::GetEquipmentItemByTag(SlotTag) };
-		if (AssetId_Default.IsValid())
+		else
 		{
-			if (auto* Data_Default{ ProcessEquipmentItemData(SlotTag, AssetId_Default) })
-			{
-				EquipmentItems.Emplace(SlotTag, Data_Default);
-				return;
-			}
+			UE_LOG(LogBE_Loadout, Error, TEXT("Item data could not be retrieved from AssetId(%s)"), *AssetId.ToString());
 		}
-
-		// デフォルトからも取得できなかった場合はエラーを出す
-
-		UE_LOG(LogBE_Loadout, Error, TEXT("SetLoadoutItem(): Cannot get Data from defaul(Tag: %s, Id: %s)"), *SlotTag.GetTagName().ToString(), *AssetId_Default.ToString());
 	}
 	else
 	{
-		UE_LOG(LogBE_Loadout, Error, TEXT("SetLoadoutItem(): Invalid Slota Tag"));
+		UE_LOG(LogBE_Loadout, Error, TEXT("Tried to set item data with invalid AssetId"));
 	}
 }
 
-FPrimaryAssetId UBELoadoutSubsystem::GetLoadoutItemAssetId(FGameplayTag SlotTag)
+FPrimaryAssetId UBELoadoutSubsystem::GetItemDataFromId(const UBEEquipmentItemData* ItemData) const
 {
-	auto ItemData{ GetLoadoutItemData(SlotTag) };
 	return ItemData ? ItemData->GetPrimaryAssetId() : FPrimaryAssetId();
-}
-
-const UBEEquipmentItemData* UBELoadoutSubsystem::GetLoadoutItemData(FGameplayTag SlotTag)
-{
-	return EquipmentItems.FindRef(SlotTag);
-}
-
-const UBEEquipmentItemData* UBELoadoutSubsystem::ProcessEquipmentItemData(const FGameplayTag& SlotTag, const FPrimaryAssetId& AssetId) const
-{
-	if (const auto* Data{ UGFCAssetManager::GetAsset<UBEEquipmentItemData>(AssetId) })
-	{
-		if (Data->GetSlotTag() == SlotTag)
-		{
-			return Data;
-		}
-	}
-
-	return nullptr;
 }
 
 
@@ -235,21 +190,18 @@ bool UBELoadoutSubsystem::SaveLoadout()
 
 	if (LoadoutSave)
 	{
+		// ローディングインジケーターを表示
+
+		HandleShowSavingLoadoutIndicator();
+
 		// 現在のロードアウトの値をセーブオブジェクトに書き込み
 
-		LoadoutSave->FighterSkin = FighterSkin;
-		LoadoutSave->WeaponSkin = WeaponSkin;
+		LoadoutSave->Fighter		= GetFighterDataId();
+		LoadoutSave->Weapon			= GetWeaponDataId();
+		LoadoutSave->MainSkill		= GetMainSkillDataId();
+		LoadoutSave->SubSkill		= GetSubSkillDataId();
+		LoadoutSave->UltimateSkill	= GetUltimateSkillDataId();
 
-		auto& SavedEquipmentItems{ LoadoutSave->EquipmentItems };
-		SavedEquipmentItems.Reset();
-
-		for (const auto& KVP : EquipmentItems)
-		{
-			const auto& Tag{ KVP.Key };
-			const auto AssetId{ KVP.Value ? KVP.Value->GetPrimaryAssetId() : FPrimaryAssetId() };
-
-			SavedEquipmentItems.Emplace(Tag, AssetId);
-		}
 
 		// Delegate を作成
 
@@ -258,14 +210,13 @@ bool UBELoadoutSubsystem::SaveLoadout()
 			FPlayerSaveEventDelegate::CreateUObject(this, &ThisClass::HandleLoadoutSaved)
 		};
 
-		if (SaveSubsystem->AsyncSaveGameToSlot(UBEPlayerLoadoutSave::StaticClass(), FString(), NewDelegate))
+		if (!SaveSubsystem->AsyncSaveGameToSlot(UBEPlayerLoadoutSave::StaticClass(), FString(), NewDelegate))
 		{
-			// ローディングインジケーターを表示
-
-			HandleShowSavingLoadoutIndicator();
-
-			return true;
+			HandleHideSavingLoadoutIndicator();
+			return false;
 		}
+
+		return true;
 	}
 
 	return false;
@@ -279,9 +230,24 @@ void UBELoadoutSubsystem::HandleLoadoutSaved(UPlayerSave* Save, bool bSuccess)
 
 // Request
 
-FBELoadoutRequest UBELoadoutSubsystem::CreateRequest() const
+bool UBELoadoutSubsystem::SendLoadoutRequest() const
 {
-	TArray<TObjectPtr<const UBEEquipmentItemData>> Items;
-	EquipmentItems.GenerateValueArray(Items);
-	return FBELoadoutRequest(Items);
+	auto* LocalPlayer{ GetLocalPlayer() };
+	auto* PlayerController{ LocalPlayer ? LocalPlayer->GetPlayerController(GetWorld()) : nullptr};
+	auto* PlayerState{ PlayerController ? PlayerController->GetPlayerState<APlayerState>() : nullptr };
+
+	if (auto* LoadoutComponent{ UBELoadoutComponent::FindBELoadoutComponent(PlayerState) })
+	{
+		FBELoadoutRequest NewRequest;
+		NewRequest.FighterData			= FighterData;
+		NewRequest.WeaponData			= WeaponData;
+		NewRequest.MainSkillData		= MainSkillData;
+		NewRequest.SubSkillData			= SubSkillData;
+		NewRequest.UltimateSkillData	= UltimateSkillData;
+
+		LoadoutComponent->LoadoutRequest(NewRequest);
+		return true;
+	}
+
+	return false;
 }

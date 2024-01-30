@@ -4,11 +4,46 @@
 
 #include "Equipment/Fragment/EquipmentFragment.h"
 
-#include "Cosmetic/BEDataRow_FighterSkin.h"
+#include "GameplayTagContainer.h"
 
 #include "BEEquipmentFragment_FighterSkin.generated.h"
 
 class USkeletalMeshComponent;
+class UContextEffectLibrary;
+class USkeletalMesh;
+class UAnimInstance;
+
+
+/**
+ * 設定するメッシュのデータ
+ */
+USTRUCT(BlueprintType)
+struct FBEMeshToSetMesh
+{
+	GENERATED_BODY()
+public:
+	FBEMeshToSetMesh() = default;
+
+public:
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TObjectPtr<USkeletalMesh> SkeletalMesh{ nullptr };
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TSubclassOf<UAnimInstance> AnimInstance{ nullptr };
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FVector NewLocation{ 0.0f, 0.0f, -90.0f };
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FRotator NewRotation{ 0.0f, -90.0f, 0.0f };
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FVector NewScale{ FVector::OneVector };
+
+public:
+	bool IsValid() const;
+
+};
 
 
 /**
@@ -38,20 +73,17 @@ public:
 	//////////////////////////////////////////////////////////////////////////////////////
 	// Skin Data
 protected:
-	//
-	// スキンのデータテーブル
-	//
-	UPROPERTY(EditDefaultsOnly, Category = "Fighter Skin", meta = (RowType = "BEDataRow_FighterSkin"))
-	TObjectPtr<const UDataTable> DataTable{ nullptr };
+	UPROPERTY(EditDefaultsOnly, Category = "Fighter Skin")
+	FBEMeshToSetMesh TPPMeshesToSet;
 
-	//
-	// 現在適用中のスキンのデータ
-	//
-	UPROPERTY(Transient);
-	FBEDataRow_FighterSkin SkinData;
+	UPROPERTY(EditDefaultsOnly, Category = "Fighter Skin")
+	FBEMeshToSetMesh FPPMeshesToSet;
 
-protected:
-	void StoreSkinData(APawn* Pawn);
+	UPROPERTY(EditDefaultsOnly, Category = "Fighter Skin")
+	TSet<TSoftObjectPtr<UContextEffectLibrary>> ContextEffectLibraries;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Fighter Skin")
+	FGameplayTagContainer ExtraContexts;
 
 
 	//////////////////////////////////////////////////////////////////////////////////////

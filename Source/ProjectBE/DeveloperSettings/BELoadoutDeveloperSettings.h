@@ -23,14 +23,20 @@ public:
 	///////////////////////////////////////////////
 	// デフォルトデータ
 public:
-	UPROPERTY(Config, BlueprintReadWrite, EditAnywhere, Category = "Loadout", meta = (ForceInlineRow, Categories = "Equipment.Slot"))
-	TMap<FGameplayTag, FPrimaryAssetId> DefaultEquipmentItems;
+	UPROPERTY(Config, BlueprintReadWrite, EditAnywhere, Category = "Default", meta = (AllowedTypes = "Fighter"))
+	FPrimaryAssetId Fighter;
 
-public:
-	/**
-	 * DeveloperSettings で設定した各装備スロットに対応するデフォルト装備アイテムの PrimaryAssetId を返す。
-	 */
-	static FPrimaryAssetId GetEquipmentItemByTag(const FGameplayTag& SlotTag);
+	UPROPERTY(Config, BlueprintReadWrite, EditAnywhere, Category = "Default", meta = (AllowedTypes = "Weapon"))
+	FPrimaryAssetId Weapon;
+
+	UPROPERTY(Config, BlueprintReadWrite, EditAnywhere, Category = "Default", meta = (AllowedTypes = "MainSkill"))
+	FPrimaryAssetId MainSkill;
+
+	UPROPERTY(Config, BlueprintReadWrite, EditAnywhere, Category = "Default", meta = (AllowedTypes = "SubSkill"))
+	FPrimaryAssetId SubSkill;
+
+	UPROPERTY(Config, BlueprintReadWrite, EditAnywhere, Category = "Default", meta = (AllowedTypes = "UltimateSkill"))
+	FPrimaryAssetId UltimateSkill;
 
 };
 

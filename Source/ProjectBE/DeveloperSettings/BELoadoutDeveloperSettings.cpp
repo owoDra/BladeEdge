@@ -10,9 +10,3 @@ UBELoadoutDeveloperSettings::UBELoadoutDeveloperSettings()
 	CategoryName = TEXT("ProjectBE");
 	SectionName = TEXT("Loadout");
 }
-
-
-FPrimaryAssetId UBELoadoutDeveloperSettings::GetEquipmentItemByTag(const FGameplayTag& SlotTag)
-{
-	return GetDefault<UBELoadoutDeveloperSettings>()->DefaultEquipmentItems.FindRef(SlotTag);
-}

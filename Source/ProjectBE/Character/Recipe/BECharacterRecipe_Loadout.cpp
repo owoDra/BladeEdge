@@ -89,15 +89,15 @@ void UBECharacterRecipe_Loadout::HandleLoadoutChange(const UBELoadoutComponent* 
 
 		// 新しくロードアウトのアイテムを装備する
 
-		for (const auto& Entry : LoadoutComponent->GetLoadout().Entries)
+		for (const auto& Entry : LoadoutComponent->Loadout)
 		{
-			auto SlotTag{ Entry.GetSlotTag() };
-			auto ItemData{ Entry.ItemData };
+			if (ensure(Entry))
+			{
+				FActiveEquipmentHandle DummyHundle;
+				EMC->AddEquipmentItem(Entry->GetSlotTag(), Entry, DummyHundle);
 
-			FActiveEquipmentHandle DummyHundle;
-			EMC->AddEquipmentItem(SlotTag, ItemData, DummyHundle);
-
-			UE_LOG(LogGameExt_CharacterRecipe, Log, TEXT("++ Add Loadout Item(%s)"), *Entry.GetDebugString());
+				UE_LOG(LogGameExt_CharacterRecipe, Log, TEXT("++ Add Loadout Item(%s)"), *GetNameSafe(Entry));
+			}
 		}
 
 		// アクティブスロットを設定

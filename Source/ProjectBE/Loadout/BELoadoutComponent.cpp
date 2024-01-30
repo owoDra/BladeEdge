@@ -2,12 +2,19 @@
 
 #include "BELoadoutComponent.h"
 
-#include "Loadout/Type/BELoadoutRequestResolver.h"
+#include "Item/BEEquipmentItemData.h"
+#include "GameplayTag/BETags_LoadingType.h"
 #include "ProjectBELogs.h"
 
+// Game Loading Core
+#include "LoadingScreenSubsystem.h"
+
+// Engine Feature
 #include "Net/UnrealNetwork.h"
 #include "Net/Core/PushModel/PushModel.h"
 #include "Engine/ActorChannel.h"
+#include "Engine/AssetManager.h"
+#include "GameFeaturesSubsystemSettings.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(BELoadoutComponent)
 
@@ -23,6 +30,18 @@ UBELoadoutComponent::UBELoadoutComponent(const FObjectInitializer& ObjectInitial
 }
 
 
+// Deinitialization
+
+void UBELoadoutComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	HandleHideLoadingLoadoutAssetScreen();
+
+	Super::EndPlay(EndPlayReason);
+}
+
+
+// Replication
+
 void UBELoadoutComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -30,13 +49,18 @@ void UBELoadoutComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 	FDoRepLifetimeParams Params;
 	Params.bIsPushBased = true;
 	Params.Condition = COND_None;
+	Params.RepNotifyCondition = REPNOTIFY_Always;
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, Loadout, Params);
 }
 
 
+// Loadout Request
+
 void UBELoadoutComponent::OnRep_Loadout()
 {
-	HandleLoadoutChange();
+	// 新しいロードアウトのアイテムデータのアセットバンドルをロードする
+
+	LoadLoadoutAssetBundle(Loadout);
 }
 
 void UBELoadoutComponent::LoadoutRequest(const FBELoadoutRequest& Request)
@@ -72,52 +96,148 @@ void UBELoadoutComponent::ReciveLoadoutRequest(const FBELoadoutRequest& Request)
 
 	UE_LOG(LogBE_Loadout, Log, TEXT("[%s] ReciveLoadoutRequest: %s"), HasAuthority() ? TEXT("SERVER") : TEXT("CLIENT"), *Request.GetDebugString());
 
-	auto Resolver{ FBELoadoutRequestResolver(Request) };
-	Resolver.ResolveRequest(Loadout);
+	// リクエストの ItemData を設定
 
-	HandleLoadoutChange();
+	Loadout = { Request.FighterData, Request.WeaponData, Request.MainSkillData, Request.SubSkillData, Request.UltimateSkillData };
+	MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, Loadout, this);
+
+	// 新しいロードアウトのアイテムデータのアセットバンドルをロードする
+
+	LoadLoadoutAssetBundle(Loadout);
 }
 
-void UBELoadoutComponent::HandleLoadoutChange()
-{
-	RebuildIndexMap();
 
-	UE_LOG(LogBE_Loadout, Log, TEXT("[%s] HandleLoadoutChange"), HasAuthority() ? TEXT("SERVER") : TEXT("CLIENT"));
-	
+// Loadout Asset Bundle
+
+void UBELoadoutComponent::LoadLoadoutAssetBundle(const TArray<const UBEEquipmentItemData*>& CurrentLoadout)
+{
+	if (!Loadout.IsEmpty())
+	{
+		UE_LOG(LogBE_Loadout, Log, TEXT("[%s] StartLoadLoadoutAssetBundle"), HasAuthority() ? TEXT("SERVER") : TEXT("CLIENT"));
+
+		// ローディング画面を表示
+
+		HandleShowLoadingLoadoutAssetScreen();
+
+		// 現在のロードアウト内の ItemData のプライマリーアセットIdをキャッシュする
+
+		TSet<FPrimaryAssetId> BundleAssetList;
+
+		for (const auto& ItemData : CurrentLoadout)
+		{
+			if (ensure(ItemData))
+			{
+				BundleAssetList.Add(ItemData->GetPrimaryAssetId());
+			}
+		}
+
+		// クライアント / サーバーごとにロードするバンドル名をキャッシュする
+
+		TArray<FName> BundlesToLoad;
+
+		const auto OwnerNetMode{ GetOwner()->GetNetMode() };
+		const auto bLoadClient{ GIsEditor || (OwnerNetMode != NM_DedicatedServer) };
+		const auto bLoadServer{ GIsEditor || (OwnerNetMode != NM_Client) };
+
+		if (bLoadClient)
+		{
+			BundlesToLoad.Add(UGameFeaturesSubsystemSettings::LoadStateClient);
+		}
+
+		if (bLoadServer)
+		{
+			BundlesToLoad.Add(UGameFeaturesSubsystemSettings::LoadStateServer);
+		}
+
+		// キャッシュしたデータをもとにバンドルのロードを開始する
+
+		const auto BundleLoadAssetHandle
+		{
+			UAssetManager::Get().ChangeBundleStateForPrimaryAssets(
+				BundleAssetList.Array(), BundlesToLoad, {}, false, FStreamableDelegate(), FStreamableManager::AsyncLoadHighPriority)	/// @ToDo: このまま高優先度にするかどうか検証する
+		};
+
+		auto OnAssetsLoadedDelegate{ FStreamableDelegate::CreateUObject(this, &ThisClass::HandleLoadoutAssetBundleLoaded) };
+
+		if (!BundleLoadAssetHandle.IsValid() || BundleLoadAssetHandle->HasLoadCompleted())
+		{
+			FStreamableHandle::ExecuteDelegate(OnAssetsLoadedDelegate);
+		}
+		else
+		{
+			BundleLoadAssetHandle->BindCompleteDelegate(OnAssetsLoadedDelegate);
+
+			BundleLoadAssetHandle->BindCancelDelegate(
+				FStreamableDelegate::CreateLambda(
+					[OnAssetsLoadedDelegate]()
+					{
+						OnAssetsLoadedDelegate.ExecuteIfBound();
+					}
+				)
+			);
+		}
+	}
+	else
+	{
+		UE_LOG(LogBE_Loadout, Warning, TEXT("Tried to load but no item data"));
+	}
+}
+
+void UBELoadoutComponent::HandleLoadoutAssetBundleLoaded()
+{
+	UE_LOG(LogBE_Loadout, Log, TEXT("[%s] LoadLoadoutAssetBundleFinished"), HasAuthority() ? TEXT("SERVER") : TEXT("CLIENT"));
+
+	// 変更を通知
+
+	BroadcastLoadoutChange();
+
+	// ロード画面を非表示
+
+	HandleHideLoadingLoadoutAssetScreen();
+}
+
+
+// Loading Screen
+
+void UBELoadoutComponent::HandleShowLoadingLoadoutAssetScreen()
+{
+	auto* PlayerController{ GetPlayerState<APlayerState>()->GetPlayerController() };
+
+	if (PlayerController && PlayerController->IsLocalPlayerController())
+	{
+		if (auto* LSSubsystem{ UGameInstance::GetSubsystem<ULoadingScreenSubsystem>(GetGameInstance<UGameInstance>()) })
+		{
+			LSSubsystem->AddLoadingProcess(
+				UBELoadoutComponent::NAME_LoadoutAssetLoading
+				, TAG_LoadingType_AsyncIndicator
+				, FText(NSLOCTEXT("LoadingScreen", "LoadoutAssetLoadingReason", "Loading Loadout")));
+		}
+	}
+}
+
+void UBELoadoutComponent::HandleHideLoadingLoadoutAssetScreen()
+{
+	auto* PlayerController{ GetPlayerState<APlayerState>()->GetPlayerController() };
+
+	if (PlayerController && PlayerController->IsLocalPlayerController())
+	{
+		if (auto* LSSubsystem{ UGameInstance::GetSubsystem<ULoadingScreenSubsystem>(GetGameInstance<UGameInstance>()) })
+		{
+			LSSubsystem->RemoveLoadingProcess(UBELoadoutComponent::NAME_LoadoutAssetLoading);
+		}
+	}
+}
+
+
+// Notify Change
+
+void UBELoadoutComponent::BroadcastLoadoutChange()
+{
 	OnLoadoutChange.Broadcast(this);
 }
 
-void UBELoadoutComponent::RebuildIndexMap()
-{
-	Loadout.IndexMap.Reset();
 
-	for (auto It{ Loadout.Entries.CreateConstIterator() }; It; ++It)
-	{
-		Loadout.IndexMap.Emplace(It->GetSlotTag(), It.GetIndex());
-	}
-}
-
-
-const UBEEquipmentItemData* UBELoadoutComponent::GetItemDataBySlot(FGameplayTag SlotTag) const
-{
-	if (auto* Index{ Loadout.IndexMap.Find(SlotTag) })
-	{
-		return Loadout.Entries[*Index].ItemData;
-	}
-
-	return nullptr;
-}
-
-const FName UBELoadoutComponent::GetSkinNameBySlot(FGameplayTag SlotTag) const
-{
-	if (auto* Index{ Loadout.IndexMap.Find(SlotTag) })
-	{
-		return Loadout.Entries[*Index].SkinName;
-	}
-
-	return FName();
-}
-
+// Utilites
 
 UBELoadoutComponent* UBELoadoutComponent::FindBELoadoutComponent(const APlayerState* PlayerState)
 {

@@ -4,28 +4,13 @@
 
 #include "Subsystems/LocalPlayerSubsystem.h"
 
-#include "Type/BELoadoutRequest.h"
+#include "Loadout/BELoadoutRequest.h"
 
 #include "BELoadoutSubsystem.generated.h"
 
-class UPlayerSave;
 class UPlayerSaveSubsystem;
-class UBEPlayerLoadoutSave;
+class UPlayerSave;
 class UBEEquipmentItemData;
-
-
-/**
- * 取得するスキンの種類
- */
-UENUM(BlueprintType)
-enum class EBESkinAccessorType : uint8
-{
-	// ファイターのスキンを取得・設定
-	Fighter,
-
-	// 武器のスキンを取得・設定
-	Weapon
-};
 
 
 /**
@@ -67,40 +52,68 @@ protected:
 
 
 	//////////////////////////////////////////////////////////////////
-	// Skin
-protected:
-	UPROPERTY(Transient)
-	TMap<FPrimaryAssetId, FName> FighterSkin;
-
-	UPROPERTY(Transient)
-	TMap<FPrimaryAssetId, FName> WeaponSkin;
-
-public:
-	UFUNCTION(BlueprintCallable, BlueprintCosmetic, Category = "Loadout|Skin")
-	void SetSkin(EBESkinAccessorType Type, FPrimaryAssetId AssetId, FName SkinName);
-
-	UFUNCTION(BlueprintCallable, BlueprintCosmetic, Category = "Loadout|Skin")
-	FName GetSkin(EBESkinAccessorType Type, FPrimaryAssetId AssetId) const;
-
-
-	//////////////////////////////////////////////////////////////////
 	// Equipment Item Data
+#pragma region Equipment Item Data
 protected:
-	UPROPERTY(Transient)
-	TMap<FGameplayTag, TObjectPtr<const UBEEquipmentItemData>> EquipmentItems;
+	void ProcessItemDataFromId(FPrimaryAssetId AssetId, TObjectPtr<const UBEEquipmentItemData>& OutItemData);
+	FPrimaryAssetId GetItemDataFromId(const UBEEquipmentItemData* ItemData) const;
+
+protected:
+	UPROPERTY(Transient) TObjectPtr<const UBEEquipmentItemData> FighterData;
+	UPROPERTY(Transient) TObjectPtr<const UBEEquipmentItemData> WeaponData;
+	UPROPERTY(Transient) TObjectPtr<const UBEEquipmentItemData> MainSkillData;
+	UPROPERTY(Transient) TObjectPtr<const UBEEquipmentItemData> SubSkillData;
+	UPROPERTY(Transient) TObjectPtr<const UBEEquipmentItemData> UltimateSkillData;
+
+public:
+	UFUNCTION(BlueprintCallable, BlueprintCosmetic, Category = "Loadout", meta = (AllowedTypes = "Fighter"))
+	void SetFighterData(FPrimaryAssetId AssetId) { ProcessItemDataFromId(AssetId, FighterData); }
+
+	UFUNCTION(BlueprintCallable, BlueprintCosmetic, Category = "Loadout", meta = (AllowedTypes = "Weapon"))
+	void SetWeaponData(FPrimaryAssetId AssetId) { ProcessItemDataFromId(AssetId, WeaponData); }
+
+	UFUNCTION(BlueprintCallable, BlueprintCosmetic, Category = "Loadout", meta = (AllowedTypes = "MainSkill"))
+	void SetMainSkillData(FPrimaryAssetId AssetId) { ProcessItemDataFromId(AssetId, MainSkillData); }
+
+	UFUNCTION(BlueprintCallable, BlueprintCosmetic, Category = "Loadout", meta = (AllowedTypes = "SubSkill"))
+	void SetSubSkillData(FPrimaryAssetId AssetId) { ProcessItemDataFromId(AssetId, SubSkillData); }
+
+	UFUNCTION(BlueprintCallable, BlueprintCosmetic, Category = "Loadout", meta = (AllowedTypes = "UltimateSkill"))
+	void SetUltimateSkillData(FPrimaryAssetId AssetId) { ProcessItemDataFromId(AssetId, UltimateSkillData); }
 
 public:
 	UFUNCTION(BlueprintCallable, BlueprintCosmetic, Category = "Loadout")
-	virtual void SetLoadoutItem(UPARAM(meta = (Categories = "Equipment.Slot")) FGameplayTag SlotTag, FPrimaryAssetId AssetId);
+	const UBEEquipmentItemData* GetFighterData() const { return FighterData; }
 
 	UFUNCTION(BlueprintCallable, BlueprintCosmetic, Category = "Loadout")
-	virtual FPrimaryAssetId GetLoadoutItemAssetId(UPARAM(meta = (Categories = "Equipment.Slot")) FGameplayTag SlotTag);
+	const UBEEquipmentItemData* GetWeaponData() const { return WeaponData; }
 
 	UFUNCTION(BlueprintCallable, BlueprintCosmetic, Category = "Loadout")
-	virtual const UBEEquipmentItemData* GetLoadoutItemData(UPARAM(meta = (Categories = "Equipment.Slot")) FGameplayTag SlotTag);
+	const UBEEquipmentItemData* GetMainSkillData() const { return MainSkillData; }
+
+	UFUNCTION(BlueprintCallable, BlueprintCosmetic, Category = "Loadout")
+	const UBEEquipmentItemData* GetSubSkillData() const { return SubSkillData; }
+
+	UFUNCTION(BlueprintCallable, BlueprintCosmetic, Category = "Loadout")
+	const UBEEquipmentItemData* GetUltimateSkillData() const { return UltimateSkillData; }
 
 public:
-	const UBEEquipmentItemData* ProcessEquipmentItemData(const FGameplayTag& SlotTag, const FPrimaryAssetId& AssetId) const;
+	UFUNCTION(BlueprintCallable, BlueprintCosmetic, Category = "Loadout")
+	FPrimaryAssetId GetFighterDataId() const { return GetItemDataFromId(FighterData); }
+
+	UFUNCTION(BlueprintCallable, BlueprintCosmetic, Category = "Loadout")
+	FPrimaryAssetId GetWeaponDataId() const { return GetItemDataFromId(WeaponData); }
+
+	UFUNCTION(BlueprintCallable, BlueprintCosmetic, Category = "Loadout")
+	FPrimaryAssetId GetMainSkillDataId() const { return GetItemDataFromId(MainSkillData); }
+
+	UFUNCTION(BlueprintCallable, BlueprintCosmetic, Category = "Loadout")
+	FPrimaryAssetId GetSubSkillDataId() const { return GetItemDataFromId(SubSkillData); }
+
+	UFUNCTION(BlueprintCallable, BlueprintCosmetic, Category = "Loadout")
+	FPrimaryAssetId GetUltimateSkillDataId() const { return GetItemDataFromId(UltimateSkillData); }
+
+#pragma endregion
 
 
 	//////////////////////////////////////////////////////////////////
@@ -116,7 +129,11 @@ protected:
 	//////////////////////////////////////////////////////////////////
 	// Request
 public:
-	UFUNCTION(BlueprintCallable, Category = "Request")
-	virtual FBELoadoutRequest CreateRequest() const;
+	//
+	// 可能ならばプレイヤーステートの保有する LoadoutComponent に現在のロードアウトの情報を送り
+	// ネットワークへの反映をリクエストする。
+	//
+	UFUNCTION(BlueprintCallable, BlueprintPure = false, Category = "Request")
+	virtual bool SendLoadoutRequest() const;
 
 };

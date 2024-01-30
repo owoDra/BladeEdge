@@ -2,16 +2,13 @@
 
 #include "BEEquipmentFragment_WeaponSkin.h"
 
-#include "Loadout/BELoadoutComponent.h"
 #include "GameplayTag/BETags_MeshType.h"
-#include "GameplayTag/BETags_Equipment.h"
 
 // Game Character Extension
 #include "Character/CharacterMeshAccessorInterface.h"
 
 // Engine Feature
 #include "Components/SkeletalMeshComponent.h"
-#include "GameFramework/PlayerState.h"
 #include "GameFramework/Pawn.h"
 
 #if WITH_EDITOR
@@ -20,11 +17,19 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(BEEquipmentFragment_WeaponSkin)
 
+//////////////////////////////////////////////////////////////////////////////////
+
+bool FBEEquipmentMeshToSpawn::IsValid() const
+{
+	return ::IsValid(MeshToSpawn);
+}
+
+//////////////////////////////////////////////////////////////////////////////////
 
 UBEEquipmentFragment_WeaponSkin::UBEEquipmentFragment_WeaponSkin(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-	NetExecutionPolicy = EEquipmentFragmentNetExecutionPolicy::ClientOnly;
+	NetExecutionPolicy = EEquipmentFragmentNetExecutionPolicy::Both;
 
 #if WITH_EDITOR
 	StaticClass()->FindPropertyByName(FName{ TEXTVIEW("NetExecutionPolicy") })->SetPropertyFlags(CPF_DisableEditOnTemplate);
@@ -36,38 +41,17 @@ EDataValidationResult UBEEquipmentFragment_WeaponSkin::IsDataValid(FDataValidati
 {
 	auto Result{ CombineDataValidationResults(Super::IsDataValid(Context), EDataValidationResult::Valid) };
 
-	if (DataTable)
+	int32 Index{ 0 };
+	for (const auto& Entry : MeshesToSpawn)
 	{
-		if (DataTable->GetRowNames().IsEmpty())
+		if (!Entry.IsValid())
 		{
 			Result = CombineDataValidationResults(Result, EDataValidationResult::Invalid);
 
-			Context.AddError(FText::FromString(FString::Printf(TEXT("Emptry Data table in %s"), *GetNameSafe(this))));
+			Context.AddError(FText::FromString(FString::Printf(TEXT("Invalid info in MeshesToSpawn[%d] in %s"), Index, *GetNameSafe(this))));
 		}
-		else
-		{
-			DataTable->ForeachRow<FBEDataRow_WeaponSkin>(FString(),
-				[this, &Result, &Context](const FName& Name, const FBEDataRow_WeaponSkin& Row)
-				{
-					if (!Row.IsValid())
-					{
-						Result = CombineDataValidationResults(Result, EDataValidationResult::Invalid);
 
-						Context.AddError(
-							FText::FromString(FString::Printf(TEXT("Invalid row(%s) in table(%s) in %s")
-								, *Name.ToString()
-								, *GetNameSafe(DataTable)
-								, *GetNameSafe(this))));
-					}
-				}
-			);
-		}
-	}
-	else
-	{
-		Result = CombineDataValidationResults(Result, EDataValidationResult::Invalid);
-
-		Context.AddError(FText::FromString(FString::Printf(TEXT("Invalid Data table in %s"), *GetNameSafe(this))));
+		++Index;
 	}
 
 	return Result;
@@ -83,20 +67,16 @@ void UBEEquipmentFragment_WeaponSkin::HandleEquiped()
 
 	if (auto* Pawn{ GetOwner<APawn>() })
 	{
-		StoreSkinData(Pawn);
-
 		if (auto* TPPMesh{ ICharacterMeshAccessorInterface::Execute_GetMeshByTag(Pawn, TAG_MeshType_TPP) })
 		{
 			SpawmMeshesFor(Pawn, TPPMesh);
 			SetAnimOverlay_TPP(TPPMesh);
-			ListenMeshAnimInitialized_TPP(TPPMesh);
 		}
 
 		if (auto* FPPMesh{ ICharacterMeshAccessorInterface::Execute_GetMeshByTag(Pawn, TAG_MeshType_FPP) })
 		{
 			SpawmMeshesFor(Pawn, FPPMesh);
 			SetAnimOverlay_FPP(FPPMesh);
-			ListenMeshAnimInitialized_FPP(FPPMesh);
 		}
 	}
 }
@@ -108,52 +88,6 @@ void UBEEquipmentFragment_WeaponSkin::HandleUnequiped()
 	RemoveSpawnedMeshes();
 	RemoveAnimOverlay_TPP();
 	RemoveAnimOverlay_FPP();
-
-	if (auto* Pawn{ GetOwner<APawn>() })
-	{
-		if(auto* TPPMesh{ ICharacterMeshAccessorInterface::Execute_GetMeshByTag(Pawn, TAG_MeshType_TPP) })
-		{
-			UnlistenMeshAnimInitialized_TPP(TPPMesh);
-		}
-		
-		if (auto* FPPMesh{ ICharacterMeshAccessorInterface::Execute_GetMeshByTag(Pawn, TAG_MeshType_FPP) })
-		{
-			UnlistenMeshAnimInitialized_FPP(FPPMesh);
-		}
-	}
-}
-
-
-// Skin Data
-
-void UBEEquipmentFragment_WeaponSkin::StoreSkinData(APawn* Pawn)
-{
-	auto* PlayerState{ Pawn->GetPlayerState() };
-	ensure(PlayerState);
-
-	if (auto* LoadoutComponent{ PlayerState ? PlayerState->GetComponentByClass<UBELoadoutComponent>() : nullptr})
-	{
-		auto SkinName{ LoadoutComponent->GetSkinNameBySlot(TAG_Equipment_Slot_Weapon) };
-		
-		// 取得したスキン名が None じゃなければそれでデータを取得
-
-		if (!SkinName.IsNone())
-		{
-			if (auto* FoundRow{ DataTable->FindRow<FBEDataRow_WeaponSkin>(SkinName, FString()) })
-			{
-				SkinData = *FoundRow;
-				return;
-			}
-		}
-
-		// 取得したスキン名では見つからなかった場合はデフォルトを返す
-
-		SkinName = DataTable->GetRowNames()[0];
-		auto DefaultRow{ DataTable->FindRow<FBEDataRow_WeaponSkin>(SkinName, FString()) };
-		check(DefaultRow);
-
-		SkinData = *DefaultRow;
-	}
 }
 
 
@@ -161,27 +95,23 @@ void UBEEquipmentFragment_WeaponSkin::StoreSkinData(APawn* Pawn)
 
 void UBEEquipmentFragment_WeaponSkin::SpawmMeshesFor(APawn* Pawn, USkeletalMeshComponent* TargetMesh)
 {
-	for (const auto& Entry : SkinData.MeshesToSpawn)
+	// 専用サーバーでは作成しない
+
+	if (Pawn->GetNetMode() == NM_DedicatedServer)
 	{
-		const auto bOwnerNoSee{ static_cast<bool>(TargetMesh->bOwnerNoSee) };
-		const auto bOnlyOwnerSee{ static_cast<bool>(TargetMesh->bOnlyOwnerSee) };
-		const auto bHiddenInGame{ static_cast<bool>(TargetMesh->bHiddenInGame) };
-		const auto bCastShadow{ static_cast<bool>(TargetMesh->CastShadow) };
+		return;
+	}
 
-		auto* MeshToSet
-		{
-			Entry.MeshToSpawn.IsValid() ? Entry.MeshToSpawn.Get() : Entry.MeshToSpawn.LoadSynchronous()
-		};
+	const auto bOwnerNoSee{ static_cast<bool>(TargetMesh->bOwnerNoSee) };
+	const auto bOnlyOwnerSee{ static_cast<bool>(TargetMesh->bOnlyOwnerSee) };
+	const auto bHiddenInGame{ static_cast<bool>(TargetMesh->bHiddenInGame) };
+	const auto bCastShadow{ static_cast<bool>(TargetMesh->CastShadow) };
 
-		auto* AnimInstanceClass
-		{
-			Entry.MeshAnimInstance.IsNull() ? nullptr :
-			Entry.MeshAnimInstance.IsValid() ? Entry.MeshAnimInstance.Get() : Entry.MeshAnimInstance.LoadSynchronous()
-		};
-
+	for (const auto& Entry : MeshesToSpawn)
+	{
 		auto* NewMesh{ NewObject<USkeletalMeshComponent>(Pawn) };
-		NewMesh->SetSkeletalMesh(MeshToSet);
-		NewMesh->SetAnimInstanceClass(AnimInstanceClass);
+		NewMesh->SetSkeletalMesh(Entry.MeshToSpawn);
+		NewMesh->SetAnimInstanceClass(Entry.MeshAnimInstance);
 		NewMesh->SetRelativeTransform(Entry.AttachTransform);
 		NewMesh->AttachToComponent(TargetMesh, FAttachmentTransformRules::KeepRelativeTransform, Entry.AttachSocket);
 		NewMesh->SetOwnerNoSee(bOwnerNoSee);
@@ -212,30 +142,26 @@ void UBEEquipmentFragment_WeaponSkin::RemoveSpawnedMeshes()
 
 void UBEEquipmentFragment_WeaponSkin::SetAnimOverlay_TPP(USkeletalMeshComponent* TargetMesh)
 {
-	auto* OverlayClass
+	if (TPPAnimOverlay)
 	{
-		SkinData.TPPAnimOverlay.IsNull() ? nullptr :
-		SkinData.TPPAnimOverlay.IsValid() ? SkinData.TPPAnimOverlay.Get() : SkinData.TPPAnimOverlay.LoadSynchronous()
-	};
+		AppliedTPPMesh = TargetMesh;
 
-	if (OverlayClass)
-	{
-		TargetMesh->LinkAnimClassLayers(OverlayClass);
-
-		ApplingOverlay_TPP.ApplingOverlayClass = OverlayClass;
-		ApplingOverlay_TPP.TargetMesh = TargetMesh;
+		TargetMesh->LinkAnimClassLayers(TPPAnimOverlay);
+		
+		ListenMeshAnimInitialized_TPP(TargetMesh);
 	}
 }
 
 void UBEEquipmentFragment_WeaponSkin::RemoveAnimOverlay_TPP()
 {
-	if (ApplingOverlay_TPP.TargetMesh.IsValid())
+	if (TPPAnimOverlay && AppliedTPPMesh.IsValid())
 	{
-		ApplingOverlay_TPP.TargetMesh->UnlinkAnimClassLayers(ApplingOverlay_TPP.ApplingOverlayClass);
-	}
+		UnlistenMeshAnimInitialized_TPP(AppliedTPPMesh.Get());
 
-	ApplingOverlay_TPP.TargetMesh.Reset();
-	ApplingOverlay_TPP.ApplingOverlayClass = nullptr;
+		AppliedTPPMesh->UnlinkAnimClassLayers(TPPAnimOverlay);
+
+		AppliedTPPMesh.Reset();
+	}
 }
 
 void UBEEquipmentFragment_WeaponSkin::ListenMeshAnimInitialized_TPP(USkeletalMeshComponent* TargetMesh)
@@ -250,9 +176,9 @@ void UBEEquipmentFragment_WeaponSkin::UnlistenMeshAnimInitialized_TPP(USkeletalM
 
 void UBEEquipmentFragment_WeaponSkin::HandleMeshAnimInitialized_TPP()
 {
-	if (ApplingOverlay_TPP.TargetMesh.IsValid())
+	if (AppliedTPPMesh.IsValid())
 	{
-		ApplingOverlay_TPP.TargetMesh->LinkAnimClassLayers(ApplingOverlay_TPP.ApplingOverlayClass);
+		AppliedTPPMesh->LinkAnimClassLayers(TPPAnimOverlay);
 	}
 }
 
@@ -261,30 +187,26 @@ void UBEEquipmentFragment_WeaponSkin::HandleMeshAnimInitialized_TPP()
 
 void UBEEquipmentFragment_WeaponSkin::SetAnimOverlay_FPP(USkeletalMeshComponent* TargetMesh)
 {
-	auto* OverlayClass
+	if (FPPAnimOverlay)
 	{
-		SkinData.FPPAnimOverlay.IsNull() ? nullptr :
-		SkinData.FPPAnimOverlay.IsValid() ? SkinData.FPPAnimOverlay.Get() : SkinData.FPPAnimOverlay.LoadSynchronous()
-	};
+		AppliedFPPMesh = TargetMesh;
 
-	if (OverlayClass)
-	{
-		TargetMesh->LinkAnimClassLayers(OverlayClass);
+		TargetMesh->LinkAnimClassLayers(FPPAnimOverlay);
 
-		ApplingOverlay_FPP.ApplingOverlayClass = OverlayClass;
-		ApplingOverlay_FPP.TargetMesh = TargetMesh;
+		ListenMeshAnimInitialized_FPP(TargetMesh);
 	}
 }
 
 void UBEEquipmentFragment_WeaponSkin::RemoveAnimOverlay_FPP()
 {
-	if (ApplingOverlay_FPP.TargetMesh.IsValid())
+	if (FPPAnimOverlay && AppliedFPPMesh.IsValid())
 	{
-		ApplingOverlay_FPP.TargetMesh->UnlinkAnimClassLayers(ApplingOverlay_FPP.ApplingOverlayClass);
-	}
+		UnlistenMeshAnimInitialized_FPP(AppliedFPPMesh.Get());
 
-	ApplingOverlay_FPP.TargetMesh.Reset();
-	ApplingOverlay_FPP.ApplingOverlayClass = nullptr;
+		AppliedFPPMesh->UnlinkAnimClassLayers(FPPAnimOverlay);
+
+		AppliedFPPMesh.Reset();
+	}
 }
 
 void UBEEquipmentFragment_WeaponSkin::ListenMeshAnimInitialized_FPP(USkeletalMeshComponent* TargetMesh)
@@ -299,9 +221,8 @@ void UBEEquipmentFragment_WeaponSkin::UnlistenMeshAnimInitialized_FPP(USkeletalM
 
 void UBEEquipmentFragment_WeaponSkin::HandleMeshAnimInitialized_FPP()
 {
-	if (ApplingOverlay_FPP.TargetMesh.IsValid())
+	if (AppliedFPPMesh.IsValid())
 	{
-		ApplingOverlay_FPP.TargetMesh->LinkAnimClassLayers(ApplingOverlay_FPP.ApplingOverlayClass);
+		AppliedFPPMesh->LinkAnimClassLayers(FPPAnimOverlay);
 	}
 }
-

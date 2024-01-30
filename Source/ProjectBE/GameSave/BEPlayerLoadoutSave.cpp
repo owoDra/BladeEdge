@@ -11,10 +11,11 @@ void UBEPlayerLoadoutSave::ResetToDefault()
 {
 	Super::ResetToDefault();
 
-	FighterSkin.Empty();
-	WeaponSkin.Empty();
-
 	const auto* DevSettings{ GetDefault<UBELoadoutDeveloperSettings>() };
 
-	EquipmentItems = DevSettings->DefaultEquipmentItems;
+	Fighter			= DevSettings->Fighter;
+	Weapon			= DevSettings->Weapon;
+	MainSkill		= DevSettings->MainSkill;
+	SubSkill		= DevSettings->SubSkill;
+	UltimateSkill	= DevSettings->UltimateSkill;
 }

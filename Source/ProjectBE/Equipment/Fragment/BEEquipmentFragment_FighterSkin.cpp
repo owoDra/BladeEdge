@@ -2,9 +2,7 @@
 
 #include "BEEquipmentFragment_FighterSkin.h"
 
-#include "Loadout/BELoadoutComponent.h"
 #include "GameplayTag/BETags_MeshType.h"
-#include "GameplayTag/BETags_Equipment.h"
 
 // Game Character Extension
 #include "Character/CharacterMeshAccessorInterface.h"
@@ -15,7 +13,6 @@
 
 // Engine Feature
 #include "Components/SkeletalMeshComponent.h"
-#include "GameFramework/PlayerState.h"
 #include "GameFramework/Pawn.h"
 
 #if WITH_EDITOR
@@ -24,11 +21,19 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(BEEquipmentFragment_FighterSkin)
 
+////////////////////////////////////////////////////////////////////////////
+
+bool FBEMeshToSetMesh::IsValid() const
+{
+	return SkeletalMesh && AnimInstance;
+}
+
+////////////////////////////////////////////////////////////////////////////
 
 UBEEquipmentFragment_FighterSkin::UBEEquipmentFragment_FighterSkin(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-	NetExecutionPolicy = EEquipmentFragmentNetExecutionPolicy::ClientOnly;
+	NetExecutionPolicy = EEquipmentFragmentNetExecutionPolicy::Both;
 
 #if WITH_EDITOR
 	StaticClass()->FindPropertyByName(FName{ TEXTVIEW("NetExecutionPolicy") })->SetPropertyFlags(CPF_DisableEditOnTemplate);
@@ -38,40 +43,20 @@ UBEEquipmentFragment_FighterSkin::UBEEquipmentFragment_FighterSkin(const FObject
 #if WITH_EDITOR 
 EDataValidationResult UBEEquipmentFragment_FighterSkin::IsDataValid(FDataValidationContext& Context) const
 {
-auto Result{ CombineDataValidationResults(Super::IsDataValid(Context), EDataValidationResult::Valid) };
+	auto Result{ CombineDataValidationResults(Super::IsDataValid(Context), EDataValidationResult::Valid) };
 
-	if (DataTable)
-	{
-		if (DataTable->GetRowNames().IsEmpty())
-		{
-			Result = CombineDataValidationResults(Result, EDataValidationResult::Invalid);
-
-			Context.AddError(FText::FromString(FString::Printf(TEXT("Emptry Data table in %s"), *GetNameSafe(this))));
-		}
-		else
-		{
-			DataTable->ForeachRow<FBEDataRow_FighterSkin>(FString(),
-				[this, &Result, &Context](const FName& Name, const FBEDataRow_FighterSkin& Row)
-				{
-					if (!Row.IsValid())
-					{
-						Result = CombineDataValidationResults(Result, EDataValidationResult::Invalid);
-
-						Context.AddError(
-							FText::FromString(FString::Printf(TEXT("Invalid row(%s) in table(%s) in %s")
-								, *Name.ToString()
-								, *GetNameSafe(DataTable)
-								, *GetNameSafe(this))));
-					}
-				}
-			);
-		}
-	}
-	else
+	if (!TPPMeshesToSet.IsValid())
 	{
 		Result = CombineDataValidationResults(Result, EDataValidationResult::Invalid);
 
-		Context.AddError(FText::FromString(FString::Printf(TEXT("Invalid Data table in %s"), *GetNameSafe(this))));
+		Context.AddError(FText::FromString(FString::Printf(TEXT("Invalid TPPMeshesToSet is set in %s"), *GetNameSafe(this))));
+	}
+
+	if (!FPPMeshesToSet.IsValid())
+	{
+		Result = CombineDataValidationResults(Result, EDataValidationResult::Invalid);
+
+		Context.AddError(FText::FromString(FString::Printf(TEXT("Invalid FPPMeshesToSet is set in %s"), *GetNameSafe(this))));
 	}
 
 	return Result;
@@ -87,16 +72,14 @@ void UBEEquipmentFragment_FighterSkin::HandleEquipmentGiven()
 
 	if (auto* Pawn{ GetOwner<APawn>() })
 	{
-		StoreSkinData(Pawn);
-
 		if (auto* TPPMesh{ ICharacterMeshAccessorInterface::Execute_GetMeshByTag(Pawn, TAG_MeshType_TPP) })
 		{
-			SetMesh(TPPMesh, SkinData.TPPMeshesToSet);
+			SetMesh(TPPMesh, TPPMeshesToSet);
 		}
 
 		if (auto* FPPMesh{ ICharacterMeshAccessorInterface::Execute_GetMeshByTag(Pawn, TAG_MeshType_FPP) })
 		{
-			SetMesh(FPPMesh, SkinData.FPPMeshesToSet);
+			SetMesh(FPPMesh, FPPMeshesToSet);
 		}
 
 		SetContextEffectLibraries(Pawn);
@@ -104,59 +87,13 @@ void UBEEquipmentFragment_FighterSkin::HandleEquipmentGiven()
 }
 
 
-// Skin Data
-
-void UBEEquipmentFragment_FighterSkin::StoreSkinData(APawn* Pawn)
-{
-	auto* PlayerState{ Pawn->GetPlayerState() };
-	ensure(PlayerState);
-
-	if (auto* LoadoutComponent{ PlayerState ? PlayerState->GetComponentByClass<UBELoadoutComponent>() : nullptr })
-	{
-		auto SkinName{ LoadoutComponent->GetSkinNameBySlot(TAG_Equipment_Slot_Fighter) };
-
-		// 取得したスキン名が None じゃなければそれでデータを取得
-
-		if (!SkinName.IsNone())
-		{
-			if (auto * FoundRow{ DataTable->FindRow<FBEDataRow_FighterSkin>(SkinName, FString()) })
-			{
-				SkinData = *FoundRow;
-				return;
-			}
-		}
-
-		// 取得したスキン名では見つからなかった場合はデフォルトを返す
-
-		SkinName = DataTable->GetRowNames()[0];
-		auto DefaultRow{ DataTable->FindRow<FBEDataRow_FighterSkin>(SkinName, FString()) };
-		check(DefaultRow);
-
-		SkinData = *DefaultRow;
-	}
-}
-
 
 // Set Meshes
 
 void UBEEquipmentFragment_FighterSkin::SetMesh(USkeletalMeshComponent* TargetMesh, const FBEMeshToSetMesh& Info)
 {
-	auto* LoadedSkeltalMesh
-	{
-		Info.SkeletalMesh.IsNull() ? nullptr :
-		Info.SkeletalMesh.IsValid() ? Info.SkeletalMesh.Get() : Info.SkeletalMesh.LoadSynchronous()
-	};
-
-	TargetMesh->SetSkeletalMesh(LoadedSkeltalMesh);
-
-	auto* LoadedAnimInstanceClass
-	{
-		Info.AnimInstance.IsNull() ? nullptr :
-		Info.AnimInstance.IsValid() ? Info.AnimInstance.Get() : Info.AnimInstance.LoadSynchronous()
-	};
-
-	TargetMesh->SetAnimInstanceClass(LoadedAnimInstanceClass);
-
+	TargetMesh->SetSkeletalMesh(Info.SkeletalMesh);
+	TargetMesh->SetAnimInstanceClass(Info.AnimInstance);
 	TargetMesh->SetRelativeLocation(Info.NewLocation);
 	TargetMesh->SetRelativeRotation(Info.NewRotation);
 	TargetMesh->SetRelativeScale3D(Info.NewScale);
@@ -167,9 +104,16 @@ void UBEEquipmentFragment_FighterSkin::SetMesh(USkeletalMeshComponent* TargetMes
 
 void UBEEquipmentFragment_FighterSkin::SetContextEffectLibraries(APawn* Pawn)
 {
+	// 専用サーバーでは設定しない
+
+	if (Pawn->GetNetMode() == NM_DedicatedServer)
+	{
+		return;
+	}
+
 	if (auto* Component{ Pawn->FindComponentByClass<UContextEffectComponent>() })
 	{
-		Component->UpdateContextEffectLibraries(SkinData.ContextEffectLibraries);
-		Component->UpdateExtraContexts(SkinData.ExtraContexts);
+		Component->UpdateContextEffectLibraries(ContextEffectLibraries);
+		Component->UpdateExtraContexts(ExtraContexts);
 	}
 }
