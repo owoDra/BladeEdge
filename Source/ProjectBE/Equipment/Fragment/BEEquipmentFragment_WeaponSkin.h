@@ -84,12 +84,16 @@ protected:
 	void RemoveAnimOverlay_TPP();
 	void ListenMeshAnimInitialized_TPP(USkeletalMeshComponent* TargetMesh);
 	void UnlistenMeshAnimInitialized_TPP(USkeletalMeshComponent* TargetMesh);
+
+	UFUNCTION()
 	void HandleMeshAnimInitialized_TPP();
 
 	void SetAnimOverlay_FPP(USkeletalMeshComponent* TargetMesh);
 	void RemoveAnimOverlay_FPP();
 	void ListenMeshAnimInitialized_FPP(USkeletalMeshComponent* TargetMesh);
 	void UnlistenMeshAnimInitialized_FPP(USkeletalMeshComponent* TargetMesh);
+
+	UFUNCTION()
 	void HandleMeshAnimInitialized_FPP();
 
 };

@@ -3,6 +3,7 @@
 #include "BELoadoutComponent.h"
 
 #include "Loadout/Type/BELoadoutRequestResolver.h"
+#include "ProjectBELogs.h"
 
 #include "Net/UnrealNetwork.h"
 #include "Net/Core/PushModel/PushModel.h"
@@ -42,6 +43,8 @@ void UBELoadoutComponent::LoadoutRequest(const FBELoadoutRequest& Request)
 {
 	if (Request.IsValid())
 	{
+		UE_LOG(LogBE_Loadout, Log, TEXT("[%s] SendLoadoutRequest: %s"), HasAuthority() ? TEXT("SERVER") : TEXT("CLIENT"), *Request.GetDebugString());
+
 		if (HasAuthority())
 		{
 			ReciveLoadoutRequest(Request);
@@ -67,6 +70,8 @@ void UBELoadoutComponent::ReciveLoadoutRequest(const FBELoadoutRequest& Request)
 {
 	check(HasAuthority());
 
+	UE_LOG(LogBE_Loadout, Log, TEXT("[%s] ReciveLoadoutRequest: %s"), HasAuthority() ? TEXT("SERVER") : TEXT("CLIENT"), *Request.GetDebugString());
+
 	auto Resolver{ FBELoadoutRequestResolver(Request) };
 	Resolver.ResolveRequest(Loadout);
 
@@ -77,6 +82,8 @@ void UBELoadoutComponent::HandleLoadoutChange()
 {
 	RebuildIndexMap();
 
+	UE_LOG(LogBE_Loadout, Log, TEXT("[%s] HandleLoadoutChange"), HasAuthority() ? TEXT("SERVER") : TEXT("CLIENT"));
+	
 	OnLoadoutChange.Broadcast(this);
 }
 

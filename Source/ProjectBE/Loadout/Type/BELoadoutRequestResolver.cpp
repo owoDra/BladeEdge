@@ -19,7 +19,7 @@ FBELoadoutRequestResolver::FBELoadoutRequestResolver(const FBELoadoutRequest& In
 
 		if (SlotTag.IsValid())
 		{
-			Requests.Emplace(SlotTag, ItemData);
+			Requests.Add(SlotTag, ItemData);
 		}
 	}
 }
@@ -63,7 +63,9 @@ void FBELoadoutRequestResolver::ResolveRequest(FBELoadout& InOutLoadout)
 		const auto& Tag{ Request.Key };
 		const auto& Data{ Request.Value };
 
-		auto& NewEntry{ InOutLoadout.Entries.Emplace_GetRef(Data, ResolveSkinName(Tag)) };
+		auto& NewEntry{ InOutLoadout.Entries.AddDefaulted_GetRef() };
+		NewEntry.ItemData = Data;
+		NewEntry.SkinName = ResolveSkinName(Tag);
 		InOutLoadout.MarkItemDirty(NewEntry);
 	}
 }

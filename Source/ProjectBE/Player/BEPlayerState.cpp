@@ -2,6 +2,8 @@
 
 #include "BEPlayerState.h"
 
+#include "Loadout/BELoadoutComponent.h"
+
 // Game Framework Core
 #include "InitState/InitStateComponent.h"
 
@@ -10,6 +12,7 @@
 
 // Engine Features
 #include "Net/UnrealNetwork.h"
+#include "Net/Core/PushModel/PushModel.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(BEPlayerState)
 
@@ -20,6 +23,7 @@ ABEPlayerState::ABEPlayerState(const FObjectInitializer& ObjectInitializer)
 {
 	InitStateComponent = ObjectInitializer.CreateDefaultSubobject<UInitStateComponent>(this, TEXT("InitState"));
 	AbilitySystemComponent = ObjectInitializer.CreateDefaultSubobject<UGAEAbilitySystemComponent>(this, TEXT("AbilitySystem"));
+	LoadoutComponent = ObjectInitializer.CreateDefaultSubobject<UBELoadoutComponent>(this, TEXT("Loadout"));
 
 	NetUpdateFrequency = 100.0f;
 }
@@ -28,7 +32,10 @@ void ABEPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(ThisClass, StatTags);
+	FDoRepLifetimeParams Params;
+	Params.bIsPushBased = true;
+	Params.Condition = COND_None;
+	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, StatTags, Params);
 }
 
 

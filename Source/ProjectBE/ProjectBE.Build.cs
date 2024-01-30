@@ -69,12 +69,6 @@ public class ProjectBE : ModuleRules
                 
                 // Game XXX: YYY Integration
                 "GAUIIntg",         // アビリティ関係のUI作成 のため
-                "GCAIntg",          // キャラクターへのアビリティ追加 のため(一時)
-                "GCFXIntg",         // キャラクターへのエフェクト設定 のため(一時)
-                "GCEIntg",          // キャラクターへの装備追加 のため(一時)
-                "GCHIntg",          // キャラクターへのヘルス設定 のため(一時)
-                "GCLIntg",          // キャラクターへの移動設定 のため(一時)
-                "GCVIntg",          // キャラクターへの視点設定 のため(一時)
                 "GIEquipAbility",   // 装備関係のアビリティ追加 のため
                 "GHFXIntg",         // 人型キャラクター関係のエフェクト表現 のため
                 "GIAIntg",          // アビリティの入力処理 のため

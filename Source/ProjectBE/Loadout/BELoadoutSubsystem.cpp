@@ -34,6 +34,10 @@ void UBELoadoutSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 
 void UBELoadoutSubsystem::InitializeLoadout(UPlayerSaveSubsystem* SaveSubsystem)
 {
+	// ロード画面を表示
+
+	HandleShowLoadingLoadoutScreen();
+
 	// ロードアウトセーブを非同期ロード開始
 
 	auto NewDelegate
@@ -41,15 +45,19 @@ void UBELoadoutSubsystem::InitializeLoadout(UPlayerSaveSubsystem* SaveSubsystem)
 		FPlayerSaveEventDelegate::CreateUObject(this, &ThisClass::HandleLoadoutSaveLoaded)
 	};
 
-	SaveSubsystem->AsyncLoadPlayerSave(
-		UBEPlayerLoadoutSave::StaticClass()
-		, /* SlotName	= */ FString()
-		, /* ForceLoad	= */ true
-		, /* Callback	= */ NewDelegate);
+	auto bSuccess
+	{
+		SaveSubsystem->AsyncLoadPlayerSave(
+			UBEPlayerLoadoutSave::StaticClass()
+			, /* SlotName	= */ FString()
+			, /* ForceLoad	= */ true
+			, /* Callback	= */ NewDelegate)
+	};
 
-	// ロード画面を表示
-
-	HandleShowLoadingLoadoutScreen();
+	if (!bSuccess)
+	{
+		HandleLoadoutSaveLoaded(nullptr, false);
+	}
 }
 
 void UBELoadoutSubsystem::HandleLoadoutSaveLoaded(UPlayerSave* Save, bool bSuccess)
@@ -266,4 +274,14 @@ bool UBELoadoutSubsystem::SaveLoadout()
 void UBELoadoutSubsystem::HandleLoadoutSaved(UPlayerSave* Save, bool bSuccess)
 {
 	HandleHideSavingLoadoutIndicator();
+}
+
+
+// Request
+
+FBELoadoutRequest UBELoadoutSubsystem::CreateRequest() const
+{
+	TArray<TObjectPtr<const UBEEquipmentItemData>> Items;
+	EquipmentItems.GenerateValueArray(Items);
+	return FBELoadoutRequest(Items);
 }

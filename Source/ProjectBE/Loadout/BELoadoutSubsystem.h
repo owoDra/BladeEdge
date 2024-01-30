@@ -77,15 +77,10 @@ protected:
 
 public:
 	UFUNCTION(BlueprintCallable, BlueprintCosmetic, Category = "Loadout|Skin")
-	void SetSkin(
-		EBESkinAccessorType Type
-		, UPARAM(meta = (AllowedTypes = "Fighter, Weapon, MainSkill, SubSkill, UltimateSkill")) FPrimaryAssetId AssetId
-		, FName SkinName);
+	void SetSkin(EBESkinAccessorType Type, FPrimaryAssetId AssetId, FName SkinName);
 
 	UFUNCTION(BlueprintCallable, BlueprintCosmetic, Category = "Loadout|Skin")
-	FName GetSkin(
-		EBESkinAccessorType Type
-		, UPARAM(meta = (AllowedTypes = "Fighter, Weapon, MainSkill, SubSkill, UltimateSkill")) FPrimaryAssetId AssetId) const;
+	FName GetSkin(EBESkinAccessorType Type, FPrimaryAssetId AssetId) const;
 
 
 	//////////////////////////////////////////////////////////////////
@@ -96,17 +91,13 @@ protected:
 
 public:
 	UFUNCTION(BlueprintCallable, BlueprintCosmetic, Category = "Loadout")
-	virtual void SetLoadoutItem(
-		UPARAM(meta = (Categories = "Equipment.Slot")) FGameplayTag SlotTag
-		, UPARAM(meta = (AllowedTypes = "Fighter, Weapon, MainSkill, SubSkill, UltimateSkill")) FPrimaryAssetId AssetId);
+	virtual void SetLoadoutItem(UPARAM(meta = (Categories = "Equipment.Slot")) FGameplayTag SlotTag, FPrimaryAssetId AssetId);
 
 	UFUNCTION(BlueprintCallable, BlueprintCosmetic, Category = "Loadout")
-	virtual FPrimaryAssetId GetLoadoutItemAssetId(
-		UPARAM(meta = (Categories = "Equipment.Slot")) FGameplayTag SlotTag);
+	virtual FPrimaryAssetId GetLoadoutItemAssetId(UPARAM(meta = (Categories = "Equipment.Slot")) FGameplayTag SlotTag);
 
 	UFUNCTION(BlueprintCallable, BlueprintCosmetic, Category = "Loadout")
-	virtual const UBEEquipmentItemData* GetLoadoutItemData(
-		UPARAM(meta = (Categories = "Equipment.Slot")) FGameplayTag SlotTag);
+	virtual const UBEEquipmentItemData* GetLoadoutItemData(UPARAM(meta = (Categories = "Equipment.Slot")) FGameplayTag SlotTag);
 
 public:
 	const UBEEquipmentItemData* ProcessEquipmentItemData(const FGameplayTag& SlotTag, const FPrimaryAssetId& AssetId) const;
@@ -120,5 +111,12 @@ public:
 
 protected:
 	virtual void HandleLoadoutSaved(UPlayerSave* Save, bool bSuccess);
+
+
+	//////////////////////////////////////////////////////////////////
+	// Request
+public:
+	UFUNCTION(BlueprintCallable, Category = "Request")
+	virtual FBELoadoutRequest CreateRequest() const;
 
 };

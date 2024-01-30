@@ -24,10 +24,13 @@ public:
 	{}
 
 public:
-	TArray<TObjectPtr<const UBEEquipmentItemData>, TInlineAllocator<5>> ItemDatas;
+	UPROPERTY()
+	TArray<TObjectPtr<const UBEEquipmentItemData>> ItemDatas;
 
+	UPROPERTY()
 	FName FighterSkinName{ NAME_None };
 	
+	UPROPERTY()
 	FName WeaponSkinName{ NAME_None };
 
 public:
@@ -36,4 +39,8 @@ public:
 	 */
 	bool IsValid() const;
 
+	/**
+	 * デバッグ用の文字列を返す
+	 */
+	FString GetDebugString() const;
 };

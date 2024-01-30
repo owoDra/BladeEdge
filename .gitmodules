@@ -101,30 +101,6 @@
 	path = Plugins/Integration/GameAbilityUIIntegration
 	url = https://github.com/owoDra/GameAbilityUIIntegration.git
 
-[submodule "Plugins/Integration/GameCharacterAbilityIntegration"]
-	path = Plugins/Integration/GameCharacterAbilityIntegration
-	url = https://github.com/owoDra/GameCharacterAbilityIntegration.git
-
-[submodule "Plugins/Integration/GameCharacterEquipmentIntegration"]
-	path = Plugins/Integration/GameCharacterEquipmentIntegration
-	url = https://github.com/owoDra/GameCharacterEquipmentIntegration.git
-
-[submodule "Plugins/Integration/GameCharacterEffectIntegration"]
-	path = Plugins/Integration/GameCharacterEffectIntegration
-	url = https://github.com/owoDra/GameCharacterEffectIntegration.git
-
-[submodule "Plugins/Integration/GameCharacterHealthIntegration"]
-	path = Plugins/Integration/GameCharacterHealthIntegration
-	url = https://github.com/owoDra/GameCharacterHealthIntegration.git
-
-[submodule "Plugins/Integration/GameCharacterViewIntegration"]
-	path = Plugins/Integration/GameCharacterViewIntegration
-	url = https://github.com/owoDra/GameCharacterViewIntegration.git
-
-[submodule "Plugins/Integration/GameCharacterLocomotionIntegration"]
-	path = Plugins/Integration/GameCharacterLocomotionIntegration
-	url = https://github.com/owoDra/GameCharacterLocomotionIntegration.git
-
 [submodule "Plugins/Integration/GameInputAbilityIntegration"]
 	path = Plugins/Integration/GameInputAbilityIntegration
 	url = https://github.com/owoDra/GameInputAbilityIntegration.git

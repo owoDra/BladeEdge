@@ -23,6 +23,7 @@
 
 // Engine Features
 #include "Net/UnrealNetwork.h"
+#include "Net/Core/PushModel/PushModel.h"
 #include "GameFramework/PlayerState.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(BECharacter)
@@ -51,7 +52,10 @@ void ABECharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(ThisClass, StatTags);
+	FDoRepLifetimeParams Params;
+	Params.bIsPushBased = true;
+	Params.Condition = COND_None;
+	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, StatTags, Params);
 }
 
 

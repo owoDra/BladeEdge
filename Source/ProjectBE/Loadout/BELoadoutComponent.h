@@ -69,7 +69,7 @@ protected:
 	virtual void ReciveLoadoutRequest(const FBELoadoutRequest& Request);
 
 	virtual void HandleLoadoutChange();
-
+	
 	void RebuildIndexMap();
 
 public:

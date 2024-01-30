@@ -10,6 +10,7 @@
 
 class UInitStateComponent;
 class UGAEAbilitySystemComponent;
+class UBELoadoutComponent;
 
 
 /** 
@@ -33,6 +34,9 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Components")
 	TObjectPtr<UGAEAbilitySystemComponent> AbilitySystemComponent;
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Components")
+	TObjectPtr<UBELoadoutComponent> LoadoutComponent;
 
 protected:
 	UPROPERTY(Replicated)

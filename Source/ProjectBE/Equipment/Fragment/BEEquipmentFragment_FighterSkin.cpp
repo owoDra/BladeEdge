@@ -81,9 +81,9 @@ auto Result{ CombineDataValidationResults(Super::IsDataValid(Context), EDataVali
 
 // Equiped / Unequiped
 
-void UBEEquipmentFragment_FighterSkin::HandleEquiped()
+void UBEEquipmentFragment_FighterSkin::HandleEquipmentGiven()
 {
-	Super::HandleEquiped();
+	Super::HandleEquipmentGiven();
 
 	if (auto* Pawn{ GetOwner<APawn>() })
 	{

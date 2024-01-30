@@ -20,6 +20,8 @@ public:
 public:
 	UBEPlayerLoadoutSave() {}
 
+	virtual FString GetSaveSlotName_Implementation() const override { return TEXT("Loadout"); }
+
 	/////////////////////////////////////////////////////////////////////////////////////
 	// セーブデータ
 public:
@@ -30,8 +32,7 @@ public:
 	TMap<FPrimaryAssetId, FName> WeaponSkin;
 
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Loadout",
-		meta = (AllowedTypes = "Fighter, Weapon, MainSkill, SubSKill, UltimateSkill", Categories = "Equipment.Slot"))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Loadout", meta = (Categories = "Equipment.Slot"))
 	TMap<FGameplayTag, FPrimaryAssetId> EquipmentItems;
 
 

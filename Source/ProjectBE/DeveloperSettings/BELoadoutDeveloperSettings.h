@@ -23,8 +23,7 @@ public:
 	///////////////////////////////////////////////
 	// デフォルトデータ
 public:
-	UPROPERTY(Config, BlueprintReadWrite, EditAnywhere, Category = "Loadout",
-		meta = (AllowedTypes = "Fighter, Weapon, MainSkill, SubSkill, UltimateSkill", Categories = "Equipment.Slot"))
+	UPROPERTY(Config, BlueprintReadWrite, EditAnywhere, Category = "Loadout", meta = (ForceInlineRow, Categories = "Equipment.Slot"))
 	TMap<FGameplayTag, FPrimaryAssetId> DefaultEquipmentItems;
 
 public:

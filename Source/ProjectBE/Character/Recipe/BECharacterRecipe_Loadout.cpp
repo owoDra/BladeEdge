@@ -4,6 +4,7 @@
 
 #include "Loadout/BELoadoutComponent.h"
 #include "Item/BEEquipmentItemData.h"
+#include "GameplayTag/BETags_Equipment.h"
 
 // Game Character Extension
 #include "CharacterInitStateComponent.h"
@@ -98,6 +99,10 @@ void UBECharacterRecipe_Loadout::HandleLoadoutChange(const UBELoadoutComponent* 
 
 			UE_LOG(LogGameExt_CharacterRecipe, Log, TEXT("++ Add Loadout Item(%s)"), *Entry.GetDebugString());
 		}
+
+		// アクティブスロットを設定
+
+		EMC->EquipEquipmentBySlot(TAG_Equipment_Slot_Weapon);
 	}
 }
 
@@ -111,9 +116,12 @@ void UBECharacterRecipe_Loadout::HandleApplyDefault()
 			DefaultEquipmentSet.IsValid() ? DefaultEquipmentSet.Get() : DefaultEquipmentSet.LoadSynchronous()
 		};
 
-		UE_LOG(LogGameExt_CharacterRecipe, Log, TEXT("++DefaultEquipmentSet (Name: %s)"), *GetNameSafe(LoadedEquipmentSet));
+		if (LoadedEquipmentSet)
+		{
+			UE_LOG(LogGameExt_CharacterRecipe, Log, TEXT("++DefaultEquipmentSet (Name: %s)"), *GetNameSafe(LoadedEquipmentSet));
 
-		TArray<FActiveEquipmentHandle> DummyHandles;
-		LoadedEquipmentSet->AddEquipmentItems(EMC, DummyHandles);
+			TArray<FActiveEquipmentHandle> DummyHandles;
+			LoadedEquipmentSet->AddEquipmentItems(EMC, DummyHandles);
+		}
 	}
 }
