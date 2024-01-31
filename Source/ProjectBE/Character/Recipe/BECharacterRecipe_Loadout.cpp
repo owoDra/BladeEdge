@@ -89,16 +89,27 @@ void UBECharacterRecipe_Loadout::HandleLoadoutChange(const UBELoadoutComponent* 
 
 		// 新しくロードアウトのアイテムを装備する
 
-		for (const auto& Entry : LoadoutComponent->Loadout)
-		{
-			if (ensure(Entry))
-			{
-				FActiveEquipmentHandle DummyHundle;
-				EMC->AddEquipmentItem(Entry->GetSlotTag(), Entry, DummyHundle);
+		const auto& Loadout{ LoadoutComponent->Loadout };
 
-				UE_LOG(LogGameExt_CharacterRecipe, Log, TEXT("++ Add Loadout Item(%s)"), *GetNameSafe(Entry));
+		auto AddToManager
+		{
+			[&EMC](const UBEEquipmentItemData* Item)
+			{
+				if (Item)
+				{
+					FActiveEquipmentHandle DummyHundle;
+					EMC->AddEquipmentItem(Item->GetSlotTag(), Item, DummyHundle);
+
+					UE_LOG(LogGameExt_CharacterRecipe, Log, TEXT("++ Add Loadout Item(%s)"), *GetNameSafe(Item));
+				}
 			}
-		}
+		};
+
+		AddToManager(Loadout.FighterData);
+		AddToManager(Loadout.WeaponData);
+		AddToManager(Loadout.MainSkillData);
+		AddToManager(Loadout.SubSkillData);
+		AddToManager(Loadout.UltimateSkillData);
 
 		// アクティブスロットを設定
 

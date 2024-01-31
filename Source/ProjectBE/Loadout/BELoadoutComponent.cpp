@@ -98,7 +98,7 @@ void UBELoadoutComponent::ReciveLoadoutRequest(const FBELoadoutRequest& Request)
 
 	// リクエストの ItemData を設定
 
-	Loadout = { Request.FighterData, Request.WeaponData, Request.MainSkillData, Request.SubSkillData, Request.UltimateSkillData };
+	Loadout = Request;
 	MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, Loadout, this);
 
 	// 新しいロードアウトのアイテムデータのアセットバンドルをロードする
@@ -109,9 +109,9 @@ void UBELoadoutComponent::ReciveLoadoutRequest(const FBELoadoutRequest& Request)
 
 // Loadout Asset Bundle
 
-void UBELoadoutComponent::LoadLoadoutAssetBundle(const TArray<const UBEEquipmentItemData*>& CurrentLoadout)
+void UBELoadoutComponent::LoadLoadoutAssetBundle(const FBELoadoutRequest& CurrentLoadout)
 {
-	if (!Loadout.IsEmpty())
+	if (Loadout.IsValid())
 	{
 		UE_LOG(LogBE_Loadout, Log, TEXT("[%s] StartLoadLoadoutAssetBundle"), HasAuthority() ? TEXT("SERVER") : TEXT("CLIENT"));
 
@@ -122,14 +122,11 @@ void UBELoadoutComponent::LoadLoadoutAssetBundle(const TArray<const UBEEquipment
 		// 現在のロードアウト内の ItemData のプライマリーアセットIdをキャッシュする
 
 		TSet<FPrimaryAssetId> BundleAssetList;
-
-		for (const auto& ItemData : CurrentLoadout)
-		{
-			if (ensure(ItemData))
-			{
-				BundleAssetList.Add(ItemData->GetPrimaryAssetId());
-			}
-		}
+		BundleAssetList.Add(Loadout.FighterData->GetPrimaryAssetId());
+		BundleAssetList.Add(Loadout.WeaponData->GetPrimaryAssetId());
+		BundleAssetList.Add(Loadout.MainSkillData->GetPrimaryAssetId());
+		BundleAssetList.Add(Loadout.SubSkillData->GetPrimaryAssetId());
+		BundleAssetList.Add(Loadout.UltimateSkillData->GetPrimaryAssetId());
 
 		// クライアント / サーバーごとにロードするバンドル名をキャッシュする
 

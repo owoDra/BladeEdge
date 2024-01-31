@@ -50,7 +50,7 @@ public:
 	// Loadout Request
 public:
 	UPROPERTY(ReplicatedUsing = "OnRep_Loadout")
-	TArray<TObjectPtr<const UBEEquipmentItemData>> Loadout;
+	FBELoadoutRequest Loadout;
 
 protected:
 	UFUNCTION()
@@ -72,7 +72,7 @@ protected:
 	////////////////////////////////////////////////////////////////////////////////////
 	// Loadout Asset Bundle
 protected:
-	virtual void LoadLoadoutAssetBundle(const TArray<const UBEEquipmentItemData*>& CurrentLoadout);
+	virtual void LoadLoadoutAssetBundle(const FBELoadoutRequest& CurrentLoadout);
 
 	virtual void HandleLoadoutAssetBundleLoaded();
 
