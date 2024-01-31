@@ -18,6 +18,7 @@ ABEPlayerCharacter::ABEPlayerCharacter(const FObjectInitializer& ObjectInitializ
 	FPPMesh->SetupAttachment(ViewerComponent);
 	FPPMesh->SetOnlyOwnerSee(true);
 	FPPMesh->SetCastShadow(false);
+	FPPMesh->SetHiddenInGame(true);
 }
 
 
