@@ -10,20 +10,6 @@ class UGamepadSensitivityData;
 
 
 /** 
- * 適用させる感度のターゲティングタイプ
- */
-UENUM()
-enum class EGamepadTargetingType : uint8
-{
-	// 通常時
-	Normal = 0,
-
-	// ターゲティング時
-	Targeting = 1,
-};
-
-
-/** 
  * 設定値に基づいてゲームパッド感度を適用させる InputModifier クラス
  */
 UCLASS(NotBlueprintable, meta = (DisplayName = "IM Gamepad Sensitivity"))
@@ -34,10 +20,7 @@ public:
 	UInputModifier_GamepadSensitivity() {}
 
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sensitivity")
-	EGamepadTargetingType TargetingType{ EGamepadTargetingType::Normal };
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sensitivity", meta=(AssetBundles="Client,Server"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sensitivity", meta=(AssetBundles="Client, Server"))
 	TObjectPtr<const UGamepadSensitivityData> SensitivityLevelTable;
 
 protected:

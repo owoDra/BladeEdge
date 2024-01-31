@@ -19,7 +19,7 @@ FInputActionValue UInputModifier_GamepadSensitivity::ModifyRaw_Implementation(co
 	auto* Settings{ UGSCGameUserSettings::GetSettingSubsystem<UControlSettingSubsystem>() };
 	ensure(Settings);
 
-	const auto Sensitivity{ (TargetingType == EGamepadTargetingType::Normal) ? Settings->GetGamepadLookSensitivityPreset() : Settings->GetGamepadTargetingSensitivityPreset() };
+	const auto Sensitivity{ Settings->GetGamepadLookSensitivityPreset() };
 
 	const auto Scalar{ SensitivityLevelTable->SensitivtyEnumToFloat(Sensitivity) };
 

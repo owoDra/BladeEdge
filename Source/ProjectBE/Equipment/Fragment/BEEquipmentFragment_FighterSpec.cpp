@@ -2,6 +2,8 @@
 
 #include "BEEquipmentFragment_FighterSpec.h"
 
+#include "GameplayTag/BETags_Input.h"
+
 // Game Ability: Health Addon
 #include "HealthFunctionLibrary.h"
 #include "HealthComponent.h"
@@ -12,6 +14,8 @@
 #include "LocomotionData.h"
 
 // Engine Feature
+#include "AbilitySystemComponent.h"
+#include "AbilitySystemGlobals.h"
 #include "GameFramework/Character.h"
 
 #if WITH_EDITOR
@@ -25,7 +29,7 @@
 UBEEquipmentFragment_FighterSpec::UBEEquipmentFragment_FighterSpec(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-	NetExecutionPolicy = EEquipmentFragmentNetExecutionPolicy::ServerOnly;
+	NetExecutionPolicy = EEquipmentFragmentNetExecutionPolicy::Both;
 
 #if WITH_EDITOR
 	StaticClass()->FindPropertyByName(FName{ TEXTVIEW("NetExecutionPolicy") })->SetPropertyFlags(CPF_DisableEditOnTemplate);
@@ -51,6 +55,20 @@ EDataValidationResult UBEEquipmentFragment_FighterSpec::IsDataValid(FDataValidat
 		Context.AddError(FText::FromString(FString::Printf(TEXT("Invalid LocomotionData is set in %s"), *GetNameSafe(this))));
 	}
 
+	if (!JumpAbility)
+	{
+		Result = CombineDataValidationResults(Result, EDataValidationResult::Invalid);
+
+		Context.AddError(FText::FromString(FString::Printf(TEXT("Invalid JumpAbility is set in %s"), *GetNameSafe(this))));
+	}
+
+	if (!DodgeAbility)
+	{
+		Result = CombineDataValidationResults(Result, EDataValidationResult::Invalid);
+
+		Context.AddError(FText::FromString(FString::Printf(TEXT("Invalid DodgeAbility is set in %s"), *GetNameSafe(this))));
+	}
+
 	return Result;
 }
 #endif
@@ -64,14 +82,82 @@ void UBEEquipmentFragment_FighterSpec::HandleEquipmentGiven()
 
 	if (auto* Character{ GetOwner<ACharacter>() })
 	{
-		if (auto* HC{ UHealthFunctionLibrary::GetHealthComponentFromActor(Character) })
-		{
-			HC->SetHealthData(HealthData);
-		}
+		ApplyHealthData(Character);
+		ApplyLocomotionData(Character);
+		ApplyAbilities(Character);
+	}
+}
 
-		if (auto* LC{ ULocomotionComponent::FindLocomotionComponent(Character) })
+void UBEEquipmentFragment_FighterSpec::HandleEquipmentRemove()
+{
+	Super::HandleEquipmentRemove();
+
+	if (auto* Character{ GetOwner<ACharacter>() })
+	{
+		RemoveAbilities(Character);
+	}
+}
+
+
+void UBEEquipmentFragment_FighterSpec::ApplyHealthData(ACharacter* Character)
+{
+	if (auto* HC{ UHealthFunctionLibrary::GetHealthComponentFromActor(Character) })
+	{
+		HC->SetHealthData(HealthData);
+	}
+}
+
+void UBEEquipmentFragment_FighterSpec::ApplyLocomotionData(ACharacter* Character)
+{
+	if (auto* LC{ ULocomotionComponent::FindLocomotionComponent(Character) })
+	{
+		LC->SetLocomotionData(LocomotionData);
+	}
+}
+
+void UBEEquipmentFragment_FighterSpec::ApplyAbilities(ACharacter* Character)
+{
+	if (Character->HasAuthority())
+	{
+		if (auto* ASC{ UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(Character) })
 		{
-			LC->SetLocomotionData(LocomotionData);
+			{
+				auto* AbilityCDO{ JumpAbility->GetDefaultObject<UGameplayAbility>() };
+				auto AbilitySpec{ FGameplayAbilitySpec(AbilityCDO, 0) };
+				AbilitySpec.SourceObject = Character;
+				AbilitySpec.DynamicAbilityTags.AddTag(TAG_Input_Shared_Jump);
+
+				JumpAbilitySpecHandle = ASC->GiveAbility(AbilitySpec);
+			}
+
+			{
+				auto* AbilityCDO{ DodgeAbility->GetDefaultObject<UGameplayAbility>() };
+				auto AbilitySpec{ FGameplayAbilitySpec(AbilityCDO, 0) };
+				AbilitySpec.SourceObject = Character;
+				AbilitySpec.DynamicAbilityTags.AddTag(TAG_Input_Shared_Dodge);
+
+				DodgeAbilitySpecHandle = ASC->GiveAbility(AbilitySpec);
+			}
+		}
+	}
+}
+
+
+void UBEEquipmentFragment_FighterSpec::RemoveAbilities(ACharacter* Character)
+{
+	if (Character->HasAuthority())
+	{
+		if (auto* ASC{ UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(Character) })
+		{
+			if (JumpAbilitySpecHandle.IsValid())
+			{
+				ASC->ClearAbility(JumpAbilitySpecHandle);
+			}
+
+			if (DodgeAbilitySpecHandle.IsValid())
+			{
+				ASC->ClearAbility(DodgeAbilitySpecHandle);
+			}
 		}
 	}
 }

@@ -5,11 +5,13 @@
 #include "Equipment/Fragment/EquipmentFragment.h"
 
 #include "GameplayTagContainer.h"
+#include "GameplayAbilitySpec.h"
 
 #include "BEEquipmentFragment_FighterSpec.generated.h"
 
 class UHealthData;
 class ULocomotionData;
+class ACharacter;
 
 
 /**
@@ -34,6 +36,7 @@ public:
 	// Given
 public:
 	virtual void HandleEquipmentGiven() override;
+	virtual void HandleEquipmentRemove() override;
 
 
 	//////////////////////////////////////////////////////////////////////////////////////
@@ -44,5 +47,25 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Fighter Spec")
 	TObjectPtr<ULocomotionData> LocomotionData{ nullptr };
+
+	UPROPERTY(EditDefaultsOnly, Category = "Fighter Spec")
+	TSubclassOf<UGameplayAbility> JumpAbility{ nullptr };
+
+	UPROPERTY(EditDefaultsOnly, Category = "Fighter Spec")
+	TSubclassOf<UGameplayAbility> DodgeAbility{ nullptr };
+
+protected:
+	UPROPERTY(Transient)
+	FGameplayAbilitySpecHandle JumpAbilitySpecHandle;
+
+	UPROPERTY(Transient)
+	FGameplayAbilitySpecHandle DodgeAbilitySpecHandle;
+
+protected:
+	virtual void ApplyHealthData(ACharacter* Character);
+	virtual void ApplyLocomotionData(ACharacter* Character);
+	virtual void ApplyAbilities(ACharacter* Character);
+
+	virtual void RemoveAbilities(ACharacter* Character);
 
 };

@@ -56,9 +56,6 @@ private:
 	// 縦軸へのマウス感度
 	UPROPERTY(Config) double MouseSensitivityY{ 1.0f };
 
-	// ターゲット時のマウス感度倍率
-	UPROPERTY(Config) double TargetingMultiplier{ 0.5f };
-
 public:
 	/**
 	 *  横軸へのマウス感度
@@ -72,20 +69,11 @@ public:
 	UFUNCTION() double GetMouseSensitivityY() const { return MouseSensitivityY; }
 	UFUNCTION() void SetMouseSensitivityY(double NewValue) { ChangeValueAndDirty(MouseSensitivityY, NewValue); }
 
-	/**
-	 *  ターゲット時のマウス感度倍率
-	 */
-	UFUNCTION() double GetTargetingMultiplier() const { return TargetingMultiplier; }
-	UFUNCTION() void SetTargetingMultiplier(double NewValue) { ChangeValueAndDirty(TargetingMultiplier, NewValue); }
-
 
 	// ===== ゲームコントローラー系 | 感度設定 =====
 private:
 	// コントローラーの感度設定
 	UPROPERTY(Config) EGamepadSensitivity GamepadLookSensitivityPreset{ EGamepadSensitivity::Normal };
-
-	// コントローラーのターゲット時の感度設定
-	UPROPERTY(Config) EGamepadSensitivity GamepadTargetingSensitivityPreset{ EGamepadSensitivity::Normal };
 
 public:
 	/**
@@ -93,12 +81,6 @@ public:
 	 */
 	UFUNCTION() EGamepadSensitivity GetGamepadLookSensitivityPreset() const { return GamepadLookSensitivityPreset; }
 	UFUNCTION() void SetLookSensitivityPreset(EGamepadSensitivity NewValue) { ChangeValueAndDirty(GamepadLookSensitivityPreset, NewValue); }
-
-	/**
-	 *  コントローラーのターゲット時の感度設定
-	 */
-	UFUNCTION() EGamepadSensitivity GetGamepadTargetingSensitivityPreset() const { return GamepadTargetingSensitivityPreset; }
-	UFUNCTION() void SetGamepadTargetingSensitivityPreset(EGamepadSensitivity NewValue) { ChangeValueAndDirty(GamepadTargetingSensitivityPreset, NewValue); }
 
 
 	// ===== ゲームコントローラー系 | デッドゾーン設定 =====

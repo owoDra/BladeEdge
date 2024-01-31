@@ -21,16 +21,11 @@ public:
 	UBECharacterRecipe_Loadout();
 
 protected:
-	UPROPERTY(EditDefaultsOnly, Category = "Default")
-	TSoftObjectPtr<UEquipmentSet> DefaultEquipmentSet{ nullptr };
-
-protected:
 	virtual void StartSetup_Implementation(const FCharacterRecipePawnInfo& Info) override;
 	virtual void OnDestroy_Implementation() override;
 
 	void ListenLoadoutChange();
 	void UnlistenLoadoutChange();
 	void HandleLoadoutChange(const UBELoadoutComponent* LoadoutComponent);
-	void HandleApplyDefault();
 
 };

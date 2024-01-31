@@ -57,10 +57,6 @@ void UBECharacterRecipe_Loadout::ListenLoadoutChange()
 		LoadoutComponent->OnLoadoutChange.AddUObject(this, &ThisClass::HandleLoadoutChange);
 		HandleLoadoutChange(LoadoutComponent);
 	}
-	else
-	{
-		HandleApplyDefault();
-	}
 }
 
 void UBECharacterRecipe_Loadout::UnlistenLoadoutChange()
@@ -114,25 +110,5 @@ void UBECharacterRecipe_Loadout::HandleLoadoutChange(const UBELoadoutComponent* 
 		// アクティブスロットを設定
 
 		EMC->EquipEquipmentBySlot(TAG_Equipment_Slot_Weapon);
-	}
-}
-
-void UBECharacterRecipe_Loadout::HandleApplyDefault()
-{
-	if (auto* EMC{ UEquipmentFunctionLibrary::GetEquipmentManagerComponentFromActor(GetTypedPawn<APawn>()) })
-	{
-		auto* LoadedEquipmentSet
-		{
-			DefaultEquipmentSet.IsNull() ? nullptr :
-			DefaultEquipmentSet.IsValid() ? DefaultEquipmentSet.Get() : DefaultEquipmentSet.LoadSynchronous()
-		};
-
-		if (LoadedEquipmentSet)
-		{
-			UE_LOG(LogGameExt_CharacterRecipe, Log, TEXT("++DefaultEquipmentSet (Name: %s)"), *GetNameSafe(LoadedEquipmentSet));
-
-			TArray<FActiveEquipmentHandle> DummyHandles;
-			LoadedEquipmentSet->AddEquipmentItems(EMC, DummyHandles);
-		}
 	}
 }

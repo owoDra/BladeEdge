@@ -12,10 +12,8 @@ void UControlSettingSubsystem::SetToDefaults()
 
     MouseSensitivityX = 1.0f;
     MouseSensitivityY = 1.0f;
-    TargetingMultiplier = 1.0f;
 
     GamepadLookSensitivityPreset = EGamepadSensitivity::Normal;
-    GamepadTargetingSensitivityPreset = EGamepadSensitivity::Normal;
 
     GamepadMoveStickDeadZone = 0.0f;
     GamepadLookStickDeadZone = 0.0f;

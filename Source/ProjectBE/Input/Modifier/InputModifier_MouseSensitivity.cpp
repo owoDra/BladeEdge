@@ -33,11 +33,6 @@ FInputActionValue UInputModifier_MouseSensitivity::ModifyRaw_Implementation(cons
 			1.0)
 	};
 
-	if (TargetingType == EMouseTargetingType::Targeting)
-	{
-		ScalarToUse *= Settings->GetTargetingMultiplier();
-	}
-
 	// 設定値を反映させる
 
 	return CurrentValue.Get<FVector>() * ScalarToUse;
