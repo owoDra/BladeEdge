@@ -20,7 +20,7 @@ public:
 	UAnimNotifyState_ComboStandby(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 protected:
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "ComboStandby", meta = (Categories = "Combo.Stanby"))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "ComboStandby", meta = (Categories = "Combo.Standby"))
 	FGameplayTag Tag;
 
 	UPROPERTY(AdvancedDisplay, BlueprintReadWrite, EditAnywhere, Category = "ComboStandby")

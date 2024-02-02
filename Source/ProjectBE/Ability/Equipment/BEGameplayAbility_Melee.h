@@ -85,11 +85,22 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Combo", meta = (Categories = "Combo.Branch"))
 	FGameplayTagContainer ChildComboBrunchTags;
 
+	//
+	// ComboReadyTag を待つことができる最大時間
+	//
+	UPROPERTY(AdvancedDisplay, EditDefaultsOnly, Category = "Combo")
+	float WaitReadyTimeoutTime{ 1.0f };
+
 private:
 	//
 	// ComboReadyTag が追加されるまで待つためのデリゲートハンドル
 	//
 	FDelegateHandle WaitComboReadyHandle;
+
+	//
+	// ComboReadyTag の待機がタイムアウトするまでのタイマーハンドル
+	//
+	FTimerHandle WaitComboReadyTimeOutHandle;
 
 protected:
 	virtual void AddComboBrunchTagToAvatar();
@@ -101,6 +112,10 @@ protected:
 
 	virtual void GameplayTagCallback(const FGameplayTag Tag, int32 NewCount);
 	virtual void UnregisterGameplayTagCallback();
+
+	virtual void StartWaitReadyTimeoutTimer();
+	virtual void StopWaitReadyTimeoutTimer();
+	virtual void HandleWaitReadyTimeout();
 
 	UFUNCTION(BlueprintNativeEvent, Category = "Combo")
 	void OnComboStart();

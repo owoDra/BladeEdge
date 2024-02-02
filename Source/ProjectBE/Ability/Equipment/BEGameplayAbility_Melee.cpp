@@ -12,6 +12,7 @@ UBEGameplayAbility_Melee::UBEGameplayAbility_Melee(const FObjectInitializer& Obj
 	: Super(ObjectInitializer)
 {
 	bShouldCallbackTargetDataReady = true;
+	bUseCooldown = false;
 }
 
 
@@ -39,6 +40,7 @@ void UBEGameplayAbility_Melee::EndAbility(const FGameplayAbilitySpecHandle Handl
 			return;
 		}
 
+		StopWaitReadyTimeoutTimer();
 		RemoveComboBrunchTagToAvatar();
 
 		Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
@@ -96,6 +98,8 @@ bool UBEGameplayAbility_Melee::DoesAbilitySatisfyTagRequirements(const UAbilityS
 }
 
 
+// コンボ
+
 void UBEGameplayAbility_Melee::AddComboBrunchTagToAvatar()
 {
 	if (!bIsComboRoot)
@@ -136,11 +140,16 @@ void UBEGameplayAbility_Melee::TryStartCombo()
 	if (bIsComboRoot)
 	{
 		HandleComboReady();
+		return;
 	}
+
+	// タイムアウトタイマーを開始する
+
+	StartWaitReadyTimeoutTimer();
 
 	// コンボの最初出ない場合は ComboReadyTag があるか確認
 
-	else if (auto* ASC{ GetAbilitySystemComponentFromActorInfo() })
+	if (auto* ASC{ GetAbilitySystemComponentFromActorInfo() })
 	{
 		// すでに ComboReadyTag がある場合は即開始
 
@@ -163,7 +172,36 @@ void UBEGameplayAbility_Melee::TryStartCombo()
 
 void UBEGameplayAbility_Melee::HandleComboReady()
 {
+	StopWaitReadyTimeoutTimer();
+
 	OnComboStart();
+}
+
+
+void UBEGameplayAbility_Melee::StartWaitReadyTimeoutTimer()
+{
+	if (auto* World{ GetWorld()})
+	{
+		World->GetTimerManager().SetTimer(WaitComboReadyTimeOutHandle, this , &ThisClass::HandleWaitReadyTimeout, WaitReadyTimeoutTime, false);
+	}
+}
+
+void UBEGameplayAbility_Melee::StopWaitReadyTimeoutTimer()
+{
+	if (WaitComboReadyTimeOutHandle.IsValid())
+	{
+		if (auto* World{ GetWorld() })
+		{
+			World->GetTimerManager().ClearTimer(WaitComboReadyTimeOutHandle);
+		}
+	}
+}
+
+void UBEGameplayAbility_Melee::HandleWaitReadyTimeout()
+{
+	WaitComboReadyTimeOutHandle.Invalidate();
+
+	K2_CancelAbility();
 }
 
 
