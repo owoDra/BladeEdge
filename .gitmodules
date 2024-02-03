@@ -17,6 +17,10 @@
 	path = Plugins/Addon/GameUIDialogAddon
 	url = https://github.com/owoDra/GameUIDialogAddon.git
 
+[submodule "Plugins/Addon/GameUISettingAddon"]
+	path = Plugins/Addon/GameUISettingAddon
+	url = https://github.com/owoDra/GameUISettingAddon.git
+
 
 ##################################################
 # Game XXX Core
