@@ -35,7 +35,7 @@ public class ProjectBE : ModuleRules
                 
                 "GameFeatures", "GameplayTasks",
 
-                "DeveloperSettings",
+                "DeveloperSettings", "PropertyPath",
             }
         );
 
@@ -68,6 +68,7 @@ public class ProjectBE : ModuleRules
                 "GAAbilityMelee",   // 近接戦闘用アビリティ作成 のため
                 "GLHAddon",         // 人型キャラクターのアニメーション制御のため
                 "GAUIDialog",       // チュートリアルダイアログ用
+                "GAUISetting",      // 設定メニュー作成のため
                 
                 // Game XXX: YYY Integration
                 "GAUIIntg",         // アビリティ関係のUI作成 のため

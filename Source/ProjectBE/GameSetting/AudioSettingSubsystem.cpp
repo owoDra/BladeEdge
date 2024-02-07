@@ -4,13 +4,20 @@
 
 #include "Audio/BEAudioMixSubsystem.h"
 
+// Game Framework Core
 #include "Platform/PlatformTags.h"
 
+// Game Audio Core
 #include "GameplayTag/GACTags_Audio.h"
 
+// Game Setting Core
+#include "GSCoreLogs.h"
+
+// Engine Feature
 #include "ICommonUIModule.h"
 #include "CommonUISettings.h"
 #include "Framework/Application/SlateApplication.h"
+#include "AudioMixerBlueprintLibrary.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(AudioSettingSubsystem)
 
@@ -36,6 +43,7 @@ void UAudioSettingSubsystem::ApplySettings()
 	ApplyHDRAudioModeSetting();
 	ApplyAllowAudioInBackgroundSetting();
 	ApplySoundVolumeSettings();
+	ApplyAudioOutputDeviceId();
 }
 
 
@@ -43,7 +51,28 @@ void UAudioSettingSubsystem::SetAudioOutputDeviceId(const FString& InAudioOutput
 {
     ChangeValueAndDirty(AudioOutputDeviceId, InAudioOutputDeviceId);
 
-    OnAudioOutputDeviceChanged.Broadcast(InAudioOutputDeviceId);
+	ApplyAudioOutputDeviceId();
+}
+
+void UAudioSettingSubsystem::ApplyAudioOutputDeviceId()
+{
+	// UE_LOG(LogGameCore_Settings, Log, TEXT("ApplyAudioOutputDeviceId(%s)"), *AudioOutputDeviceId);
+
+	if (auto ViewPort{ GEngine->GameViewport })
+	{
+		// UE_LOG(LogGameCore_Settings, Log, TEXT("SwapAudioDevice"));
+
+		FOnCompletedDeviceSwap DevicesSwappedCallback;
+		DevicesSwappedCallback.BindUFunction(this, FName("OnCompletedAudioDeviceSwap"));
+		UAudioMixerBlueprintLibrary::SwapAudioOutputDevice(ViewPort, AudioOutputDeviceId, DevicesSwappedCallback);
+	}
+
+	OnAudioOutputDeviceChanged.Broadcast(AudioOutputDeviceId);
+}
+
+void UAudioSettingSubsystem::OnCompletedAudioDeviceSwap(const FSwapAudioOutputResult& SwapResult)
+{
+	UE_LOG(LogGameCore_Settings, Log, TEXT("AudioDeviceSwaped(Request: %s, Current: %s)"), *SwapResult.RequestedDeviceId, *SwapResult.CurrentDeviceId);
 }
 
 

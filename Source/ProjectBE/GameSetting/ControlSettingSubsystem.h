@@ -51,23 +51,23 @@ public:
 	// ===== キーボードマウス系 =====
 private:
 	// 横軸へのマウス感度
-	UPROPERTY(Config) double MouseSensitivityX{ 1.0f };
+	UPROPERTY(Config) float MouseSensitivityX{ 1.0f };
 
 	// 縦軸へのマウス感度
-	UPROPERTY(Config) double MouseSensitivityY{ 1.0f };
+	UPROPERTY(Config) float MouseSensitivityY{ 1.0f };
 
 public:
 	/**
 	 *  横軸へのマウス感度
 	 */
-	UFUNCTION() double GetMouseSensitivityX() const { return MouseSensitivityX; }
-	UFUNCTION() void SetMouseSensitivityX(double NewValue) { ChangeValueAndDirty(MouseSensitivityX, NewValue); }
+	UFUNCTION() float GetMouseSensitivityX() const { return MouseSensitivityX; }
+	UFUNCTION() void SetMouseSensitivityX(float NewValue) { ChangeValueAndDirty(MouseSensitivityX, NewValue); }
 
 	/**
 	 *  縦軸へのマウス感度
 	 */
-	UFUNCTION() double GetMouseSensitivityY() const { return MouseSensitivityY; }
-	UFUNCTION() void SetMouseSensitivityY(double NewValue) { ChangeValueAndDirty(MouseSensitivityY, NewValue); }
+	UFUNCTION() float GetMouseSensitivityY() const { return MouseSensitivityY; }
+	UFUNCTION() void SetMouseSensitivityY(float NewValue) { ChangeValueAndDirty(MouseSensitivityY, NewValue); }
 
 
 	// ===== ゲームコントローラー系 | 感度設定 =====

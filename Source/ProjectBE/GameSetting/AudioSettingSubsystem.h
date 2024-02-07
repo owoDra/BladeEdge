@@ -18,10 +18,10 @@ class USoundControlBusMix;
 UENUM(BlueprintType)
 enum class EAllowBackgroundAudioType : uint8
 {
-	Off,
+	Off = 0,
 	AllSounds,
 
-	Num UMETA(Hidden)
+	MAX UMETA(Hidden)
 };
 
 
@@ -59,6 +59,11 @@ private:
 public:
 	UFUNCTION() FString GetAudioOutputDeviceId() const { return AudioOutputDeviceId; }
 	UFUNCTION() void SetAudioOutputDeviceId(const FString& InAudioOutputDeviceId);
+
+	void ApplyAudioOutputDeviceId();
+
+	UFUNCTION()
+	void OnCompletedAudioDeviceSwap(const FSwapAudioOutputResult& SwapResult);
 
 
 	// ===== 立体音響　=====

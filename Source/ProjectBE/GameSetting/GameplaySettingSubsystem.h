@@ -54,21 +54,21 @@ private:
 
 public:
 	/**
+	 *  色覚特性設定を適用させる
+	 */
+	void ApplyColorBlindSettings();
+
+	/**
 	 *  色覚特性の種類
 	 */
 	UFUNCTION() EColorBlindMode GetColorBlindMode() const { return ColorBlindMode; }
-	UFUNCTION() void SetColorBlindMode(EColorBlindMode InMode) { ChangeValueAndDirty(ColorBlindMode, InMode); }
+	UFUNCTION() void SetColorBlindMode(EColorBlindMode InMode) { ChangeValueAndDirty(ColorBlindMode, InMode); ApplyColorBlindSettings(); }
 
 	/**
 	 *  色覚特性の強さ
 	 */
 	UFUNCTION() int32 GetColorBlindStrength() const { return ColorBlindStrength; }
-	UFUNCTION() void SetColorBlindStrength(int32 InColorBlindStrength) { ChangeValueAndDirty(ColorBlindStrength, InColorBlindStrength); }
-
-	/**
-	 *  色覚特性設定を適用させる
-	 */
-	void ApplyColorBlindSettings();
+	UFUNCTION() void SetColorBlindStrength(int32 InColorBlindStrength) { ChangeValueAndDirty(ColorBlindStrength, InColorBlindStrength); ApplyColorBlindSettings(); }
 
 
 	// ===== 視点系 | FOV設定 =====
