@@ -45,13 +45,13 @@ FRegisteredSettingUITable UBESettingUICustomRegister_Keybind::CreateTable(USetti
 			TArray<FKeyMappingRow> Rows;
 		};
 
-		TMap<FName, FMappings> CategoryMappingsMap;
+		TMap<FString, FMappings> CategoryMappingsMap;
 
 		auto AddOrCreateForCategory
 		{
 			[&CategoryMappingsMap](const FText& InCategory, const FKeyMappingRow& InMapping)
 			{
-				const auto CategoryName{ FName(InCategory.ToString()) };
+				const auto CategoryName{ InCategory.ToString() };
 				auto& Entry{ CategoryMappingsMap.FindOrAdd(CategoryName) };
 
 				Entry.Category = InCategory;
@@ -70,6 +70,11 @@ FRegisteredSettingUITable UBESettingUICustomRegister_Keybind::CreateTable(USetti
 			{
 				const auto& Category{ MappingRow.Mappings.begin()->GetDisplayCategory() };
 				const auto& DefaultKey{ MappingRow.Mappings.begin()->GetDefaultKey() };
+
+				if (!MappingRow.Mappings.begin()->GetAssociatedInputAction())
+				{
+					continue;
+				}
 
 				if ((DefaultKey.IsGamepadKey() && bShowGamepad) || (!DefaultKey.IsGamepadKey() && bShowKeyboardAndMouse))
 				{
@@ -96,11 +101,15 @@ FRegisteredSettingUITable UBESettingUICustomRegister_Keybind::CreateTable(USetti
 			}
 		}
 
+		// マップをソート
+
+		CategoryMappingsMap.KeySort(TLess<FString>());
+		
 		// キャッシュしたデータをもとに設定項目を作成
 
 		for (const auto& SortedKVP : CategoryMappingsMap)
 		{
-			const auto& CategoryDevName{ SortedKVP.Key };
+			const auto& CategoryDevName{ FName(SortedKVP.Key) };
 			const auto& CategoryDisplayName{ SortedKVP.Value.Category };
 			const auto& Mappings{ SortedKVP.Value.Rows };
 
