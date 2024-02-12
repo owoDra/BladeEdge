@@ -11,6 +11,9 @@
 // Game Experience Extension
 #include "ExperienceDataComponent.h"
 
+// Game Phase Extension
+#include "GamePhaseComponent.h"
+
 // Game Ability Extension
 #include "GAEAbilitySystemComponent.h"
 
@@ -24,6 +27,7 @@ ABEGameState::ABEGameState(const FObjectInitializer& ObjectInitializer)
 {
 	ExperienceDataComponent = ObjectInitializer.CreateDefaultSubobject<UExperienceDataComponent>(this, TEXT("ExperienceData"));
 	AbilitySystemComponent = ObjectInitializer.CreateDefaultSubobject<UGAEAbilitySystemComponent>(this, TEXT("AbilitySystem"));
+	GamePhaseComponent = ObjectInitializer.CreateDefaultSubobject<UGamePhaseComponent>(this, TEXT("GamePhase"));
 
 	ExperienceDataComponent->OnGameReady_Register(FSimpleMulticastDelegate::FDelegate::CreateUObject(this, &ThisClass::HandleGameReady));
 

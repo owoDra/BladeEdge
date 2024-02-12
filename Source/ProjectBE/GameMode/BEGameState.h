@@ -9,6 +9,7 @@
 
 class UExperienceDataComponent;
 class UGAEAbilitySystemComponent;
+class UGamePhaseComponent;
 class ULoadingProcessTask;
 
 
@@ -35,6 +36,9 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Components")
 	TObjectPtr<UGAEAbilitySystemComponent> AbilitySystemComponent;
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Components")
+	TObjectPtr<UGamePhaseComponent> GamePhaseComponent;
 
 public:
 	virtual void BeginPlay() override;

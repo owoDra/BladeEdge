@@ -36,6 +36,8 @@ public class ProjectBE : ModuleRules
                 "GameFeatures", "GameplayTasks",
 
                 "DeveloperSettings", "PropertyPath",
+
+                "OnlineServicesInterface", "CoreOnline",
             }
         );
 
@@ -62,6 +64,7 @@ public class ProjectBE : ModuleRules
                 "GTExt",            // TeamMemberComponentInterface のため
                 "GUIExt",           // UI実装 のため
                 "GVExt",            // FOV設定付きの視点の追加 のため
+                "GEPhase",          // ゲームモードの進行制御 のため
                
                 // Game XXX: YYY Addon
                 "GAHAddon",         // ヘルス管理 のため
