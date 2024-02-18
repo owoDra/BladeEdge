@@ -1,4 +1,4 @@
-{
+﻿{
 	"FileVersion": 3,
 	"EngineAssociation": "5.3",
 	"Category": "",
@@ -172,11 +172,6 @@
 			"SupportedTargetPlatforms": [
 				"Mac"
 			]
-		},
-		{
-			"Name": "OnlineSubsystemBlueprints",
-			"Enabled": true,
-			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/product/f9b4f0637a8f4993ac05a4481fdfd3e0"
 		}
 	],
 	"TargetPlatforms": [
