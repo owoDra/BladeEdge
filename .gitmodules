@@ -49,6 +49,10 @@
 	path = Plugins/Core/GameLoadingCore
 	url = https://github.com/owoDra/GameLoadingCore.git
 
+[submodule "Plugins/Core/GameOnlineCore"]
+	path = Plugins/Core/GameOnlineCore
+	url = https://github.com/owoDra/GameOnlineCore.git
+
 
 ##################################################
 # Game XXX Extension
