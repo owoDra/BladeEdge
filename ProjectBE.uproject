@@ -1,4 +1,4 @@
-﻿{
+{
 	"FileVersion": 3,
 	"EngineAssociation": "5.3",
 	"Category": "",
@@ -172,6 +172,10 @@
 			"SupportedTargetPlatforms": [
 				"Mac"
 			]
+		},
+		{
+			"Name": "BEGFLobby",
+			"Enabled": true
 		}
 	],
 	"TargetPlatforms": [
