@@ -150,3 +150,6 @@
 # Configs
 
 
+[submodule "Config/Custom"]
+	path = Config/Custom
+	url = https://github.com/owoDra/Custom.git
