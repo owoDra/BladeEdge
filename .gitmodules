@@ -153,3 +153,6 @@
 [submodule "Config/Custom"]
 	path = Config/Custom
 	url = https://github.com/owoDra/Custom.git
+[submodule "Content"]
+	path = Content
+	url = https://github.com/owoDra/Content.git
