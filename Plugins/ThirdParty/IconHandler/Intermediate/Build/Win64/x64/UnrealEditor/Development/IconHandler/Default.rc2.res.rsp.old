@@ -74,5 +74,5 @@
 /DBUILD_ICON_FILE_NAME="\"..\\Build\\Windows\\Resources\\Default.ico\""
 /DPROJECT_COPYRIGHT_STRING="Fill out your copyright notice in the Description page of Project Settings."
 /DPROJECT_PRODUCT_IDENTIFIER=ProjectBE
-/fo "E:\20_Creator\20_Projects\Unreal\ProjectBE\Plugins\IconHandler-master\Intermediate\Build\Win64\x64\UnrealEditor\Development\IconHandler\Default.rc2.res"
+/fo "E:\20_Creator\20_Projects\Unreal\ProjectBE\Plugins\ThirdParty\IconHandler\Intermediate\Build\Win64\x64\UnrealEditor\Development\IconHandler\Default.rc2.res"
 "..\Build\Windows\Resources\Default.rc2"

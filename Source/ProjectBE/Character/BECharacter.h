@@ -111,6 +111,18 @@ protected:
 	UPROPERTY(Replicated)
 	FGameplayTagStackContainer StatTags;
 
+	//////////////////////////////////////////////////////////////////////////
+	// Initialization
+#pragma region Initialization
+protected:
+	UFUNCTION()
+	virtual void HandleGameReady();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Death")
+	void OnGameReady();
+
+#pragma endregion
+
 
 	//////////////////////////////////////////////////////////////////////////
 	// Death

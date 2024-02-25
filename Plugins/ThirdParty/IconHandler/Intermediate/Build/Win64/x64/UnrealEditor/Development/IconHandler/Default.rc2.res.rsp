@@ -72,7 +72,9 @@
 /DBUILT_FROM_CHANGELIST=29314046
 /DBUILD_VERSION=++UE5+Release-5.3-CL-29314046
 /DBUILD_ICON_FILE_NAME="\"..\\Build\\Windows\\Resources\\Default.ico\""
-/DPROJECT_COPYRIGHT_STRING="Fill out your copyright notice in the Description page of Project Settings."
+/DPROJECT_COMPANY_NAME=owoDra
+/DPROJECT_COPYRIGHT_STRING="Copyright (C) 2024 owoDra"
+/DPROJECT_PRODUCT_NAME="Blade Edge"
 /DPROJECT_PRODUCT_IDENTIFIER=ProjectBE
 /fo "E:\20_Creator\20_Projects\Unreal\ProjectBE\Plugins\ThirdParty\IconHandler\Intermediate\Build\Win64\x64\UnrealEditor\Development\IconHandler\Default.rc2.res"
 "..\Build\Windows\Resources\Default.rc2"

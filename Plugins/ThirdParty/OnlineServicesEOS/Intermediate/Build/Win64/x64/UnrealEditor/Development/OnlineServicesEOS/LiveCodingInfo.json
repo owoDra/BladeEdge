@@ -1,0 +1,17 @@
+{
+	"RemapUnityFiles": 
+	{
+		"Module.OnlineServicesEOS.cpp.obj": [
+			"AuthEOS.cpp.obj",
+			"CommerceEOS.cpp.obj",
+			"ExternalUIEOS.cpp.obj",
+			"OnlineIdEOS.cpp.obj",
+			"OnlineServicesEOS.cpp.obj",
+			"OnlineServicesEOSModule.cpp.obj",
+			"PresenceEOS.cpp.obj",
+			"SocialEOS.cpp.obj",
+			"OnlineIdEOSTests.cpp.obj",
+			"UserInfoEOS.cpp.obj"
+		]
+	}
+}

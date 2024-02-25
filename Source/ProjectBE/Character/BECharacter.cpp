@@ -46,6 +46,8 @@ ABECharacter::ABECharacter(const FObjectInitializer& ObjectInitializer)
 	FScriptDelegate NewDeathFinishedDelegate;
 	NewDeathFinishedDelegate.BindUFunction(this, GET_FUNCTION_NAME_STRING_CHECKED(ABECharacter, HandleDeathFinish));
 	HealthComponent->OnDeathFinished.Add(NewDeathFinishedDelegate);
+
+	CharacterInitStateComponent->OnGameReady_Register(FSimpleMulticastDelegate::FDelegate::CreateUObject(this, &ThisClass::HandleGameReady));
 }
 
 void ABECharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -56,6 +58,12 @@ void ABECharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 	Params.bIsPushBased = true;
 	Params.Condition = COND_None;
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, StatTags, Params);
+}
+
+
+void ABECharacter::HandleGameReady()
+{
+	OnGameReady();
 }
 
 

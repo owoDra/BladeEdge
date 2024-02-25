@@ -52,6 +52,7 @@ public class ProjectBE : ModuleRules
                 "GSCore",           // ゲーム設定 のため
                 "GCSave",           // ロードアウト保存のため
                 "GCLoading",        // ロード画面作成のため
+                "GCOnline",         // オンラインサービス利用のため
 
                 // Game XXX Extension
                 "GAExt",            // アビリティ実装 のため
@@ -68,7 +69,6 @@ public class ProjectBE : ModuleRules
                
                 // Game XXX: YYY Addon
                 "GAHAddon",         // ヘルス管理 のため
-                "GAAbilityMelee",   // 近接戦闘用アビリティ作成 のため
                 "GLHAddon",         // 人型キャラクターのアニメーション制御のため
                 "GAUIDialog",       // チュートリアルダイアログ用
                 "GAUISetting",      // 設定メニュー作成のため
