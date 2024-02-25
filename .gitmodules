@@ -135,18 +135,18 @@
 
 [submodule "Plugins/GameFeatures"]
 	path = Plugins/GameFeatures
-	url = https://github.com/owoDra/ProjectBE-GameFeatures.git
+	url = https://github.com/owoDra/BE-GameFeatures.git
 
 
 ##################################################
 # Third Party
 
+[submodule "Plugins/ThirdParty"]
+	path = Plugins/ThirdParty
+	url = https://github.com/owoDra/ThirdParty.git
 
 
 ##################################################
 # Configs
 
 
-[submodule "Plugins/ProjectBE-GameFeatures"]
-	path = Plugins/ProjectBE-GameFeatures
-	url = https://github.com/owoDra/ProjectBE-GameFeatures.git
