@@ -181,6 +181,19 @@
 			"Name": "FlatNodes",
 			"Enabled": true,
 			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/content/b719437f3fb54c259b34227363df8cab"
+		},
+		{
+			"Name": "BEGFMap",
+			"Enabled": true
+		},
+		{
+			"Name": "BEGFMode_Duel",
+			"Enabled": true
+		},
+		{
+			"Name": "CommonMaps",
+			"Enabled": true,
+			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/product/44d967336ad64ba7ac3f27f384e7d97b"
 		}
 	],
 	"TargetPlatforms": [

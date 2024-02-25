@@ -96,6 +96,9 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Debug")
 	bool bDeprecated{ false };
 
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Debug")
+	bool bDisabled{ false };
+
 public:
 	UFUNCTION(BlueprintCallable, Category = "Request")
 	virtual void CreateRequestsFromThis(

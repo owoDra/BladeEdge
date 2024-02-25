@@ -1,0 +1,8 @@
+{
+	"RemapUnityFiles": 
+	{
+		"Module.BEGFMode_DuelRuntime.cpp.obj": [
+			"BEGFMode_DuelRuntimeModule.cpp.obj"
+		]
+	}
+}
