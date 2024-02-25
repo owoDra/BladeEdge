@@ -147,3 +147,6 @@
 # Configs
 
 
+[submodule "Plugins/ProjectBE-GameFeatures"]
+	path = Plugins/ProjectBE-GameFeatures
+	url = https://github.com/owoDra/ProjectBE-GameFeatures.git
