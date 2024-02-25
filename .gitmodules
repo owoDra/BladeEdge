@@ -5,10 +5,6 @@
 	path = Plugins/Addon/GameAbilityHealthAddon
 	url = https://github.com/owoDra/GameAbilityHealthAddon.git
 
-[submodule "Plugins/Addon/GameAbilityMeleeAddon"]
-	path = Plugins/Addon/GameAbilityMeleeAddon
-	url = https://github.com/owoDra/GameAbilityMeleeAddon.git
-
 [submodule "Plugins/Addon/GameLocomotionHumanAddon"]
 	path = Plugins/Addon/GameLocomotionHumanAddon
 	url = https://github.com/owoDra/GameLocomotionHumanAddon.git
@@ -132,3 +128,22 @@
 [submodule "Plugins/Integration/GameUIEquipmentIntegration"]
 	path = Plugins/Integration/GameUIEquipmentIntegration
 	url = https://github.com/owoDra/GameUIEquipmentIntegration.git
+
+
+##################################################
+# Game Features
+
+[submodule "Plugins/GameFeatures"]
+	path = Plugins/GameFeatures
+	url = https://github.com/owoDra/ProjectBE-GameFeatures.git
+
+
+##################################################
+# Third Party
+
+
+
+##################################################
+# Configs
+
+
