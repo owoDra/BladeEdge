@@ -1,6 +1,0 @@
-{
-	"OutputFiles": [
-		"..\\..\\..\\..\\..\\..\\..\\..\\..\\Intermediate\\Build\\Win64\\x64\\UnrealGame\\Shipping\\Engine\\SharedPCH.Engine.Cpp20.h.obj",
-		"..\\..\\..\\x64\\UnrealGame\\Shipping\\OnlineServicesEOSGS\\Module.OnlineServicesEOSGS.cpp.obj"
-	]
-}
