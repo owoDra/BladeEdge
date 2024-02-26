@@ -91,6 +91,8 @@ void UUserFacingExperienceData::CreateRequestsFromThis(UOnlineLobbySubsystem* Lo
 		CreateRequest->ExtraArgs = ExtraArgs;
 		CreateRequest->ExtraArgs.Add(TEXT("ExperienceData"), ExperienceName);
 		CreateRequest->MaxPlayerCount = MaxPlayers;
+		CreateRequest->InitialAttributes = LobbyAttributes;
+		CreateRequest->InitialUserAttributes = LobbyUserAttributes;
 
 		SearchRequest = LobbySubsystem->CreateOnlineLobbySearchRequest();
 		FLobbyAttributeFilter ModeNameFilter
@@ -99,5 +101,6 @@ void UUserFacingExperienceData::CreateRequestsFromThis(UOnlineLobbySubsystem* Lo
 			ELobbyAttributeComparisonOp::Equals
 		};
 		SearchRequest->Filters.Add(ModeNameFilter);
+		SearchRequest->Filters.Append(LobbyAttributeFilters);
 	}
 }

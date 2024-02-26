@@ -95,9 +95,7 @@ UAbilitySystemComponent* ABECharacter::GetAbilitySystemComponent() const
 
 UTeamMemberComponent* ABECharacter::GetTeamMemberComponent() const
 {
-	auto* PS{ GetPlayerState() };
-
-	return PS ? UTeamFunctionLibrary::GetTeamMemberComponentFromActor(PS) : nullptr;
+	return UTeamFunctionLibrary::GetTeamMemberComponentFromActor(GetPlayerState());
 }
 
 UEquipmentManagerComponent* ABECharacter::GetEquipmentManagerComponent() const

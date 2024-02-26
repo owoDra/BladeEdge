@@ -4,6 +4,8 @@
 
 #include "Engine/DataAsset.h"
 
+#include "Type/OnlineLobbyAttributeTypes.h"
+
 #include "UserFacingExperienceData.generated.h"
 
 class UExperienceData;
@@ -69,6 +71,24 @@ protected:
 	//
 	UPROPERTY(EditDefaultsOnly, Category = "Info", meta = (ForceInlineRow))
 	TMap<FString, FString> ExtraArgs;
+
+	//
+	// 特定の追加ロビーアトリビュートがある場合に使用
+	//
+	UPROPERTY(EditDefaultsOnly, Category = "Info")
+	TSet<FLobbyAttribute> LobbyAttributes;
+
+	//
+	// 特定の追加ロビーユーザーアトリビュートがある場合に使用
+	//
+	UPROPERTY(EditDefaultsOnly, Category = "Info")
+	TSet<FLobbyAttribute> LobbyUserAttributes;
+
+	//
+	// 特定の検索用ロビーアトリビュートがある場合に使用
+	//
+	UPROPERTY(EditDefaultsOnly, Category = "Info")
+	TSet<FLobbyAttributeFilter> LobbyAttributeFilters;
 
 	//
 	// このゲームモードの最大人数

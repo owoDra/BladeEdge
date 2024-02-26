@@ -4,6 +4,7 @@
 
 #include "GameMode/GFCGameState.h"
 #include "AbilitySystemInterface.h"
+#include "GameplayTag/GameplayTagStackInterface.h"
 
 #include "BEGameState.generated.h"
 
@@ -20,10 +21,13 @@ UCLASS(Blueprintable)
 class PROJECTBE_API ABEGameState 
 	: public AGFCGameStateBase
 	, public IAbilitySystemInterface
+	, public IGameplayTagStackInterface
 {
 	GENERATED_BODY()
 public:
 	ABEGameState(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	static const FName NAME_GameStateLoading;
 
@@ -46,6 +50,14 @@ public:
 protected:
 	void HandleGameReady();
 
+
+protected:
+	UPROPERTY(Replicated)
+	FGameplayTagStackContainer StatTags;
+
+protected:
+	virtual FGameplayTagStackContainer* GetStatTags() override { return &StatTags; }
+	virtual const FGameplayTagStackContainer* GetStatTagsConst() const override { return &StatTags; }
 
 public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;

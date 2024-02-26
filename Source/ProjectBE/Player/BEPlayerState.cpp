@@ -10,6 +10,9 @@
 // Game Ability Extension
 #include "GAEAbilitySystemComponent.h"
 
+// Game Team Extension
+#include "TeamMemberComponent.h"
+
 // Engine Features
 #include "Net/UnrealNetwork.h"
 #include "Net/Core/PushModel/PushModel.h"
@@ -24,6 +27,7 @@ ABEPlayerState::ABEPlayerState(const FObjectInitializer& ObjectInitializer)
 	InitStateComponent = ObjectInitializer.CreateDefaultSubobject<UInitStateComponent>(this, TEXT("InitState"));
 	AbilitySystemComponent = ObjectInitializer.CreateDefaultSubobject<UGAEAbilitySystemComponent>(this, TEXT("AbilitySystem"));
 	LoadoutComponent = ObjectInitializer.CreateDefaultSubobject<UBELoadoutComponent>(this, TEXT("Loadout"));
+	TeamMemberComponent = ObjectInitializer.CreateDefaultSubobject<UTeamMemberComponent>(this, TEXT("TeamMember"));
 
 	NetUpdateFrequency = 100.0f;
 }
@@ -42,4 +46,9 @@ void ABEPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 UAbilitySystemComponent* ABEPlayerState::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComponent;
+}
+
+UTeamMemberComponent* ABEPlayerState::GetTeamMemberComponent() const
+{
+	return TeamMemberComponent;
 }
