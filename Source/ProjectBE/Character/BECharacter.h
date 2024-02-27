@@ -121,6 +121,10 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent, Category = "Death")
 	void OnGameReady();
 
+public:
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Initialization")
+	virtual bool IsGameReady() const;
+
 #pragma endregion
 
 

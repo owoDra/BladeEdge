@@ -14,7 +14,6 @@ UE_DEFINE_GAMEPLAY_TAG(TAG_Message_Ability_Cooldown_UltimateSkill, "Message.Abil
 UE_DEFINE_GAMEPLAY_TAG(TAG_Message_Ability_Cooldown_Dodge, "Message.Ability.Cooldown.Dodge");
 
 
-
 ////////////////////////////////////
 // Message.Ability.Activation
 
@@ -24,3 +23,11 @@ UE_DEFINE_GAMEPLAY_TAG(TAG_Message_Ability_Activation_MainSkill, "Message.Abilit
 UE_DEFINE_GAMEPLAY_TAG(TAG_Message_Ability_Activation_SubSkill, "Message.Ability.Activation.SubSkill");
 UE_DEFINE_GAMEPLAY_TAG(TAG_Message_Ability_Activation_UltimateSkill, "Message.Ability.Activation.UltimateSkill");
 UE_DEFINE_GAMEPLAY_TAG(TAG_Message_Ability_Activation_Dodge, "Message.Ability.Activation.Dodge");
+
+
+////////////////////////////////////
+// Message.Match
+
+UE_DEFINE_GAMEPLAY_TAG(TAG_Message_Match_Start, "Message.Match.Start");
+UE_DEFINE_GAMEPLAY_TAG(TAG_Message_Match_Win, "Message.Match.Win");
+UE_DEFINE_GAMEPLAY_TAG(TAG_Message_Match_Lose, "Message.Match.Lose");

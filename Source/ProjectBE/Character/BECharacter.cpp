@@ -2,6 +2,9 @@
 
 #include "BECharacter.h"
 
+// Game Framework Core
+#include "InitState/InitStateTags.h"
+
 // Game Effect Extension
 #include "ContextEffectComponent.h"
 
@@ -64,6 +67,11 @@ void ABECharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 void ABECharacter::HandleGameReady()
 {
 	OnGameReady();
+}
+
+bool ABECharacter::IsGameReady() const
+{
+	return CharacterInitStateComponent->HasReachedInitState(TAG_InitState_GameplayReady);
 }
 
 
