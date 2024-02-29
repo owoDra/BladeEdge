@@ -65,7 +65,7 @@ bool UBEGameplayAbility_Melee::DoesAbilitySatisfyTagRequirements(const UAbilityS
 
 	// ComboStandbyTag がない場合は許可しない
 
-	if (!bIsComboRoot)
+	if (!bIsComboRoot && ComboStandbyTag.IsValid())
 	{
 		if (!AbilitySystemComponentTags.HasTag(ComboStandbyTag))
 		{
@@ -153,7 +153,7 @@ void UBEGameplayAbility_Melee::TryStartCombo()
 	{
 		// すでに ComboReadyTag がある場合は即開始
 
-		if (ASC->HasMatchingGameplayTag(ComboReadyTag))
+		if (!ComboReadyTag.IsValid() || ASC->HasMatchingGameplayTag(ComboReadyTag))
 		{
 			HandleComboReady();
 			return;
