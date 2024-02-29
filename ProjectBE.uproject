@@ -32,10 +32,6 @@
 			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/product/8ab50c0d12f0427b847a443f8dfd7f94"
 		},
 		{
-			"Name": "BEGFFrontEnd",
-			"Enabled": true
-		},
-		{
 			"Name": "OnlineSubsystemGooglePlay",
 			"Enabled": false,
 			"SupportedTargetPlatforms": [
@@ -187,10 +183,6 @@
 			"Enabled": true
 		},
 		{
-			"Name": "BEGFMode_Duel",
-			"Enabled": true
-		},
-		{
 			"Name": "CommonMaps",
 			"Enabled": true,
 			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/product/44d967336ad64ba7ac3f27f384e7d97b"
@@ -216,6 +208,14 @@
 		{
 			"Name": "VisualStudioSourceCodeAccess",
 			"Enabled": false
+		},
+		{
+			"Name": "BEGFFrontEnd",
+			"Enabled": true
+		},
+		{
+			"Name": "BEGFMode_Duel",
+			"Enabled": true
 		}
 	],
 	"TargetPlatforms": [
