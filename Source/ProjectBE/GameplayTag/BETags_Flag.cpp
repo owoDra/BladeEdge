@@ -7,3 +7,4 @@
 // Flag
 
 UE_DEFINE_GAMEPLAY_TAG(TAG_Flag_EquipmentUseBlocked, "Flag.EquipmentUseBlocked");
+UE_DEFINE_GAMEPLAY_TAG(TAG_Flag_Parry, "Flag.Parry");
