@@ -31,3 +31,13 @@ UE_DEFINE_GAMEPLAY_TAG(TAG_Message_Ability_Activation_Dodge, "Message.Ability.Ac
 UE_DEFINE_GAMEPLAY_TAG(TAG_Message_Match_Start, "Message.Match.Start");
 UE_DEFINE_GAMEPLAY_TAG(TAG_Message_Match_Win, "Message.Match.Win");
 UE_DEFINE_GAMEPLAY_TAG(TAG_Message_Match_Lose, "Message.Match.Lose");
+
+
+////////////////////////////////////
+// Message.Combat
+
+UE_DEFINE_GAMEPLAY_TAG(TAG_Message_Combat_Eliminate, "Message.Combat.Eliminate");
+UE_DEFINE_GAMEPLAY_TAG(TAG_Message_Combat_Hit, "Message.Combat.Hit");
+UE_DEFINE_GAMEPLAY_TAG(TAG_Message_Combat_EliminateBy, "Message.Combat.EliminateBy");
+UE_DEFINE_GAMEPLAY_TAG(TAG_Message_Combat_HitBY, "Message.Combat.HitBy");
+UE_DEFINE_GAMEPLAY_TAG(TAG_Message_Combat_Parry, "Message.Combat.Parry");

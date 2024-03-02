@@ -15,6 +15,7 @@ UE_DEFINE_GAMEPLAY_TAG(TAG_UI_Extension_HUDSlot_CenterRight, "UI.Extension.HUDSl
 UE_DEFINE_GAMEPLAY_TAG(TAG_UI_Extension_HUDSlot_TopLeft, "UI.Extension.HUDSlot.TopLeft");
 UE_DEFINE_GAMEPLAY_TAG(TAG_UI_Extension_HUDSlot_TopMiddle, "UI.Extension.HUDSlot.TopMiddle");
 UE_DEFINE_GAMEPLAY_TAG(TAG_UI_Extension_HUDSlot_TopRight, "UI.Extension.HUDSlot.TopRight");
+UE_DEFINE_GAMEPLAY_TAG(TAG_UI_Extension_HUDSlot_Full, "UI.Extension.HUDSlot.Full");
 
 
 ////////////////////////////////////
