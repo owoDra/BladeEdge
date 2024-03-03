@@ -216,6 +216,10 @@
 		{
 			"Name": "BEGFMode_Duel",
 			"Enabled": true
+		},
+		{
+			"Name": "BEGFTutorial",
+			"Enabled": true
 		}
 	],
 	"TargetPlatforms": [
