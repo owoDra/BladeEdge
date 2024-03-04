@@ -23,7 +23,7 @@ class UContextEffectComponent;
 /** 
  * このプロジェクトにおける Character のベースクラス
  */
-UCLASS(Abstract, Blueprintable)
+UCLASS(Blueprintable)
 class PROJECTBE_API ABECharacter 
 	: public AAbilityLocomotionCharacter
 	, public IAbilitySystemInterface

@@ -4,6 +4,7 @@
 
 #include "GameplayTag/BETags_Message.h"
 #include "GameplayTag/BETags_Stat.h"
+#include "GameplayTag/BETags_Input.h"
 
 // Game Ability Extension
 #include "Cost/AbilityCost_StatTag.h"
@@ -30,4 +31,10 @@ UBEGameplayAbility_UltimateSkill::UBEGameplayAbility_UltimateSkill(const FObject
 	AdditionalCosts.Add(NewCost);
 
 	AbilityTags.AddTag(TAG_Ability_Type_Skill);
+
+	FAbilityTriggerData TriggerData;
+	TriggerData.TriggerSource = EGameplayAbilityTriggerSource::GameplayEvent;
+	TriggerData.TriggerTag = TAG_Input_MouseAndKeyboard_UltimateSkill;
+	AbilityTriggers.Empty(1);
+	AbilityTriggers.Add(TriggerData);
 }

@@ -2,6 +2,7 @@
 
 #include "BEGameplayAbility_MainSkill.h"
 
+#include "GameplayTag/BETags_Input.h"
 #include "GameplayTag/BETags_Message.h"
 #include "Ability/Equipment/Cost/AbilityCost_TimeChargeSkillStock.h"
 
@@ -23,4 +24,10 @@ UBEGameplayAbility_MainSkill::UBEGameplayAbility_MainSkill(const FObjectInitiali
 	AdditionalCosts.Add(NewCost);
 
 	AbilityTags.AddTag(TAG_Ability_Type_Skill);
+
+	FAbilityTriggerData TriggerData;
+	TriggerData.TriggerSource = EGameplayAbilityTriggerSource::GameplayEvent;
+	TriggerData.TriggerTag = TAG_Input_Shared_MainSkill;
+	AbilityTriggers.Empty(1);
+	AbilityTriggers.Add(TriggerData);
 }
