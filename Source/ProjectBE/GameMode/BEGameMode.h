@@ -17,4 +17,7 @@ class PROJECTBE_API ABEGameMode : public AGFCGameModeBase
 public:
 	ABEGameMode(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
+public:
+	virtual bool ShouldSpawnAtStartSpot(AController* Player) override;
+	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 };

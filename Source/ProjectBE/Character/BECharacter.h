@@ -131,6 +131,9 @@ public:
 	//////////////////////////////////////////////////////////////////////////
 	// Death
 #pragma region Death
+public:
+	virtual void FellOutOfWorld(const class UDamageType& dmgType) override;
+
 protected:
 	UFUNCTION()
 	virtual void HandleDeathStart();

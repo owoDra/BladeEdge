@@ -77,6 +77,15 @@ bool ABECharacter::IsGameReady() const
 
 #pragma region Death
 
+void ABECharacter::FellOutOfWorld(const UDamageType& dmgType)
+{
+	if (HasAuthority())
+	{
+		HealthComponent->HandleOutOfHealth(this, nullptr, FGameplayEffectSpec(), 999999999.0f);
+	}
+}
+
+
 void ABECharacter::HandleDeathStart()
 {
 	DisableMovementAndCollision();

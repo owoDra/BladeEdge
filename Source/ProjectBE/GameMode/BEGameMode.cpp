@@ -2,6 +2,7 @@
 
 #include "BEGameMode.h"
 
+#include "GameMode/BESpawningManagerComponent.h"
 #include "Character/BECharacter.h"
 #include "Character/BESpectatorPawn.h"
 #include "Player/BEPlayerController.h"
@@ -29,4 +30,22 @@ ABEGameMode::ABEGameMode(const FObjectInitializer& ObjectInitializer)
 	GameSessionClass = AGameSession::StaticClass();
 	SpectatorClass = ABESpectatorPawn::StaticClass();
 	ReplaySpectatorPlayerControllerClass = ABEPlayerController::StaticClass();
+}
+
+
+bool ABEGameMode::ShouldSpawnAtStartSpot(AController* Player)
+{
+	// Spawn Manager を使用するためこの機能を無効にする。
+
+	return false;
+}
+
+AActor* ABEGameMode::ChoosePlayerStart_Implementation(AController* Player)
+{
+	if (auto* SpawningManager{ GameState->FindComponentByClass<UBESpawningManagerComponent>() })
+	{
+		return SpawningManager->ChoosePlayerStart(Player);
+	}
+
+	return Super::ChoosePlayerStart_Implementation(Player);
 }
