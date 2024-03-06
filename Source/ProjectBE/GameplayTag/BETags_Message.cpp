@@ -31,6 +31,8 @@ UE_DEFINE_GAMEPLAY_TAG(TAG_Message_Ability_Activation_Dodge, "Message.Ability.Ac
 UE_DEFINE_GAMEPLAY_TAG(TAG_Message_Match_Start, "Message.Match.Start");
 UE_DEFINE_GAMEPLAY_TAG(TAG_Message_Match_Win, "Message.Match.Win");
 UE_DEFINE_GAMEPLAY_TAG(TAG_Message_Match_Lose, "Message.Match.Lose");
+UE_DEFINE_GAMEPLAY_TAG(TAG_Message_Match_Draw, "Message.Match.Draw");
+UE_DEFINE_GAMEPLAY_TAG(TAG_Message_Match_SuddenDeath, "Message.Match.SuddenDeath");
 
 
 ////////////////////////////////////

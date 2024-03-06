@@ -14,6 +14,8 @@
 #include UE_INLINE_GENERATED_CPP_BY_NAME(BESystemStatics)
 
 
+// AssetManager
+
 TSoftObjectPtr<UObject> UBESystemStatics::GetTypedSoftObjectReferenceFromPrimaryAssetId(FPrimaryAssetId PrimaryAssetId, TSubclassOf<UObject> ExpectedAssetType)
 {
 	if (auto* Manager{ UAssetManager::GetIfInitialized() })
@@ -41,6 +43,24 @@ TSoftObjectPtr<UObject> UBESystemStatics::GetTypedSoftObjectReferenceFromPrimary
 	return nullptr;
 }
 
+
+// Project
+
+FString UBESystemStatics::GetProjectVersion()
+{
+	FString AppVersion;
+	GConfig->GetString(
+		TEXT("/Script/EngineSettings.GeneralProjectSettings"),
+		TEXT("ProjectVersion"),
+		AppVersion,
+		GGameIni
+	);
+
+	return AppVersion;
+}
+
+
+// Rendering
 
 void UBESystemStatics::SetScalarParameterValueOnAllMeshComponents(AActor* TargetActor, const FName ParameterName, const float ParameterValue, bool bIncludeChildActors)
 {
@@ -114,6 +134,8 @@ void UBESystemStatics::SetScalarParametersValueOnImages(const TArray<UImage*>& I
 	}
 }
 
+
+// Components
 
 TArray<UActorComponent*> UBESystemStatics::FindComponentsByClass(AActor* TargetActor, TSubclassOf<UActorComponent> ComponentClass, bool bIncludeChildActors)
 {

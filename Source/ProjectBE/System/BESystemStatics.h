@@ -23,6 +23,13 @@ public:
 
 
 	//////////////////////////////////////////////////////
+	// Project
+public:
+	UFUNCTION(BlueprintCallable, Category = "Project")
+	static FString GetProjectVersion();
+
+
+	//////////////////////////////////////////////////////
 	// Rendering
 public:
 	UFUNCTION(BlueprintCallable, Category = "Rendering|Material", meta=(DefaultToSelf="TargetActor"))
