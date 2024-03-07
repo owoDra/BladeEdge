@@ -38,6 +38,9 @@ public:
 	UPROPERTY()
 	EMatchTimerState State{ EMatchTimerState::Stop };
 
+	UPROPERTY(NotReplicated)
+	EMatchTimerState LastState{ EMatchTimerState::Stop };
+
 	//
 	// ServerTimeSeconds をもとに現在のタイマー時間を計算するための数値。
 	// State に応じて数値の意味は以下の通りに変化する。
@@ -102,6 +105,9 @@ public:
 	virtual bool Pause();
 
 	UFUNCTION(BlueprintAuthorityOnly, BlueprintCallable, Category = "Match Timer")
+	virtual bool Resume();
+
+	UFUNCTION(BlueprintAuthorityOnly, BlueprintCallable, Category = "Match Timer")
 	virtual bool ResumeCountdown();
 
 	UFUNCTION(BlueprintAuthorityOnly, BlueprintCallable, Category = "Match Timer")
@@ -111,9 +117,9 @@ protected:
 	virtual void SetTimerInfo(FMatchTimerInfo InTimerInfo);
 
 	UFUNCTION()
-	void OnRep_TimerInfo();
+	void OnRep_TimerInfo(FMatchTimerInfo LastTimerInfo);
 
-	virtual void HandleTimerInfoChange();
+	virtual void HandleTimerInfoChange(FMatchTimerInfo LastTimerInfo);
 
 public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Match Timer")
@@ -121,6 +127,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Match Timer")
 	virtual EMatchTimerState GetMatchTimerState() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Match Timer")
+	virtual EMatchTimerState GetLastMatchTimerState() const;
 
 
 	/////////////////////////////////////////////////////////////////

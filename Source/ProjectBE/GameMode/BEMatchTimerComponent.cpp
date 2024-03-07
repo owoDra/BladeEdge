@@ -77,6 +77,29 @@ bool UBEMatchTimerComponent::Pause()
 	return false;
 }
 
+bool UBEMatchTimerComponent::Resume()
+{
+	if (HasAuthority() && GetMatchTimerState() == EMatchTimerState::Stop && GetLastMatchTimerState() != EMatchTimerState::Stop)
+	{
+		auto ServerTimeSeconds{ GetGameStateChecked<AGameStateBase>()->GetServerWorldTimeSeconds() };
+
+		switch (GetLastMatchTimerState())
+		{
+		case EMatchTimerState::Countdown:
+			StartCountdown(GetMatchTime());
+			return true;
+			break;
+
+		case EMatchTimerState::CountUp:
+			StartCountup(GetMatchTime());
+			return true;
+			break;
+		}
+	}
+
+	return false;
+}
+
 bool UBEMatchTimerComponent::ResumeCountdown()
 {
 	if (HasAuthority() && GetMatchTimerState() == EMatchTimerState::Stop)
@@ -106,20 +129,24 @@ void UBEMatchTimerComponent::SetTimerInfo(FMatchTimerInfo InTimerInfo)
 
 	InTimerInfo.Time = FMath::Max(InTimerInfo.Time, 0.0);
 
+	const auto LastTimerInfo{ TimerInfo };
+
 	TimerInfo = InTimerInfo;
 
 	MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, TimerInfo, this);
 
-	HandleTimerInfoChange();
+	HandleTimerInfoChange(LastTimerInfo);
 }
 
-void UBEMatchTimerComponent::OnRep_TimerInfo()
+void UBEMatchTimerComponent::OnRep_TimerInfo(FMatchTimerInfo LastTimerInfo)
 {
-	HandleTimerInfoChange();
+	HandleTimerInfoChange(LastTimerInfo);
 }
 
-void UBEMatchTimerComponent::HandleTimerInfoChange()
+void UBEMatchTimerComponent::HandleTimerInfoChange(FMatchTimerInfo LastTimerInfo)
 {
+	TimerInfo.LastState = LastTimerInfo.State;
+
 	BroadcastMatchTimerChanged();
 
 	UpdateCountdownTimer();
@@ -148,6 +175,11 @@ double UBEMatchTimerComponent::GetMatchTime() const
 EMatchTimerState UBEMatchTimerComponent::GetMatchTimerState() const
 {
 	return TimerInfo.State;
+}
+
+EMatchTimerState UBEMatchTimerComponent::GetLastMatchTimerState() const
+{
+	return TimerInfo.LastState;
 }
 
 
