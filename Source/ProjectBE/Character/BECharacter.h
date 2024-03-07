@@ -122,8 +122,9 @@ protected:
 	void OnGameReady();
 
 public:
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Initialization")
-	virtual bool IsGameReady() const;
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, BlueprintPure, Category = "Initialization")
+	bool IsGameReady() const;
+	virtual bool IsGameReady_Implementation() const;
 
 #pragma endregion
 

@@ -69,7 +69,7 @@ void ABECharacter::HandleGameReady()
 	OnGameReady();
 }
 
-bool ABECharacter::IsGameReady() const
+bool ABECharacter::IsGameReady_Implementation() const
 {
 	return CharacterInitStateComponent->HasReachedInitState(TAG_InitState_GameplayReady);
 }
