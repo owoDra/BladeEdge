@@ -2,11 +2,14 @@
 
 #include "UserFacingExperienceData.h"
 
+#include "DeveloperSettings/BELobbyDeveloperSettings.h"
+
 #include "Type/OnlineLobbySearchTypes.h"
 #include "Type/OnlineLobbyCreateTypes.h"
 #include "OnlineLobbySubsystem.h"
 
 #include "Online/OnlineSessionNames.h"
+#include "GameFramework/PlayerController.h"
 
 #if WITH_EDITOR
 #include "Misc/DataValidation.h"
@@ -86,7 +89,7 @@ void UUserFacingExperienceData::CreateRequestsFromThis(UOnlineLobbySubsystem* Lo
 
 		CreateRequest = LobbySubsystem->CreateOnlineLobbyCreateRequest();
 		CreateRequest->bPresenceEnabled = bPresenceEnabled;
-		CreateRequest->ModeNameForAdvertisement = UserFacingExperienceName;
+		CreateRequest->ModeNameForAdvertisement = ExperienceName;
 		CreateRequest->MapID = MapIDs[PickMapIndex];
 		CreateRequest->ExtraArgs = ExtraArgs;
 		CreateRequest->ExtraArgs.Add(TEXT("ExperienceData"), ExperienceName);
@@ -97,10 +100,79 @@ void UUserFacingExperienceData::CreateRequestsFromThis(UOnlineLobbySubsystem* Lo
 		SearchRequest = LobbySubsystem->CreateOnlineLobbySearchRequest();
 		FLobbyAttributeFilter ModeNameFilter
 		{
-			FLobbyAttribute(FName(SETTING_GAMEMODE), UserFacingExperienceName),
+			FLobbyAttribute(FName(SETTING_GAMEMODE), ExperienceName),
 			ELobbyAttributeComparisonOp::Equals
 		};
 		SearchRequest->Filters.Add(ModeNameFilter);
+
+		static const FName NAME_MATCHSTARTED{ TEXTVIEW("MATCHSTARTED") };
+		FLobbyAttributeFilter MatchStartedFilter
+		{
+			FLobbyAttribute(NAME_MATCHSTARTED, false),
+			ELobbyAttributeComparisonOp::Equals
+		};
+		SearchRequest->Filters.Add(MatchStartedFilter);
+
 		SearchRequest->Filters.Append(LobbyAttributeFilters);
+	}
+}
+
+void UUserFacingExperienceData::CreateRequestsForMatchmaking(UOnlineLobbySubsystem* LobbySubsystem, APlayerController* HostingPlayerController, ULobbyCreateRequest*& CreateRequest, ULobbySearchRequest*& SearchRequest) const
+{
+	if (LobbySubsystem && HostingPlayerController)
+	{
+		CreateRequestsFromThis(LobbySubsystem, CreateRequest, SearchRequest);
+
+		////////////////////////////////////////
+		// グローバルアトリビュートを結合
+
+		const auto* DevSetting{ GetDefault<UBELobbyDeveloperSettings>() };
+
+		CreateRequest->InitialAttributes.Append(DevSetting->GlobalLobbyAttributesForMatchmaking);
+		CreateRequest->InitialUserAttributes.Append(DevSetting->GlobalLobbyUserAttributesForMatchmaking);
+
+		SearchRequest->Filters.Append(DevSetting->GlobalLobbyAttributeFiltersForMatchmaking);
+
+		////////////////////////////////////////
+		// ユニークID を追加
+
+		// 構築に用いる文字列をトリミングする
+		static constexpr int32 NUM_ReferForBuildUniqueId{ 16 };
+
+		auto* LocalPlayer{ HostingPlayerController->GetLocalPlayer() };
+		auto AccountId{ ensure(LocalPlayer) ? ToString(LocalPlayer->GetPreferredUniqueNetId().GetV2()) : FString()};
+		AccountId = AccountId.Left(NUM_ReferForBuildUniqueId);
+		auto GUID{ FGuid::NewGuid().ToString() };
+		GUID = GUID.Left(NUM_ReferForBuildUniqueId);
+
+		const auto NewUniqueID{ AccountId + GUID };
+		
+		CreateRequest->InitialAttributes.Add({ UBELobbyDeveloperSettings::GetLobbyAttrName_UNIQUEID(), NewUniqueID });
+	}
+}
+
+void UUserFacingExperienceData::CreateRequestsForRejoin(UOnlineLobbySubsystem* LobbySubsystem, const FString& LobbyUniqueID, ULobbyCreateRequest*& CreateRequest, ULobbySearchRequest*& SearchRequest) const
+{
+	if (LobbySubsystem && !LobbyUniqueID.IsEmpty())
+	{
+		CreateRequestsFromThis(LobbySubsystem, CreateRequest, SearchRequest);
+
+		////////////////////////////////////////
+		// グローバルアトリビュートを結合
+
+		const auto* DevSetting{ GetDefault<UBELobbyDeveloperSettings>() };
+
+		CreateRequest->InitialAttributes.Append(DevSetting->GlobalLobbyAttributesForRejoin);
+		CreateRequest->InitialUserAttributes.Append(DevSetting->GlobalLobbyUserAttributesForRejoin);
+
+		SearchRequest->Filters.Append(DevSetting->GlobalLobbyAttributeFiltersForRejoin);
+
+		////////////////////////////////////////
+		// ユニークID を追加
+
+		FLobbyAttribute UniqueIdAttr{ UBELobbyDeveloperSettings::GetLobbyAttrName_UNIQUEID(), LobbyUniqueID };
+		FLobbyAttributeFilter UniqueIdAttrFilter{ UniqueIdAttr, ELobbyAttributeComparisonOp::Equals };
+
+		SearchRequest->Filters.Add(UniqueIdAttrFilter);
 	}
 }

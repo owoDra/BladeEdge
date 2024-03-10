@@ -32,6 +32,13 @@ class PROJECTBE_API UBESpawningManagerComponent : public UGFCGameStateComponent
 public:
 	UBESpawningManagerComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
+	//
+	// InitState に登録するための機能名
+	//
+	inline static const FName NAME_ActorFeatureName{ TEXTVIEW("SpawningManager")};
+
+	virtual FName GetFeatureName() const override { return NAME_ActorFeatureName; }
+
 	/////////////////////////////////////////////////////////////////
 	// Initialization
 public:

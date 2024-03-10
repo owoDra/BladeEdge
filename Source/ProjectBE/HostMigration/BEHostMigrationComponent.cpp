@@ -2,13 +2,22 @@
 
 #include "BEHostMigrationComponent.h"
 
+#include "HostMigration/BEHostMigrationSubsystem.h"
 #include "ProjectBELogs.h"
 
+// Game Online Core
+#include "OnlineLobbySubsystem.h"
+#include "Type/OnlineLobbyResultTypes.h"
+
+// Game Phase Extension
+#include "GamePhaseSubsystem.h"
+
+// Game Team Extension
+#include "TeamManagerSubsystem.h"
+
+// Engine Features
 #include "GameDelegates.h"
-#include "GameFramework/PlayerController.h"
-#include "GameFramework/PlayerState.h"
-#include "GameFramework/GameModeBase.h"
-#include "GameFramework/GameStateBase.h"
+#include "Online/OnlineSessionNames.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(BEHostMigrationComponent)
 
@@ -46,6 +55,8 @@ void UBEHostMigrationComponent::EndPlay(const EEndPlayReason::Type EndPlayReason
 
 void UBEHostMigrationComponent::HandleDisconnect(UWorld* InWorld, UNetDriver* NetDriver)
 {
+	// 切断したのがホストだった場合はマイグレーションを行わない
+
 	const auto bIsClient{ !NetDriver->IsServer() };
 	if (!bIsClient)
 	{
@@ -55,39 +66,64 @@ void UBEHostMigrationComponent::HandleDisconnect(UWorld* InWorld, UNetDriver* Ne
 	UE_LOG(LogBE_HostMigration, Log, TEXT("[%s]Disconeccted"), NetDriver->IsServer() ? TEXT("SERVER") : TEXT("CLIENT"));
 	UE_LOG(LogBE_HostMigration, Log, TEXT("| NetDriver: %s"), *GetNameSafe(NetDriver));
 	UE_LOG(LogBE_HostMigration, Log, TEXT("| World: %s"), *GetNameSafe(InWorld));
-	
-	UE_LOG(LogBE_HostMigration, Log, TEXT("| PlayerControlers"));
-	for (auto It{ InWorld->GetPlayerControllerIterator() }; It; ++It)
+
+	const auto NewURL{ CreateNewURL(InWorld, NetDriver) };
+
+	SendHostMigrationRequest(InWorld, NewURL);
+}
+
+
+FString UBEHostMigrationComponent::CreateNewURL(UWorld* InWorld, UNetDriver* NetDriver) const
+{
+	FString Map;
+	FString Options{ TEXT("?listen") };
+
+	auto* GameInstance{ InWorld->GetGameInstance() };
+
+	// ロビーから情報を取得
+	// - マップ名を設定
+	// - ExperienceDataを指定
+
+	auto* LobbySubsystem{ UGameInstance::GetSubsystem<UOnlineLobbySubsystem>(GameInstance) };
+	if (ensure(LobbySubsystem))
 	{
-		auto PC{ *It };
-		UE_LOG(LogBE_HostMigration, Log, TEXT("| + PC[%d]: %s"), It.GetIndex(), *GetNameSafe(PC.Get()));
+		if (auto* CurrentLobby{ LobbySubsystem->GetJoinedLobby(NAME_GameSession) })
+		{
+			CurrentLobby->GetLobbyAttributeAsString(SETTING_MAPNAME, Map);
+
+			FString ExperienceData;
+			CurrentLobby->GetLobbyAttributeAsString(SETTING_GAMEMODE, ExperienceData);
+			Options += FString::Printf(TEXT("?ExperienceData=%s"), *ExperienceData);
+		}
 	}
 
-	auto* FirstPC{ InWorld->GetFirstPlayerController() };
-	UE_LOG(LogBE_HostMigration, Log, TEXT("| FirstPlayerController: %s"), *GetNameSafe(FirstPC));
+	// GamePhase から情報を取得
+	// - 開始時 GamePhase を設定
 
-	auto* FistPS{ FirstPC ? FirstPC->GetPlayerState<APlayerState>() : nullptr };
-	UE_LOG(LogBE_HostMigration, Log, TEXT("| FirstPlayerState: %s"), *GetNameSafe(FistPS));
-
-	auto* GM{ InWorld->GetAuthGameMode() };
-	UE_LOG(LogBE_HostMigration, Log, TEXT("| AuthGameMode: %s"), *GetNameSafe(GM));
-
-	auto* GS{ InWorld->GetGameState() };
-	UE_LOG(LogBE_HostMigration, Log, TEXT("| GameState: %s"), *GetNameSafe(GS));
-
-	UE_LOG(LogBE_HostMigration, Log, TEXT("| PlayerArray"));
-	auto Players{ GS ? GS->PlayerArray : TArray<TObjectPtr<APlayerState>>() };
-
-	for (const auto& PlayerState : Players)
+	auto* GamePhaseSubsystem{ UWorld::GetSubsystem<UGamePhaseSubsystem>(InWorld) };
+	if (ensure(GamePhaseSubsystem))
 	{
-		UE_LOG(LogBE_HostMigration, Log, TEXT("| + PS: %s"), *GetNameSafe(PlayerState));
+		Options += GamePhaseSubsystem->ConstructGameModeOption();
+	}
 
-		if (PlayerState)
-		{
-			UE_LOG(LogBE_HostMigration, Log, TEXT("| ++ PlayerId: %d"), PlayerState->GetPlayerId());
-			UE_LOG(LogBE_HostMigration, Log, TEXT("| ++ PlayerName: %s"), *PlayerState->GetPlayerName());
-			UE_LOG(LogBE_HostMigration, Log, TEXT("| ++ UniqueId: %s"), *PlayerState->GetUniqueId().ToDebugString());
-			UE_LOG(LogBE_HostMigration, Log, TEXT("| ++ IsFirst: %s"), (FistPS == PlayerState) ? TEXT("YES") : TEXT("NO"));
-		}
+	// TeamManager から情報を取得
+	// - 開始時 TeamStat を設定
+
+	auto* TeamManagerSubsystem{ UWorld::GetSubsystem<UTeamManagerSubsystem>(InWorld) };
+	if (ensure(TeamManagerSubsystem))
+	{
+		Options += TeamManagerSubsystem->ConstructGameModeOption();
+	}
+
+	return FString::Printf(TEXT("%s%s"), *Map, *Options);
+}
+
+void UBEHostMigrationComponent::SendHostMigrationRequest(UWorld* InWorld, const FString& NewURL)
+{
+	auto* GameInstance{ InWorld->GetGameInstance() };
+	auto* HostMigrationSubsystem{ UGameInstance::GetSubsystem<UBEHostMigrationSubsystem>(GameInstance) };
+	if (ensure(HostMigrationSubsystem))
+	{
+		HostMigrationSubsystem->HandleHostMigrationRequestURL(NewURL);
 	}
 }

@@ -66,6 +66,13 @@ public:
 
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+	//
+	// InitState に登録するための機能名
+	//
+	inline static const FName NAME_ActorFeatureName{ TEXTVIEW("MatchTimer") };
+
+	virtual FName GetFeatureName() const override { return NAME_ActorFeatureName; }
+
 	/////////////////////////////////////////////////////////////////
 	// Delegate
 public:

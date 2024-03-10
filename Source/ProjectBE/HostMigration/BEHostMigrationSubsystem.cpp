@@ -2,6 +2,10 @@
 
 #include "BEHostMigrationSubsystem.h"
 
+#include "ProjectBELogs.h"
+
+// Game Online Core
+#include "OnlineLobbySubsystem.h"
 #include "Type/OnlineLobbyCreateTypes.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(BEHostMigrationSubsystem)
@@ -26,25 +30,83 @@ bool UBEHostMigrationSubsystem::ShouldCreateSubsystem(UObject* Outer) const
 
 void UBEHostMigrationSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
+	auto* OnlineLobbySubsystem{ Collection.InitializeDependency<UOnlineLobbySubsystem>() };
+	check(OnlineLobbySubsystem);
+
+	OnlineLobbySubsystem->OnLobbyBecomeLeader.AddUObject(this, &ThisClass::HandleBecomeLeader);
 }
 
 void UBEHostMigrationSubsystem::Deinitialize()
 {
-	ClearMigrationLobbyRequest();
+	if (auto* OnlineLobbySubsystem{ UGameInstance::GetSubsystem<UOnlineLobbySubsystem>(GetGameInstance()) })
+	{
+		OnlineLobbySubsystem->OnLobbyBecomeLeader.RemoveAll(this);
+	}
 }
 
 
-void UBEHostMigrationSubsystem::SetMigrationLobbyRequest(ULobbyCreateRequest* InReuqest)
+void UBEHostMigrationSubsystem::HandleBecomeLeader(FName LocalName)
 {
-	MigrationLobbyRequest = InReuqest;
+	if (LocalName == NAME_GameSession)
+	{
+		HandleHostMigrationRequest();
+	}
 }
 
-void UBEHostMigrationSubsystem::ClearMigrationLobbyRequest()
+
+// HostMigration
+
+bool UBEHostMigrationSubsystem::HandleHostMigrationRequest()
 {
-	MigrationLobbyRequest = nullptr;
+	bRequested = true;
+
+	return TryHostMigration();
 }
 
-bool UBEHostMigrationSubsystem::HasMigrationLobbyRequest() const
+bool UBEHostMigrationSubsystem::HandleHostMigrationRequestURL(const FString& InURL)
 {
-	return IsValid(MigrationLobbyRequest);
+	HostMigrationRequestURL = InURL;
+
+	return TryHostMigration();
+}
+
+bool UBEHostMigrationSubsystem::TryHostMigration()
+{
+	UE_LOG(LogBE_HostMigration, Log, TEXT("Try Host Migration"));
+	UE_LOG(LogBE_HostMigration, Log, TEXT("| bRequested: %s"), bRequested ? TEXT("TRUE") : TEXT("FALSE"));
+	UE_LOG(LogBE_HostMigration, Log, TEXT("| URL: %s"), *HostMigrationRequestURL);
+
+	/// @TODO: OSSV2 のバグでLeaderChangeがうまくハンドルされないことがあるため一時的にLeaderChangeを考慮せずにホストマイグレーションを行う
+	///		   このゲームでは1対1のゲームモードが基本なため問題はない
+
+	//if (bRequested && !HostMigrationRequestURL.IsEmpty())
+	if (!HostMigrationRequestURL.IsEmpty())
+	{
+		auto* World{ GetWorld() };
+
+		if (ensure(World))
+		{
+			if (auto* LobbySubsystem{ UGameInstance::GetSubsystem<UOnlineLobbySubsystem>(World->GetGameInstance()) })
+			{
+				if (LobbySubsystem->GetJoinedLobby(NAME_GameSession))
+				{
+					if (ensure(World->ServerTravel(HostMigrationRequestURL, true)))
+					{
+						ClearHostMigrationRequest();
+						return true;
+					}
+				}
+			}
+		}
+
+		ClearHostMigrationRequest();
+	}
+
+	return false;
+}
+
+void UBEHostMigrationSubsystem::ClearHostMigrationRequest()
+{
+	bRequested = false;
+	HostMigrationRequestURL = FString();
 }

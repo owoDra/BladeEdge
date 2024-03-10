@@ -26,22 +26,29 @@ public:
     virtual void Initialize(FSubsystemCollectionBase& Collection) override;
     virtual void Deinitialize() override;
 
+    void HandleBecomeLeader(FName LocalName);
+
     ///////////////////////////////////////////////////////////////////////
     // HostMigration
 protected:
-	UPROPERTY(Transient)
-    TObjectPtr<ULobbyCreateRequest> MigrationLobbyRequest{ nullptr };
+    //
+    // ホストマイグレーションリクエストを受けた際に新規ホスト用のURL
+    //
+    FString HostMigrationRequestURL;
+
+    //
+    // ロビーの新規リーダーになった際にホストマイグレーションが必要にな場合に true になる
+    //
+    bool bRequested{ false };
 
 public:
-    virtual void SetMigrationLobbyRequest(ULobbyCreateRequest* InReuqest);
-
-	UFUNCTION(BlueprintCallable, Category = "HostMigration")
-    virtual void ClearMigrationLobbyRequest();
+    virtual bool HandleHostMigrationRequest();
+    virtual bool HandleHostMigrationRequestURL(const FString& InURL);
 
     UFUNCTION(BlueprintCallable, Category = "HostMigration")
-    virtual ULobbyCreateRequest* GetMigrationLobbyRequest() const { return MigrationLobbyRequest; }
+    virtual bool TryHostMigration();
 
-    UFUNCTION(BlueprintCallable, Category = "HostMigration", meta = (ExpandBoolAsExecs = "ReturnValue"))
-    virtual bool HasMigrationLobbyRequest() const;
+	UFUNCTION(BlueprintCallable, Category = "HostMigration")
+    virtual void ClearHostMigrationRequest();
 
 };

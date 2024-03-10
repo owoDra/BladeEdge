@@ -12,6 +12,7 @@ class UExperienceData;
 class ULobbyCreateRequest;
 class ULobbySearchRequest;
 class UOnlineLobbySubsystem;
+class APlayerController;
 
 
 /**
@@ -126,4 +127,17 @@ public:
 		, ULobbyCreateRequest*& CreateRequest
 		, ULobbySearchRequest*& SearchRequest) const;
 
+	UFUNCTION(BlueprintCallable, Category = "Request")
+	virtual void CreateRequestsForMatchmaking(
+		UOnlineLobbySubsystem* LobbySubsystem
+		, APlayerController* HostingPlayerController
+		, ULobbyCreateRequest*& CreateRequest
+		, ULobbySearchRequest*& SearchRequest) const;
+
+	UFUNCTION(BlueprintCallable, Category = "Request")
+	virtual void CreateRequestsForRejoin(
+		UOnlineLobbySubsystem* LobbySubsystem
+		, const FString& LobbyUniqueID
+		, ULobbyCreateRequest*& CreateRequest
+		, ULobbySearchRequest*& SearchRequest) const;
 };

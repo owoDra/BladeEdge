@@ -17,6 +17,13 @@ class PROJECTBE_API UBEHostMigrationComponent : public UGFCGameStateComponent
 public:
 	UBEHostMigrationComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
+	//
+	// InitState に登録するための機能名
+	//
+	inline static const FName NAME_ActorFeatureName{ TEXTVIEW("HostMigration") };
+
+	virtual FName GetFeatureName() const override { return NAME_ActorFeatureName; }
+
 	/////////////////////////////////////////////////////////////////
 	// Initialization
 protected:
@@ -27,6 +34,17 @@ public:
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 protected:
-	virtual void HandleDisconnect(UWorld* InWorld, UNetDriver* NetDriver);
+	void HandleDisconnect(UWorld* InWorld, UNetDriver* NetDriver);
+
+
+	/////////////////////////////////////////////////////////////////
+	// Request
+protected:
+	/**
+	 * ホストマイグレーションのための新規レベル開始のためのURLを作成する
+	 */
+	virtual FString CreateNewURL(UWorld* InWorld, UNetDriver* NetDriver) const;
+
+	void SendHostMigrationRequest(UWorld* InWorld, const FString& NewURL);
 
 };
