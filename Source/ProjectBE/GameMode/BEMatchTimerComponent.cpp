@@ -2,10 +2,13 @@
 
 #include "BEMatchTimerComponent.h"
 
+#include "ProjectBELogs.h"
+
 // Engine Features
 #include "Net/UnrealNetwork.h"
 #include "Net/Core/PushModel/PushModel.h"
 #include "GameFramework/GameStateBase.h"
+#include "Kismet/GameplayStatics.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(BEMatchTimerComponent)
 
@@ -50,7 +53,7 @@ void UBEMatchTimerComponent::StartCountdown(double Duration)
 	{
 		auto ServerTimeSeconds{ GetGameStateChecked<AGameStateBase>()->GetServerWorldTimeSeconds() };
 
-		SetTimerInfo({ EMatchTimerState::Countdown, ServerTimeSeconds + Duration });
+		SetTimerInfo({ EMatchTimerState::Countdown, GetMatchTimerState(), ServerTimeSeconds + Duration });
 	}
 }
 
@@ -60,7 +63,7 @@ void UBEMatchTimerComponent::StartCountup(double ElapsedTime)
 	{
 		auto ServerTimeSeconds{ GetGameStateChecked<AGameStateBase>()->GetServerWorldTimeSeconds() };
 
-		SetTimerInfo({ EMatchTimerState::CountUp, ServerTimeSeconds - ElapsedTime });
+		SetTimerInfo({ EMatchTimerState::CountUp, GetMatchTimerState(), ServerTimeSeconds - ElapsedTime });
 	}
 }
 
@@ -70,7 +73,7 @@ bool UBEMatchTimerComponent::Pause()
 	{
 		auto ServerTimeSeconds{ GetGameStateChecked<AGameStateBase>()->GetServerWorldTimeSeconds() };
 
-		SetTimerInfo({ EMatchTimerState::Stop, GetMatchTime() });
+		SetTimerInfo({ EMatchTimerState::Stop, GetMatchTimerState(), GetMatchTime() });
 		return true;
 	}
 
@@ -129,24 +132,20 @@ void UBEMatchTimerComponent::SetTimerInfo(FMatchTimerInfo InTimerInfo)
 
 	InTimerInfo.Time = FMath::Max(InTimerInfo.Time, 0.0);
 
-	const auto LastTimerInfo{ TimerInfo };
-
 	TimerInfo = InTimerInfo;
 
 	MARK_PROPERTY_DIRTY_FROM_NAME(ThisClass, TimerInfo, this);
 
-	HandleTimerInfoChange(LastTimerInfo);
+	HandleTimerInfoChange();
 }
 
-void UBEMatchTimerComponent::OnRep_TimerInfo(FMatchTimerInfo LastTimerInfo)
+void UBEMatchTimerComponent::OnRep_TimerInfo()
 {
-	HandleTimerInfoChange(LastTimerInfo);
+	HandleTimerInfoChange();
 }
 
-void UBEMatchTimerComponent::HandleTimerInfoChange(FMatchTimerInfo LastTimerInfo)
+void UBEMatchTimerComponent::HandleTimerInfoChange()
 {
-	TimerInfo.LastState = LastTimerInfo.State;
-
 	BroadcastMatchTimerChanged();
 
 	UpdateCountdownTimer();
@@ -216,6 +215,94 @@ void UBEMatchTimerComponent::UpdateCountdownTimer()
 void UBEMatchTimerComponent::HandleCountdownFinish()
 {
 	BroadcastMatchTimerCountdownFinish();
+}
+
+
+// Game Mode Option
+
+bool UBEMatchTimerComponent::InitializeFromGameModeOption()
+{
+	if (!HasAuthority())
+	{
+		return false;
+	}
+
+	auto* GameMode{ GetWorld()->GetAuthGameMode() };
+	if (ensure(GameMode))
+	{
+		auto OptionString{ GameMode->OptionsString };
+
+		UE_LOG(LogBE_MatchTimer, Log, TEXT("Initialize MatchTimer From Game Mode Option"));
+
+		EMatchTimerState NewState;
+		EMatchTimerState NewLastState;
+		double NewTime;
+
+		auto HasAllOption
+		{  
+			UGameplayStatics::HasOption(OptionString, UBEMatchTimerComponent::NAME_MatchTimerTypeOptionKey) &&
+			UGameplayStatics::HasOption(OptionString, UBEMatchTimerComponent::NAME_MatchTimerLastTypeOptionKey) &&
+			UGameplayStatics::HasOption(OptionString, UBEMatchTimerComponent::NAME_MatchTimerTimeOptionKey)
+		};
+
+		if (HasAllOption)
+		{
+			{
+				const auto OptionValue{ UGameplayStatics::ParseOption(OptionString, UBEMatchTimerComponent::NAME_MatchTimerTypeOptionKey) };
+				NewState = static_cast<EMatchTimerState>(FCString::Atoi(*OptionValue));
+
+				UE_LOG(LogBE_MatchTimer, Log, TEXT("| MatchTimerType: %s"), *StaticEnum<EMatchTimerState>()->GetDisplayValueAsText(NewState).ToString());
+			}
+
+			{
+				const auto OptionValue{ UGameplayStatics::ParseOption(OptionString, UBEMatchTimerComponent::NAME_MatchTimerLastTypeOptionKey) };
+				NewLastState = static_cast<EMatchTimerState>(FCString::Atoi(*OptionValue));
+
+				UE_LOG(LogBE_MatchTimer, Log, TEXT("| MatchTimerLastType: %s"), *StaticEnum<EMatchTimerState>()->GetDisplayValueAsText(NewLastState).ToString());
+			}
+
+			{
+				const auto OptionValue{ UGameplayStatics::ParseOption(OptionString, UBEMatchTimerComponent::NAME_MatchTimerTimeOptionKey) };
+				NewTime = FCString::Atof(*OptionValue);
+
+				UE_LOG(LogBE_MatchTimer, Log, TEXT("| MatchTimerTime: %f"), NewTime);
+			}
+
+			auto ServerTimeSeconds{ GetGameStateChecked<AGameStateBase>()->GetServerWorldTimeSeconds() };
+
+			switch (NewState)
+			{
+			case EMatchTimerState::Countdown:
+				SetTimerInfo({ NewState, NewLastState, ServerTimeSeconds + NewTime });
+				break;
+			case EMatchTimerState::CountUp:
+				SetTimerInfo({ NewState, NewLastState, NewTime - ServerTimeSeconds });
+				break;
+			case EMatchTimerState::Stop:
+				SetTimerInfo({ NewState, NewLastState, NewTime });
+				break;
+			}
+
+			return true;
+		}
+		else
+		{
+			UE_LOG(LogBE_MatchTimer, Log, TEXT("| No Option"));
+		}
+	}
+
+	return false;
+}
+
+FString UBEMatchTimerComponent::ConstructGameModeOption() const
+{
+	return FString::Printf(TEXT("?%s=%d?%s=%d?%s=%f")
+		, *UBEMatchTimerComponent::NAME_MatchTimerTypeOptionKey
+		, static_cast<int32>(GetMatchTimerState())
+		, *UBEMatchTimerComponent::NAME_MatchTimerLastTypeOptionKey
+		, static_cast<int32>(GetLastMatchTimerState())
+		, *UBEMatchTimerComponent::NAME_MatchTimerTimeOptionKey
+		, GetMatchTime());
 }
 
 

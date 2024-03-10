@@ -40,6 +40,13 @@ protected:
 	/////////////////////////////////////////////////////////////////
 	// Request
 protected:
+	bool bShouldHostMigration{ false };
+
+public:
+	UFUNCTION(BlueprintCallable, Category = "HostMigration")
+	virtual void SetShouldHostMigration(bool bShould) { bShouldHostMigration = bShould; }
+
+protected:
 	/**
 	 * ホストマイグレーションのための新規レベル開始のためのURLを作成する
 	 */

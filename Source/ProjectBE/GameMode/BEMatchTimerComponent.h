@@ -30,15 +30,15 @@ struct FMatchTimerInfo
 	GENERATED_BODY()
 public:
 	FMatchTimerInfo() = default;
-	FMatchTimerInfo(const EMatchTimerState& State, double Time)
-		: State(State), Time(Time)
+	FMatchTimerInfo(const EMatchTimerState& InState, const EMatchTimerState& InLastState, double InTime)
+		: State(InState), LastState(InLastState), Time(InTime)
 	{}
 
 public:
 	UPROPERTY()
 	EMatchTimerState State{ EMatchTimerState::Stop };
 
-	UPROPERTY(NotReplicated)
+	UPROPERTY()
 	EMatchTimerState LastState{ EMatchTimerState::Stop };
 
 	//
@@ -65,6 +65,10 @@ public:
 	UBEMatchTimerComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	inline static const FString NAME_MatchTimerTypeOptionKey{ TEXT("TimerType") };
+	inline static const FString NAME_MatchTimerLastTypeOptionKey{ TEXT("TimerTypeL") };
+	inline static const FString NAME_MatchTimerTimeOptionKey{ TEXT("TimerTime") };
 
 	//
 	// InitState に登録するための機能名
@@ -124,9 +128,9 @@ protected:
 	virtual void SetTimerInfo(FMatchTimerInfo InTimerInfo);
 
 	UFUNCTION()
-	void OnRep_TimerInfo(FMatchTimerInfo LastTimerInfo);
+	void OnRep_TimerInfo();
 
-	virtual void HandleTimerInfoChange(FMatchTimerInfo LastTimerInfo);
+	virtual void HandleTimerInfoChange();
 
 public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Match Timer")
@@ -154,6 +158,16 @@ protected:
 protected:
 	virtual void UpdateCountdownTimer();
 	virtual void HandleCountdownFinish();
+
+
+	////////////////////////////////////////////////////
+	// Game Mode Option
+public:
+	UFUNCTION(BlueprintAuthorityOnly, BlueprintCallable, Category = "Match Timer")
+	virtual bool InitializeFromGameModeOption();
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Match Timer")
+	virtual FString ConstructGameModeOption() const;
 
 	
 	/////////////////////////////////////////////////////////////////

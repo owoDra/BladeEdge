@@ -3,6 +3,7 @@
 #include "BEHostMigrationComponent.h"
 
 #include "HostMigration/BEHostMigrationSubsystem.h"
+#include "GameMode/BEMatchTimerComponent.h"
 #include "ProjectBELogs.h"
 
 // Game Online Core
@@ -108,6 +109,7 @@ FString UBEHostMigrationComponent::CreateNewURL(UWorld* InWorld, UNetDriver* Net
 
 	// TeamManager から情報を取得
 	// - 開始時 TeamStat を設定
+	// - 開始時 Team分け を設定
 
 	auto* TeamManagerSubsystem{ UWorld::GetSubsystem<UTeamManagerSubsystem>(InWorld) };
 	if (ensure(TeamManagerSubsystem))
@@ -115,15 +117,27 @@ FString UBEHostMigrationComponent::CreateNewURL(UWorld* InWorld, UNetDriver* Net
 		Options += TeamManagerSubsystem->ConstructGameModeOption();
 	}
 
+	// MatchTimer から情報を取得
+	// - 開始時タイマー情報を設定
+
+	auto* GameState{ InWorld->GetGameState() };
+	if (auto* MatchTimer{ GameState->FindComponentByClass<UBEMatchTimerComponent>() })
+	{
+		Options += MatchTimer->ConstructGameModeOption();
+	}
+
 	return FString::Printf(TEXT("%s%s"), *Map, *Options);
 }
 
 void UBEHostMigrationComponent::SendHostMigrationRequest(UWorld* InWorld, const FString& NewURL)
 {
-	auto* GameInstance{ InWorld->GetGameInstance() };
-	auto* HostMigrationSubsystem{ UGameInstance::GetSubsystem<UBEHostMigrationSubsystem>(GameInstance) };
-	if (ensure(HostMigrationSubsystem))
+	if (bShouldHostMigration)
 	{
-		HostMigrationSubsystem->HandleHostMigrationRequestURL(NewURL);
+		auto* GameInstance{ InWorld->GetGameInstance() };
+		auto* HostMigrationSubsystem{ UGameInstance::GetSubsystem<UBEHostMigrationSubsystem>(GameInstance) };
+		if (ensure(HostMigrationSubsystem))
+		{
+			HostMigrationSubsystem->HandleHostMigrationRequestURL(NewURL);
+		}
 	}
 }
