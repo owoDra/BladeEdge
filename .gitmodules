@@ -167,4 +167,4 @@
 
 [submodule "Plugins/Project/BEDataBase"]
 	path = Plugins/Project/BEDataBase
-	url = https://github.com/owoDra/BE-Project-DataBase.git
+	url = https://github.com/owoDra/BEDataBase.git
