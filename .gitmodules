@@ -160,6 +160,11 @@
 [submodule "Content"]
 	path = Content
 	url = https://github.com/owoDra/Content.git
-[submodule "Plugins/Project/BE-Project-DataBase"]
-	path = Plugins/Project/BE-Project-DataBase
+
+
+##################################################
+# Project
+
+[submodule "Plugins/Project/BEDataBase"]
+	path = Plugins/Project/BEDataBase
 	url = https://github.com/owoDra/BE-Project-DataBase.git
