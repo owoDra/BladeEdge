@@ -101,6 +101,7 @@ void UBEGameplayAbility_EquipmentBase::HandleTargetDataReady(const FGameplayAbil
 		ASC->CallServerSetReplicatedTargetData(CurrentSpecHandle, CurrentActivationInfo.GetActivationPredictionKey(), LocalTargetDataHandle, ApplicationTag, ASC->ScopedPredictionKey);
 	}
 
+	OnTargetDataReadyNative(LocalTargetDataHandle);
 	OnTargetDataReady(LocalTargetDataHandle);
 
 	ASC->ConsumeClientReplicatedTargetData(CurrentSpecHandle, CurrentActivationInfo.GetActivationPredictionKey());

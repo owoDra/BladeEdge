@@ -2,41 +2,29 @@
 
 #pragma once
 
-#include "Ability/Equipment/BEGameplayAbility_EquipmentBase.h"
-
-#include "GameplayTagContainer.h"
+#include "Ability/Equipment/BEGameplayAbility_Combo.h"
 
 #include "BEGameplayAbility_Melee.generated.h"
 
-class UAbilitySystemComponent;
+class UAnimMontage;
+class UGameplayEffect;
 
 
 /**
  * 近接攻撃のためのアビリティベースクラス
  * 
  * Tips:
- *	コンボやターゲットデータのやり取りなどに必要な機能が実装されている
+ *	基本的な攻撃判定処理とダメージ適用処理、アニメーション処理が含まれている
  */
 UCLASS(Abstract)
-class UBEGameplayAbility_Melee : public UBEGameplayAbility_EquipmentBase
+class UBEGameplayAbility_Melee : public UBEGameplayAbility_Combo
 {
 	GENERATED_BODY()
 public:
 	UBEGameplayAbility_Melee(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
-public:
-	virtual void PreActivate(
-		const FGameplayAbilitySpecHandle Handle
-		, const FGameplayAbilityActorInfo* ActorInfo
-		, const FGameplayAbilityActivationInfo ActivationInfo
-		, FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate
-		, const FGameplayEventData* TriggerEventData = nullptr);
-
-	virtual void ActivateAbility(
-		const FGameplayAbilitySpecHandle Handle
-		, const FGameplayAbilityActorInfo* ActorInfo
-		, const FGameplayAbilityActivationInfo ActivationInfo
-		, const FGameplayEventData* TriggerEventData) override;
+protected:
+	virtual void OnGiveAbility(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec) override;
 
 	virtual void EndAbility(
 		const FGameplayAbilitySpecHandle Handle
@@ -45,80 +33,128 @@ public:
 		, bool bReplicateEndAbility
 		, bool bWasCancelled) override;
 
-	virtual bool DoesAbilitySatisfyTagRequirements(
-		const UAbilitySystemComponent& AbilitySystemComponent
-		, const FGameplayTagContainer* SourceTags
-		, const FGameplayTagContainer* TargetTags
-		, OUT FGameplayTagContainer* OptionalRelevantTags) const override;
+	virtual void OnComboStart_Implementation() override;
 
 
 	///////////////////////////////////////////////////////////
-	// コンボ
+	// Melee
 protected:
-	//
-	// このアビリティがコンボの最初であるかどうか
-	//
-	UPROPERTY(EditDefaultsOnly, Category = "Combo")
-	bool bIsComboRoot{ true };
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Melee|Trace")
+	TArray<TEnumAsByte<EObjectTypeQuery>> MeleeTraceObjectTypes{ EObjectTypeQuery::ObjectTypeQuery7 };
 
-	//
-	// この派生コンボアビリティが起動するのに必要なタグ
-	//
-	UPROPERTY(EditDefaultsOnly, Category = "Combo", meta = (Categories = "Combo.Standby", EditCondition = "!bIsComboRoot"))
-	FGameplayTag ComboStandbyTag;
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Melee|Trace")
+	float MeleeTraceDuration{ 0.0f };
 
-	//
-	// この派生コンボアビリティの実行するのに必要なタグ
-	//
-	UPROPERTY(EditDefaultsOnly, Category = "Combo", meta = (Categories = "Combo.Ready", EditCondition = "!bIsComboRoot"))
-	FGameplayTag ComboReadyTag;
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Melee|Trace")
+	float MeleeTraceRadius{ 25.0f };
 
-	//
-	// この派生コンボアビリティを識別するためのタグ
-	//
-	UPROPERTY(EditDefaultsOnly, Category = "Combo", meta = (Categories = "Combo.Branch", EditCondition = "!bIsComboRoot"))
-	FGameplayTag ComboBrunchTag;
-
-	//
-	// このコンボアビリティから派生するすべてのコンボアビリティのブランチタグ
-	//
-	UPROPERTY(EditDefaultsOnly, Category = "Combo", meta = (Categories = "Combo.Branch"))
-	FGameplayTagContainer ChildComboBrunchTags;
-
-	//
-	// ComboReadyTag を待つことができる最大時間
-	//
-	UPROPERTY(AdvancedDisplay, EditDefaultsOnly, Category = "Combo")
-	float WaitReadyTimeoutTime{ 1.0f };
-
-private:
-	//
-	// ComboReadyTag が追加されるまで待つためのデリゲートハンドル
-	//
-	FDelegateHandle WaitComboReadyHandle;
-
-	//
-	// ComboReadyTag の待機がタイムアウトするまでのタイマーハンドル
-	//
-	FTimerHandle WaitComboReadyTimeOutHandle;
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Melee|Trace")
+	float MeleeTraceDistance{ 300.0f };
 
 protected:
-	virtual void AddComboBrunchTagToAvatar();
-	virtual void RemoveComboBrunchTagToAvatar();
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Melee|Damage")
+	TSubclassOf<UGameplayEffect> MeleeDamageGE{ nullptr };
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Melee|Damage")
+	float MeleeDamage{ 30.0f };
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Melee|Damage")
+	float MeleeHeadMultiply{ 1.5f };
 
 protected:
-	virtual void TryStartCombo();
-	virtual void HandleComboReady();
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Melee")
+	TObjectPtr<UAnimMontage> MeleeMontage{ nullptr };
 
-	virtual void GameplayTagCallback(const FGameplayTag Tag, int32 NewCount);
-	virtual void UnregisterGameplayTagCallback();
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Melee")
+	float MeleeAttackSpeed{ 1.0f };
 
-	virtual void StartWaitReadyTimeoutTimer();
-	virtual void StopWaitReadyTimeoutTimer();
-	virtual void HandleWaitReadyTimeout();
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Melee")
+	float MeleeAttackTime{ 1.0f };
 
-	UFUNCTION(BlueprintNativeEvent, Category = "Combo")
-	void OnComboStart();
-	virtual void OnComboStart_Implementation() {}
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Melee")
+	int32 MeleeDirection{ 0 };
+
+protected:
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Melee|DataBase", meta = (Categories = "DataBase.Weapon.AttackRadius"))
+	FGameplayTag AttackRadiusTag;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Melee|DataBase", meta = (Categories = "DataBase.Weapon.AttackDistance"))
+	FGameplayTag AttackDistanceTag;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Melee|DataBase", meta = (Categories = "DataBase.Weapon.AttackSpeed"))
+	FGameplayTag AttackSpeedTag;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Melee|DataBase", meta = (Categories = "DataBase.Weapon.AttackDamage"))
+	FGameplayTag AttackDamageTag;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Melee|DataBase", meta = (Categories = "DataBase.Weapon.HeadMultiply"))
+	FGameplayTag HeadMultiplyTag;
+
+protected:
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Melee")
+	virtual float GetAttackSpeed() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, BlueprintPure, Category = "Melee")
+	float ComputeAttackTime() const;
+	virtual float ComputeAttackTime_Implementation() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, BlueprintPure, Category = "Melee")
+	float ComputeMeleeDamage(const FHitResult& InHitResult) const;
+	virtual float ComputeMeleeDamage_Implementation(const FHitResult& InHitResult) const;
+
+
+	///////////////////////////////////////////////////////////
+	// Parry
+protected:
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Parry")
+	bool bCannotParry{ false };
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Parry")
+	float ParryDirectionThreshold{ 45.0f };
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Parry")
+	int32 ParryPowerThreshold{ -10 };
+
+protected:
+	UFUNCTION(BlueprintCallable, BlueprintPure = "false", Category = "Parry")
+	virtual bool CompareParryPower(const FGameplayAbilityTargetDataHandle& TargetData) const;
+
+	UFUNCTION(BlueprintCallable, Category = "Parry")
+	virtual void NotifyParry(const FGameplayAbilityTargetDataHandle& TargetData);
+
+
+	///////////////////////////////////////////////////////////
+	// Step1_StartTimer 
+protected:
+	FTimerHandle AttackTimerHandle;
+
+protected:
+	virtual void Step1_StartAttackTimer();
+	virtual void ClearAttackTimer();
+	virtual void HandleAttackTimer();
+
+
+	///////////////////////////////////////////////////////////
+	// Step2_PlayMontage 
+protected:
+	virtual void Step2_PlayMontage();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Melee")
+	void HandlePlayMeleeMontage(UAnimMontage* Montage, const FGameplayTagContainer& EventTags, float PlayRate);
+
+	UFUNCTION(BlueprintCallable, Category = "Melee")
+	virtual void NotifyTargetNow();
+
+
+	///////////////////////////////////////////////////////////
+	// Step3_Targeting
+protected:
+	virtual void Step3_Targeting();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Melee")
+	void HandleTargeting(const TArray<TEnumAsByte<EObjectTypeQuery>>& Types, float Duration, float Radius, float Distance);
+
+	virtual void OnTargetDataReadyNative(const FGameplayAbilityTargetDataHandle& TargetData) override;
+	virtual void GiveDamage(const FGameplayAbilityTargetDataHandle& TargetData);
 
 };

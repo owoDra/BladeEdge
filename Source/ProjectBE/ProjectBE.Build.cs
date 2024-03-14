@@ -80,6 +80,9 @@ public class ProjectBE : ModuleRules
                 "GIAIntg",          // アビリティの入力処理 のため
                 "GLAIntg",          // 移動関係のアビリティ機能利用 のため
                 "GIUIEquip",        // 装備関係のUI実装 のため
+
+                // Project
+                "BEDataBase",
             }
         );
 

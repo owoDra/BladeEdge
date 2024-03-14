@@ -2,8 +2,29 @@
 
 #include "BEGameplayAbility_Melee.h"
 
-#include "AbilitySystemComponent.h"
+#include "Ability/Equipment/Attribute/BECombatAttributeSet.h"
+#include "GameplayTag/BETags_GameplayEvent.h"
+#include "GameplayTag/BETags_Flag.h"
+#include "GameplayTag/BETags_GameplayCue.h"
+
+// BE Data Base
+#include "BEDataBaseSubsystem.h"
+
+// Game Item Core
+#include "ItemData.h"
+
+// Game Equipment Extension
+#include "Equipment/Equipment.h"
+
+// Game Locomotion: Human Addon
+#include "LocomotionHumanNameStatics.h"
+
+// Game Ability Extension
+#include "GameplayTag/GAETags_SetByCaller.h"
+#include "GAEAbilitySystemComponent.h"
+
 #include "AbilitySystemGlobals.h"
+#include "GameplayEffect.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(BEGameplayAbility_Melee)
 
@@ -11,23 +32,30 @@
 UBEGameplayAbility_Melee::UBEGameplayAbility_Melee(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-	bShouldCallbackTargetDataReady = true;
-	bUseCooldown = false;
 }
 
 
-void UBEGameplayAbility_Melee::PreActivate(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate, const FGameplayEventData* TriggerEventData)
+void UBEGameplayAbility_Melee::OnGiveAbility(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)
 {
-	AddComboBrunchTagToAvatar();
+	Super::OnGiveAbility(ActorInfo, Spec);
 
-	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
-}
+	const auto* Equipment{ GetTypedSourceObject<UEquipment>() };
+	const auto* ItemData{ Equipment ? Equipment->GetAssociateItemData() : nullptr };
 
-void UBEGameplayAbility_Melee::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
-{
-	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+	const auto* World{ GetWorld() };
+	const auto* DataBase{ World ? UGameInstance::GetSubsystem<UBEDataBaseSubsystem>(World->GetGameInstance()) : nullptr };
 
-	TryStartCombo();
+	if (ensure(ItemData) && ensure(DataBase))
+	{
+		const auto AssetId{ ItemData->GetPrimaryAssetId() };
+
+		MeleeTraceRadius	= DataBase->GetEquipmentParameter(AssetId, AttackRadiusTag, MeleeTraceRadius);
+		MeleeTraceDistance	= DataBase->GetEquipmentParameter(AssetId, AttackDistanceTag, MeleeTraceDistance);
+
+		MeleeAttackSpeed	= DataBase->GetEquipmentParameter(AssetId, AttackSpeedTag, MeleeAttackSpeed);
+		MeleeDamage			= DataBase->GetEquipmentParameter(AssetId, AttackDamageTag, MeleeDamage);
+		MeleeHeadMultiply	= DataBase->GetEquipmentParameter(AssetId, HeadMultiplyTag, MeleeHeadMultiply);
+	}
 }
 
 void UBEGameplayAbility_Melee::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
@@ -40,190 +68,236 @@ void UBEGameplayAbility_Melee::EndAbility(const FGameplayAbilitySpecHandle Handl
 			return;
 		}
 
-		StopWaitReadyTimeoutTimer();
-		RemoveComboBrunchTagToAvatar();
+		ClearAttackTimer();
 
 		Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 	}
 }
 
-bool UBEGameplayAbility_Melee::DoesAbilitySatisfyTagRequirements(const UAbilitySystemComponent& AbilitySystemComponent, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, OUT FGameplayTagContainer* OptionalRelevantTags) const
+void UBEGameplayAbility_Melee::OnComboStart_Implementation()
 {
-	if (!Super::DoesAbilitySatisfyTagRequirements(AbilitySystemComponent, SourceTags, TargetTags, OptionalRelevantTags))
+	Step1_StartAttackTimer();
+	Step2_PlayMontage();
+}
+
+
+// Melee
+
+float UBEGameplayAbility_Melee::GetAttackSpeed() const
+{
+	auto Result{ 1.0f };
+
+	if (auto* ASC{ GetAbilitySystemComponent() })
+	{
+		auto bFound{ false };
+		Result = ASC->GetGameplayAttributeValue(UBECombatAttributeSet::GetAttackSpeedAttribute(), bFound);
+
+		if (!bFound)
+		{
+			Result = 1.0f;
+		}
+	}
+
+	return MeleeAttackSpeed * Result;
+}
+
+float UBEGameplayAbility_Melee::ComputeAttackTime_Implementation() const
+{
+	return MeleeAttackTime / GetAttackSpeed();
+}
+
+float UBEGameplayAbility_Melee::ComputeMeleeDamage_Implementation(const FHitResult& InHitResult) const
+{
+	const auto bIsHead{ InHitResult.BoneName == ULocomotionHumanNameStatics::HeadBoneName() };
+
+	return bIsHead ? MeleeDamage * MeleeHeadMultiply : MeleeDamage;
+}
+
+
+// Parry
+
+bool UBEGameplayAbility_Melee::CompareParryPower(const FGameplayAbilityTargetDataHandle& TargetData) const
+{
+	// 防御不可能な攻撃の場合
+
+	if (bCannotParry)
+	{
+		return true;
+	}
+
+	// 最初のターゲットデータを取得し
+
+	const auto* Data{ TargetData.Get(0) };
+	if (!Data)
 	{
 		return false;
 	}
 
-	// 所有しているタグをキャッシュ
+	// Actor を取得
 
-	auto& AbilitySystemGlobals{ UAbilitySystemGlobals::Get() };
-
-	static FGameplayTagContainer AbilitySystemComponentTags;
-	AbilitySystemComponentTags.Reset();
-
-	AbilitySystemComponent.GetOwnedGameplayTags(AbilitySystemComponentTags);
-
-	// ComboStandbyTag がない場合は許可しない
-
-	if (!bIsComboRoot && ComboStandbyTag.IsValid())
+	auto Actors{ Data->GetActors() };
+	if (Actors.IsEmpty())
 	{
-		if (!AbilitySystemComponentTags.HasTag(ComboStandbyTag))
-		{
-			const auto& MissingTag{ AbilitySystemGlobals.ActivateFailTagsMissingTag };
-
-			if (OptionalRelevantTags && MissingTag.IsValid())
-			{
-				OptionalRelevantTags->AddTag(MissingTag);
-			}
-
-			return false;
-		}
-	}
-
-	// ChildComboBrunchTags がある場合は許可しない
-
-	if (AbilitySystemComponentTags.HasAny(ChildComboBrunchTags))
-	{
-		const auto& BlockedTag{ AbilitySystemGlobals.ActivateFailTagsBlockedTag };
-
-		if (OptionalRelevantTags && BlockedTag.IsValid())
-		{
-			OptionalRelevantTags->AddTag(BlockedTag);
-		}
-
 		return false;
 	}
 
-	return true;
-}
+	auto* TargetActor{ Actors[0].Get() };
+	auto* MyActor{ GetAvatarActorFromActorInfo() };
 
-
-// コンボ
-
-void UBEGameplayAbility_Melee::AddComboBrunchTagToAvatar()
-{
-	if (!bIsComboRoot)
+	if (!TargetActor || !MyActor)
 	{
-		if (auto* ASC{ GetAbilitySystemComponentFromActorInfo() })
-		{
-			ASC->SetLooseGameplayTagCount(ComboBrunchTag, 1);
-
-			if (UAbilitySystemGlobals::Get().ShouldReplicateActivationOwnedTags())
-			{
-				ASC->SetReplicatedLooseGameplayTagCount(ComboBrunchTag, 1);
-			}
-		}
+		return false;
 	}
-}
 
-void UBEGameplayAbility_Melee::RemoveComboBrunchTagToAvatar()
-{
-	if (!bIsComboRoot)
+	// ASC を取得する
+
+	auto* TargetASC{ UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(TargetActor) };
+	if (!TargetASC)
 	{
-		if (auto* ASC{ GetAbilitySystemComponentFromActorInfo() })
-		{
-			ASC->SetLooseGameplayTagCount(ComboBrunchTag, 0);
-
-			if (UAbilitySystemGlobals::Get().ShouldReplicateActivationOwnedTags())
-			{
-				ASC->SetReplicatedLooseGameplayTagCount(ComboBrunchTag, 0);
-			}
-		}
+		return false;
 	}
+
+	auto* MyASC{ GetAbilitySystemComponent() };
+
+	// Parry 値を比較する
+
+	const auto MyFlag{ MyASC->GetGameplayTagCount(TAG_Flag_Parry) };
+	const auto TargetFlag{ TargetASC->GetGameplayTagCount(TAG_Flag_Parry) };
+	const auto Delta{ TargetFlag - MyFlag };
+	const auto AllowDamage_Power{ Delta < ParryPowerThreshold };
+
+	if (AllowDamage_Power)
+	{
+		return true;	// Parry 値が上回っているならばダメージを与えられる
+	}
+
+	// 方向をチェック
+
+	const auto TargetRotation{ TargetActor->GetActorRotation() };
+	const auto MyRotation{ MyActor->GetActorRotation() + FRotator(0.0f, 180.0f, 0.0f) };
+	const auto DeltaRotation{ TargetRotation - MyRotation };
+	const auto AllowDamage_Angle{ FMath::Abs<float>(DeltaRotation.Yaw) >= ParryDirectionThreshold };
+
+	if (AllowDamage_Angle)
+	{
+		return true;	// 角度的にパリー不可能ならばダメージを与えられる
+	}
+
+	return false;
 }
 
-
-void UBEGameplayAbility_Melee::TryStartCombo()
+void UBEGameplayAbility_Melee::NotifyParry(const FGameplayAbilityTargetDataHandle& TargetData)
 {
-	// コンボの最初だった場合は即コンボ開始
-
-	if (bIsComboRoot)
+	const auto* Data{ TargetData.Get(0) };
+	if (!Data)
 	{
-		HandleComboReady();
 		return;
 	}
 
-	// タイムアウトタイマーを開始する
-
-	StartWaitReadyTimeoutTimer();
-
-	// コンボの最初出ない場合は ComboReadyTag があるか確認
-
-	if (auto* ASC{ GetAbilitySystemComponentFromActorInfo() })
+	const auto* HitResult{ Data->GetHitResult() };
+	if (!HitResult)
 	{
-		// すでに ComboReadyTag がある場合は即開始
+		return;
+	}
 
-		if (!ComboReadyTag.IsValid() || ASC->HasMatchingGameplayTag(ComboReadyTag))
-		{
-			HandleComboReady();
-			return;
-		}
+	FGameplayCueParameters CueParameters;
+	CueParameters.Location = (HitResult->bBlockingHit ? HitResult->ImpactPoint : HitResult->TraceEnd);
+	CueParameters.Normal = HitResult->ImpactNormal;
+	CueParameters.PhysicalMaterial = HitResult->PhysMaterial;
 
-		// ない場合は追加されるまで待つ
+	K2_ExecuteGameplayCueWithParams(TAG_GameplayCue_Parry, CueParameters);
+}
 
-		if (WaitComboReadyHandle.IsValid())
-		{
-			UnregisterGameplayTagCallback();
-		}
 
-		WaitComboReadyHandle = ASC->RegisterGameplayTagEvent(ComboReadyTag).AddUObject(this, &UBEGameplayAbility_Melee::GameplayTagCallback);
+// Step1_StartTimer 
+
+void UBEGameplayAbility_Melee::Step1_StartAttackTimer()
+{
+	if (auto* World{ GetWorld() })
+	{
+		World->GetTimerManager().SetTimer(AttackTimerHandle, this, &ThisClass::HandleAttackTimer, ComputeAttackTime(), false);
 	}
 }
 
-void UBEGameplayAbility_Melee::HandleComboReady()
+void UBEGameplayAbility_Melee::ClearAttackTimer()
 {
-	StopWaitReadyTimeoutTimer();
-
-	OnComboStart();
-}
-
-
-void UBEGameplayAbility_Melee::StartWaitReadyTimeoutTimer()
-{
-	if (auto* World{ GetWorld()})
-	{
-		World->GetTimerManager().SetTimer(WaitComboReadyTimeOutHandle, this , &ThisClass::HandleWaitReadyTimeout, WaitReadyTimeoutTime, false);
-	}
-}
-
-void UBEGameplayAbility_Melee::StopWaitReadyTimeoutTimer()
-{
-	if (WaitComboReadyTimeOutHandle.IsValid())
+	if (AttackTimerHandle.IsValid())
 	{
 		if (auto* World{ GetWorld() })
 		{
-			World->GetTimerManager().ClearTimer(WaitComboReadyTimeOutHandle);
+			World->GetTimerManager().ClearTimer(AttackTimerHandle);
 		}
 	}
 }
 
-void UBEGameplayAbility_Melee::HandleWaitReadyTimeout()
+void UBEGameplayAbility_Melee::HandleAttackTimer()
 {
-	WaitComboReadyTimeOutHandle.Invalidate();
+	AttackTimerHandle.Invalidate();
 
-	K2_CancelAbility();
+	K2_EndAbility();
 }
 
 
-void UBEGameplayAbility_Melee::GameplayTagCallback(const FGameplayTag Tag, int32 NewCount)
-{
-	if (NewCount == 1)
-	{
-		HandleComboReady();
+// Step2_PlayMontage 
 
-		UnregisterGameplayTagCallback();
+void UBEGameplayAbility_Melee::Step2_PlayMontage()
+{
+	HandlePlayMeleeMontage(MeleeMontage, FGameplayTagContainer(TAG_Event_Melee), GetAttackSpeed());
+}
+
+void UBEGameplayAbility_Melee::NotifyTargetNow()
+{
+	if (IsLocallyControlled())
+	{
+		Step3_Targeting();
 	}
 }
 
-void UBEGameplayAbility_Melee::UnregisterGameplayTagCallback()
-{
-	if (WaitComboReadyHandle.IsValid())
-	{
-		if (auto* ASC{ GetAbilitySystemComponentFromActorInfo() })
-		{
-			ASC->RegisterGameplayTagEvent(ComboReadyTag).Remove(WaitComboReadyHandle);
-		}
 
-		WaitComboReadyHandle.Reset();
+// Step3_Targeting
+
+void UBEGameplayAbility_Melee::Step3_Targeting()
+{
+	HandleTargeting(MeleeTraceObjectTypes, MeleeTraceDuration, MeleeTraceRadius, MeleeTraceDistance);
+}
+
+void UBEGameplayAbility_Melee::OnTargetDataReadyNative(const FGameplayAbilityTargetDataHandle& TargetData)
+{
+	if (CompareParryPower(TargetData))
+	{
+		GiveDamage(TargetData);
 	}
+	else
+	{
+		NotifyParry(TargetData);
+	}
+}
+
+void UBEGameplayAbility_Melee::GiveDamage(const FGameplayAbilityTargetDataHandle& TargetData)
+{
+	const auto* Data{ TargetData.Get(0) };
+	if (!Data)
+	{
+		return;
+	}
+
+	const auto* HitResult{ Data->GetHitResult() };
+	if (!HitResult)
+	{
+		return;
+	}
+
+	const auto Damage{ ComputeMeleeDamage(*HitResult) };
+	auto SpecHandle{ MakeOutgoingGameplayEffectSpec(MeleeDamageGE, MeleeDirection) };
+	auto* Spec{ SpecHandle.Data.Get() };
+	if (Spec)
+	{
+		Spec->SetSetByCallerMagnitude(TAG_SetByCaller_Magnitude, Damage);
+	}
+	else
+	{
+		return;
+	}
+
+	K2_ApplyGameplayEffectSpecToTarget(SpecHandle, TargetData);
 }

@@ -55,6 +55,7 @@ protected:
 	 */
 	UFUNCTION(BlueprintImplementableEvent, Category = "Targeting")
 	void OnTargetDataReady(const FGameplayAbilityTargetDataHandle& TargetData);
+	virtual void OnTargetDataReadyNative(const FGameplayAbilityTargetDataHandle& TargetData) {}
 
 	/**
 	 * クライアントで作成されたターゲットデータをサーバーに送る
