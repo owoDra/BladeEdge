@@ -35,27 +35,22 @@ UBEGameplayAbility_Melee::UBEGameplayAbility_Melee(const FObjectInitializer& Obj
 }
 
 
-void UBEGameplayAbility_Melee::OnGiveAbility(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)
+void UBEGameplayAbility_Melee::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)
 {
-	Super::OnGiveAbility(ActorInfo, Spec);
-
-	const auto* Equipment{ GetTypedSourceObject<UEquipment>() };
-	const auto* ItemData{ Equipment ? Equipment->GetAssociateItemData() : nullptr };
-
 	const auto* World{ GetWorld() };
 	const auto* DataBase{ World ? UGameInstance::GetSubsystem<UBEDataBaseSubsystem>(World->GetGameInstance()) : nullptr };
 
-	if (ensure(ItemData) && ensure(DataBase))
+	if (ensure(DataBase))
 	{
-		const auto AssetId{ ItemData->GetPrimaryAssetId() };
+		MeleeTraceRadius	= DataBase->GetEquipmentParameter(DataBaseKey, AttackRadiusTag, MeleeTraceRadius);
+		MeleeTraceDistance	= DataBase->GetEquipmentParameter(DataBaseKey, AttackDistanceTag, MeleeTraceDistance);
 
-		MeleeTraceRadius	= DataBase->GetEquipmentParameter(AssetId, AttackRadiusTag, MeleeTraceRadius);
-		MeleeTraceDistance	= DataBase->GetEquipmentParameter(AssetId, AttackDistanceTag, MeleeTraceDistance);
-
-		MeleeAttackSpeed	= DataBase->GetEquipmentParameter(AssetId, AttackSpeedTag, MeleeAttackSpeed);
-		MeleeDamage			= DataBase->GetEquipmentParameter(AssetId, AttackDamageTag, MeleeDamage);
-		MeleeHeadMultiply	= DataBase->GetEquipmentParameter(AssetId, HeadMultiplyTag, MeleeHeadMultiply);
+		MeleeAttackSpeed	= DataBase->GetEquipmentParameter(DataBaseKey, AttackSpeedTag, MeleeAttackSpeed);
+		MeleeDamage			= DataBase->GetEquipmentParameter(DataBaseKey, AttackDamageTag, MeleeDamage);
+		MeleeHeadMultiply	= DataBase->GetEquipmentParameter(DataBaseKey, HeadMultiplyTag, MeleeHeadMultiply);
 	}
+
+	Super::OnAvatarSet(ActorInfo, Spec);
 }
 
 void UBEGameplayAbility_Melee::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)

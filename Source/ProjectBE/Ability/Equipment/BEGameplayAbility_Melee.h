@@ -24,7 +24,7 @@ public:
 	UBEGameplayAbility_Melee(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 protected:
-	virtual void OnGiveAbility(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec) override;
+	virtual void OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec) override;
 
 	virtual void EndAbility(
 		const FGameplayAbilitySpecHandle Handle
@@ -75,19 +75,19 @@ protected:
 	int32 MeleeDirection{ 0 };
 
 protected:
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Melee|DataBase", meta = (Categories = "DataBase.Weapon.AttackRadius"))
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "DataBase|Melee", meta = (Categories = "DataBase.Weapon.AttackRadius"))
 	FGameplayTag AttackRadiusTag;
 
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Melee|DataBase", meta = (Categories = "DataBase.Weapon.AttackDistance"))
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "DataBase|Melee", meta = (Categories = "DataBase.Weapon.AttackDistance"))
 	FGameplayTag AttackDistanceTag;
 
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Melee|DataBase", meta = (Categories = "DataBase.Weapon.AttackSpeed"))
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "DataBase|Melee", meta = (Categories = "DataBase.Weapon.AttackSpeed"))
 	FGameplayTag AttackSpeedTag;
 
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Melee|DataBase", meta = (Categories = "DataBase.Weapon.AttackDamage"))
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "DataBase|Melee", meta = (Categories = "DataBase.Weapon.AttackDamage"))
 	FGameplayTag AttackDamageTag;
 
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Melee|DataBase", meta = (Categories = "DataBase.Weapon.HeadMultiply"))
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "DataBase|Melee", meta = (Categories = "DataBase.Weapon.HeadMultiply"))
 	FGameplayTag HeadMultiplyTag;
 
 protected:

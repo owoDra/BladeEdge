@@ -54,6 +54,8 @@ void UBEGameplayAbility_EquipmentBase::EndAbility(const FGameplayAbilitySpecHand
 }
 
 
+// Target Data
+
 void UBEGameplayAbility_EquipmentBase::BindTargetDataReadyCallback(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActivationInfo ActivationInfo)
 {
 	if (!bShouldCallbackTargetDataReady)

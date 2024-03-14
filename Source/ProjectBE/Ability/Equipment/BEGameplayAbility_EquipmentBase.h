@@ -32,6 +32,15 @@ public:
 		, bool bWasCancelled) override;
 
 
+	/////////////////////////////////////////////////////////////
+	// Data Base
+public:
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "DataBase")
+	FName DataBaseKey;
+
+
+	/////////////////////////////////////////////////////////////
+	// Target Data
 protected:
 	//
 	// ターゲットデータのレプリケート時のコールバックを受け取るかどうか

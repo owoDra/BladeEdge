@@ -17,4 +17,11 @@ class PROJECTBE_API UBEGameplayAbility_MainSkill : public UBEGameplayAbility_Equ
 public:
 	UBEGameplayAbility_MainSkill(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
+protected:
+	virtual void OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec) override;
+
+protected:
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "DataBase", meta = (Categories = "DataBase.MainSkill.Cooltime"))
+	FGameplayTag CooltimeTag;
+
 };
