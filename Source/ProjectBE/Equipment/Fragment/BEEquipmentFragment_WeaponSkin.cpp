@@ -69,13 +69,13 @@ void UBEEquipmentFragment_WeaponSkin::HandleEquiped()
 	{
 		if (auto* TPPMesh{ ICharacterMeshAccessorInterface::Execute_GetMeshByTag(Pawn, TAG_MeshType_TPP) })
 		{
-			SpawmMeshesFor(Pawn, TPPMesh);
+			SpawmMeshesFor(Pawn, TPPMesh, false);
 			SetAnimOverlay_TPP(TPPMesh);
 		}
 
 		if (auto* FPPMesh{ ICharacterMeshAccessorInterface::Execute_GetMeshByTag(Pawn, TAG_MeshType_FPP) })
 		{
-			SpawmMeshesFor(Pawn, FPPMesh);
+			SpawmMeshesFor(Pawn, FPPMesh, true);
 			SetAnimOverlay_FPP(FPPMesh);
 		}
 	}
@@ -93,7 +93,7 @@ void UBEEquipmentFragment_WeaponSkin::HandleUnequiped()
 
 // Spawn meshes
 
-void UBEEquipmentFragment_WeaponSkin::SpawmMeshesFor(APawn* Pawn, USkeletalMeshComponent* TargetMesh)
+void UBEEquipmentFragment_WeaponSkin::SpawmMeshesFor(APawn* Pawn, USkeletalMeshComponent* TargetMesh, bool bIsFPP)
 {
 	// 専用サーバーでは作成しない
 
@@ -114,11 +114,13 @@ void UBEEquipmentFragment_WeaponSkin::SpawmMeshesFor(APawn* Pawn, USkeletalMeshC
 		NewMesh->SetAnimInstanceClass(Entry.MeshAnimInstance);
 		NewMesh->SetRelativeTransform(Entry.AttachTransform);
 		NewMesh->AttachToComponent(TargetMesh, FAttachmentTransformRules::KeepRelativeTransform, Entry.AttachSocket);
+		NewMesh->SetScalarParameterValueOnMaterials(FName(TEXTVIEW("IsFPP")), bIsFPP ? 1.0f : 0.0f);
 		NewMesh->SetOwnerNoSee(bOwnerNoSee);
 		NewMesh->SetOnlyOwnerSee(bOnlyOwnerSee);
 		NewMesh->SetHiddenInGame(bHiddenInGame);
 		NewMesh->SetCastShadow(bCastShadow);
 		NewMesh->RegisterComponent();
+
 
 		SpawnedMeshes.Add(NewMesh);
 	}

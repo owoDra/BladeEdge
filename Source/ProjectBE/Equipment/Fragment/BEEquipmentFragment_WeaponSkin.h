@@ -85,7 +85,7 @@ protected:
 	TArray<TObjectPtr<USkeletalMeshComponent>> SpawnedMeshes;
 
 protected:
-	void SpawmMeshesFor(APawn* Pawn, USkeletalMeshComponent* TargetMesh);
+	void SpawmMeshesFor(APawn* Pawn, USkeletalMeshComponent* TargetMesh, bool bIsFPP = false);
 	void RemoveSpawnedMeshes();
 
 

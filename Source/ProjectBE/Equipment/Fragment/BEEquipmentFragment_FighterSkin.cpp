@@ -75,11 +75,13 @@ void UBEEquipmentFragment_FighterSkin::HandleEquipmentGiven()
 		if (auto* TPPMesh{ ICharacterMeshAccessorInterface::Execute_GetMeshByTag(Pawn, TAG_MeshType_TPP) })
 		{
 			SetMesh(TPPMesh, TPPMeshesToSet);
+			TPPMesh->SetScalarParameterValueOnMaterials(FName(TEXTVIEW("IsFPP")), 0.0f);
 		}
 
 		if (auto* FPPMesh{ ICharacterMeshAccessorInterface::Execute_GetMeshByTag(Pawn, TAG_MeshType_FPP) })
 		{
 			SetMesh(FPPMesh, FPPMeshesToSet);
+			FPPMesh->SetScalarParameterValueOnMaterials(FName(TEXTVIEW("IsFPP")), 1.0f);
 		}
 
 		SetContextEffectLibraries(Pawn);
