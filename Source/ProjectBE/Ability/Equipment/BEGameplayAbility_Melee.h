@@ -71,8 +71,8 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Melee")
 	float MeleeAttackTime{ 1.0f };
 
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Melee")
-	int32 MeleeDirection{ 0 };
+	UPROPERTY(BlueprintReadOnly, Category = "Melee")
+	float MeleeDirection{ 0.0f };
 
 protected:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "DataBase|Melee", meta = (Categories = "DataBase.Weapon.AttackRadius"))
@@ -143,13 +143,13 @@ protected:
 	void HandlePlayMeleeMontage(UAnimMontage* Montage, const FGameplayTagContainer& EventTags, float PlayRate);
 
 	UFUNCTION(BlueprintCallable, Category = "Melee")
-	virtual void NotifyTargetNow();
+	virtual void NotifyTargetNow(float InMeleeDirection);
 
 
 	///////////////////////////////////////////////////////////
 	// Step3_Targeting
 protected:
-	virtual void Step3_Targeting();
+	virtual void Step3_Targeting(float InMeleeDirection);
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Melee")
 	void HandleTargeting(const TArray<TEnumAsByte<EObjectTypeQuery>>& Types, float Duration, float Radius, float Distance);

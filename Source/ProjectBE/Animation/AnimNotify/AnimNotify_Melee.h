@@ -27,6 +27,9 @@ protected:
 	UPROPERTY(AdvancedDisplay, BlueprintReadWrite, EditAnywhere, Category = "Gameplay Event")
 	FGameplayEventData Payload;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Gameplay Event")
+	float MeleeDirection{ 0.0f };
+
 public:
 	virtual FString GetNotifyName_Implementation() const override;
 

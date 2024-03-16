@@ -32,6 +32,8 @@ void UAnimNotify_Melee::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBa
 	{
 		auto NewScopedWindow{ FScopedPredictionWindow(ASC, true) };
 
+		Payload.EventMagnitude = MeleeDirection;
+
 		ASC->HandleGameplayEvent(EventTag, &Payload);
 	}
 }

@@ -240,18 +240,20 @@ void UBEGameplayAbility_Melee::Step2_PlayMontage()
 	HandlePlayMeleeMontage(MeleeMontage, FGameplayTagContainer(TAG_Event_Melee), GetAttackSpeed());
 }
 
-void UBEGameplayAbility_Melee::NotifyTargetNow()
+void UBEGameplayAbility_Melee::NotifyTargetNow(float InMeleeDirection)
 {
+	MeleeDirection = InMeleeDirection;
+
 	if (IsLocallyControlled())
 	{
-		Step3_Targeting();
+		Step3_Targeting(MeleeDirection);
 	}
 }
 
 
 // Step3_Targeting
 
-void UBEGameplayAbility_Melee::Step3_Targeting()
+void UBEGameplayAbility_Melee::Step3_Targeting(float InMeleeDirection)
 {
 	HandleTargeting(MeleeTraceObjectTypes, MeleeTraceDuration, MeleeTraceRadius, MeleeTraceDistance);
 }
