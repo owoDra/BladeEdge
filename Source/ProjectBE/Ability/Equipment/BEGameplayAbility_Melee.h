@@ -42,36 +42,36 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Melee|Trace")
 	TArray<TEnumAsByte<EObjectTypeQuery>> MeleeTraceObjectTypes{ EObjectTypeQuery::ObjectTypeQuery7 };
 
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Melee|Trace")
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Melee|Trace")
 	float MeleeTraceDuration{ 0.0f };
 
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Melee|Trace")
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Melee|Trace")
 	float MeleeTraceRadius{ 25.0f };
 
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Melee|Trace")
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Melee|Trace")
 	float MeleeTraceDistance{ 300.0f };
 
 protected:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Melee|Damage")
 	TSubclassOf<UGameplayEffect> MeleeDamageGE{ nullptr };
 
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Melee|Damage")
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Melee|Damage")
 	float MeleeDamage{ 30.0f };
 
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Melee|Damage")
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Melee|Damage")
 	float MeleeHeadMultiply{ 1.5f };
 
 protected:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Melee")
 	TObjectPtr<UAnimMontage> MeleeMontage{ nullptr };
 
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Melee")
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Melee")
 	float MeleeAttackSpeed{ 1.0f };
 
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Melee")
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Melee")
 	float MeleeAttackTime{ 1.0f };
 
-	UPROPERTY(BlueprintReadOnly, Category = "Melee")
+	UPROPERTY(BlueprintReadWrite, Category = "Melee")
 	float MeleeDirection{ 0.0f };
 
 protected:

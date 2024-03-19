@@ -112,8 +112,8 @@ void UBEEquipmentFragment_WeaponSkin::SpawmMeshesFor(APawn* Pawn, USkeletalMeshC
 		auto* NewMesh{ NewObject<USkeletalMeshComponent>(Pawn) };
 		NewMesh->SetSkeletalMesh(Entry.MeshToSpawn);
 		NewMesh->SetAnimInstanceClass(Entry.MeshAnimInstance);
+		NewMesh->AttachToComponent(TargetMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Entry.AttachSocket);
 		NewMesh->SetRelativeTransform(Entry.AttachTransform);
-		NewMesh->AttachToComponent(TargetMesh, FAttachmentTransformRules::KeepRelativeTransform, Entry.AttachSocket);
 		NewMesh->SetScalarParameterValueOnMaterials(FName(TEXTVIEW("IsFPP")), bIsFPP ? 1.0f : 0.0f);
 		NewMesh->SetOwnerNoSee(bOwnerNoSee);
 		NewMesh->SetOnlyOwnerSee(bOnlyOwnerSee);
