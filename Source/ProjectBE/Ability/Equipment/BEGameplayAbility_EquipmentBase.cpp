@@ -26,6 +26,7 @@ UBEGameplayAbility_EquipmentBase::UBEGameplayAbility_EquipmentBase(const FObject
 	CooltimeOverride = 2.0f;
 	CooldownMessageTag = FGameplayTag::EmptyTag;
 
+	AbilityTags.AddTag(TAG_Flag_EquipmentUseBlocked);
 	ActivationBlockedTags.AddTag(TAG_Flag_EquipmentUseBlocked);
 }
 

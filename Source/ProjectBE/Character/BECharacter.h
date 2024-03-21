@@ -115,6 +115,8 @@ protected:
 	// Initialization
 #pragma region Initialization
 protected:
+	virtual void BeginPlay() override;
+
 	UFUNCTION()
 	virtual void HandleGameReady();
 

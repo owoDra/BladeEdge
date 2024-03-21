@@ -64,6 +64,13 @@ void ABECharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 }
 
 
+void ABECharacter::BeginPlay()
+{
+	//AbilitySystemComponent->InitAbilityActorInfo(this, this);
+
+	Super::BeginPlay();
+}
+
 void ABECharacter::HandleGameReady()
 {
 	OnGameReady();
