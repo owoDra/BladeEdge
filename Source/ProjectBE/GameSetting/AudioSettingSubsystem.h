@@ -36,7 +36,7 @@ public:
 	UAudioSettingSubsystem() {}
 
 protected:
-	virtual FString GetCustomConfigIniName() const override { return FString(TEXT("UserGameplaySettings")); }
+	//virtual FString GetCustomConfigIniName() const override { return FString(TEXT("UserGameplaySettings")); }
 
 protected:
 	virtual void SetToDefaults() override;

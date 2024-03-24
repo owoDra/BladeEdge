@@ -20,7 +20,7 @@ public:
 	UControlSettingSubsystem() {}
 
 protected:
-	virtual FString GetCustomConfigIniName() const override { return FString(TEXT("UserControlSettings")); }
+	//virtual FString GetCustomConfigIniName() const override { return FString(TEXT("UserControlSettings")); }
 
 protected:
 	virtual void SetToDefaults() override;
