@@ -34,6 +34,13 @@ Windows10/11
  - Substance 3D Painter 2022
 
 
+**製作期間**
+
+3か月 (フレームワークの製作に2カ月、ゲーム自体は1か月)
+
+※ フレームワーク: https://github.com/stars/owoDra/lists/plugin-game-xxx-plugins
+
+
 **必要事項**
 
 Epic Games アカウントが必要  (※1)
