@@ -1,6 +1,6 @@
 {
 	"FileVersion": 3,
-	"EngineAssociation": "5.3",
+	"EngineAssociation": "{AE50AFBC-4E6D-AF2E-EEE8-2E927CFA87F3}",
 	"Category": "",
 	"Description": "",
 	"Modules": [
@@ -45,10 +45,6 @@
 				"IOS",
 				"TVOS"
 			]
-		},
-		{
-			"Name": "OnlineSubsystemNull",
-			"Enabled": false
 		},
 		{
 			"Name": "OnlineServicesEOS",

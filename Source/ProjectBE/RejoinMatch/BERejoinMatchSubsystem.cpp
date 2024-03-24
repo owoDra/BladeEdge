@@ -68,6 +68,11 @@ void UBERejoinMatchSubsystem::CacheOngoingLobby(const ULobbyResult* InLobbyResul
 		InLobbyResult->GetLobbyAttributeAsString(UBELobbyDeveloperSettings::GetLobbyAttrName_UNIQUEID(), OngoingLobbyUniqueId);
 
 		OngoingLobbyUserFacingExperience = InData;
+
+		UE_LOG(LogBE_RejoinMatch, Log, TEXT("CacheOngoingLobby"))
+		UE_LOG(LogBE_RejoinMatch, Log, TEXT("| LobbyResult: %s"), *GetNameSafe(InLobbyResult))
+		UE_LOG(LogBE_RejoinMatch, Log, TEXT("| UserFacingExperienceData: %s"), *GetNameSafe(InData))
+		UE_LOG(LogBE_RejoinMatch, Log, TEXT("| UniqueId: %s"), *OngoingLobbyUniqueId)
 	}
 
 	SaveCache();

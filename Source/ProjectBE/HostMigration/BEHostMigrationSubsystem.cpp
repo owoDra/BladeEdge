@@ -2,11 +2,18 @@
 
 #include "BEHostMigrationSubsystem.h"
 
+#include "Experience/UserFacingExperienceData.h"
+#include "RejoinMatch/BERejoinMatchSubsystem.h"
 #include "ProjectBELogs.h"
 
 // Game Online Core
+#include "OnlineServiceSubsystem.h"
 #include "OnlineLobbySubsystem.h"
 #include "Type/OnlineLobbyCreateTypes.h"
+#include "Type/OnlineLobbySearchTypes.h"
+
+// Engine Feature
+#include "Kismet/GameplayStatics.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(BEHostMigrationSubsystem)
 
@@ -82,21 +89,9 @@ bool UBEHostMigrationSubsystem::TryHostMigration()
 	//if (bRequested && !HostMigrationRequestURL.IsEmpty())
 	if (!HostMigrationRequestURL.IsEmpty())
 	{
-		auto* World{ GetWorld() };
-
-		if (ensure(World))
+		if (Step1_CheckLobbyExist())
 		{
-			if (auto* LobbySubsystem{ UGameInstance::GetSubsystem<UOnlineLobbySubsystem>(World->GetGameInstance()) })
-			{
-				if (LobbySubsystem->GetJoinedLobby(NAME_GameSession))
-				{
-					if (ensure(World->ServerTravel(HostMigrationRequestURL, true)))
-					{
-						ClearHostMigrationRequest();
-						return true;
-					}
-				}
-			}
+			return true;
 		}
 
 		ClearHostMigrationRequest();
@@ -109,4 +104,137 @@ void UBEHostMigrationSubsystem::ClearHostMigrationRequest()
 {
 	bRequested = false;
 	HostMigrationRequestURL = FString();
+}
+
+
+bool UBEHostMigrationSubsystem::Step1_CheckLobbyExist()
+{
+	auto* World{ GetWorld() };
+
+	if (ensure(World))
+	{
+		if (auto* OnlineServiceSubsystem{ UGameInstance::GetSubsystem<UOnlineServiceSubsystem>(World->GetGameInstance()) })
+		{
+			const auto CurrentService{ OnlineServiceSubsystem->GetOnlineServiceType() };
+
+			// Online Service Null の場合はホストが切断すると即座にロビーが破棄されるのでロビーを再作成する
+
+			if (CurrentService == EOnlineServiceType::Null)
+			{
+				return Step2_LeaveLobby();
+			}
+
+			// Online Service EOS の場合はホスト切断後にロビーにメンバーが残っていれば存続し続けるためロビーの再作成をスキップする
+
+			else if (CurrentService == EOnlineServiceType::Epic)
+			{
+				return Step6_ServerTravel();
+			}
+		}
+	}
+
+	return false;
+}
+
+bool UBEHostMigrationSubsystem::Step2_LeaveLobby()
+{
+	auto* World{ GetWorld() };
+	auto* LobbySubsystem{ World ? UGameInstance::GetSubsystem<UOnlineLobbySubsystem>(World->GetGameInstance()) : nullptr };
+
+	if (ensure(LobbySubsystem))
+	{
+		auto NewDelegate
+		{
+			FLobbyLeaveCompleteDelegate::CreateUObject(this, &ThisClass::Step3_LeaveLobbyComplete)
+		};
+
+		return LobbySubsystem->CleanUpLobby(NAME_GameSession, World->GetFirstPlayerController(), NewDelegate);
+	}
+
+	return false;
+}
+
+void UBEHostMigrationSubsystem::Step3_LeaveLobbyComplete(FOnlineServiceResult Result)
+{
+	if (Result.bWasSuccessful)
+	{
+		Step4_RecreateLobby();
+	}
+	else
+	{
+		HostMigrationException();
+	}
+}
+
+bool UBEHostMigrationSubsystem::Step4_RecreateLobby()
+{
+	auto* World{ GetWorld() };
+	auto* LobbySubsystem{ World ? UGameInstance::GetSubsystem<UOnlineLobbySubsystem>(World->GetGameInstance()) : nullptr };
+	auto* RejoinSubsystem{ World ? UGameInstance::GetSubsystem<UBERejoinMatchSubsystem>(World->GetGameInstance()) : nullptr };
+
+	if (ensure(LobbySubsystem) && (RejoinSubsystem))
+	{
+		// キャッシュした進行中の対戦ロビーのデータをもとにロビーを再作成する。
+
+		if (const auto* Experience{ RejoinSubsystem->GetOngoingLobbyUserFacingExperience() })
+		{
+			ULobbyCreateRequest* NewCreateRequest{ nullptr };
+			ULobbySearchRequest* NewSearchRequest{ nullptr };
+
+			Experience->CreateRequestsForRejoin(LobbySubsystem, RejoinSubsystem->GetOngoingLobbyUniqueId(), NewCreateRequest, NewSearchRequest);
+
+			if (ensure(NewCreateRequest))
+			{
+				auto NewDelegate
+				{
+					FLobbyCreateCompleteDelegate::CreateUObject(this, &ThisClass::Step5_RecreateLobbyComplete)
+				};
+
+				return LobbySubsystem->CreateLobby(World->GetFirstPlayerController(), NewCreateRequest, NewDelegate);
+			}
+		}
+	}
+
+	return false;
+}
+
+void UBEHostMigrationSubsystem::Step5_RecreateLobbyComplete(ULobbyCreateRequest* Request, FOnlineServiceResult Result)
+{
+	auto* World{ GetWorld() };
+
+	if (ensure(World))
+	{
+		if (Result.bWasSuccessful)
+		{
+			if (Step6_ServerTravel())
+			{
+				return;
+			}
+		}
+
+		HostMigrationException();
+	}
+}
+
+bool UBEHostMigrationSubsystem::Step6_ServerTravel()
+{
+	auto* World{ GetWorld() };
+
+	if (ensure(World))
+	{
+		if (ensure(World->ServerTravel(HostMigrationRequestURL, true)))
+		{
+			ClearHostMigrationRequest();
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+void UBEHostMigrationSubsystem::HostMigrationException()
+{
+	ClearHostMigrationRequest();
+	UGameplayStatics::OpenLevel(this, NAME_None);
 }

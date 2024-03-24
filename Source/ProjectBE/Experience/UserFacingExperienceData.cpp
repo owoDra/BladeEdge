@@ -173,6 +173,7 @@ void UUserFacingExperienceData::CreateRequestsForRejoin(UOnlineLobbySubsystem* L
 		FLobbyAttribute UniqueIdAttr{ UBELobbyDeveloperSettings::GetLobbyAttrName_UNIQUEID(), LobbyUniqueID };
 		FLobbyAttributeFilter UniqueIdAttrFilter{ UniqueIdAttr, ELobbyAttributeComparisonOp::Equals };
 
+		CreateRequest->InitialAttributes.Add(UniqueIdAttr);
 		SearchRequest->Filters.Add(UniqueIdAttrFilter);
 	}
 }

@@ -34,7 +34,7 @@ class PROJECTBE_API UGameplaySettingSubsystem : public UGSCSubsystem
 {
 	GENERATED_BODY()
 public:
-	UGameplaySettingSubsystem() {}
+	UGameplaySettingSubsystem();
 
 protected:
 	virtual FString GetCustomConfigIniName() const override { return FString(TEXT("UserGameplaySettings")); }
@@ -42,6 +42,33 @@ protected:
 protected:
 	virtual void SetToDefaults() override;
 	virtual void ApplySettings() override;
+
+
+	// ===== アクセシビリティ系 | 言語設定 =====
+private:
+	// 適用しようとしている言語
+	UPROPERTY(Transient)
+	FString PendingCulture;
+
+	// true ならばデフォルトの言語に戻す。
+	bool bResetToDefaultCulture{ false };
+
+public:
+	UFUNCTION() const FString& GetPendingCulture() const { return PendingCulture; }
+
+	UFUNCTION() void SetPendingCulture(const FString& NewCulture) { ChangeValueAndDirty(PendingCulture, NewCulture); bResetToDefaultCulture = false; ApplyCultureSettings(); }
+
+	void ResetToDefaultCulture();
+	bool ShouldResetToDefaultCulture() const { return bResetToDefaultCulture; }
+
+	bool IsUsingDefaultCulture() const;
+
+protected:
+	void OnCultureChanged();
+
+	void ClearPendingCulture();
+
+	void ApplyCultureSettings();
 
 
 	// ===== アクセシビリティ系 | 色覚特性設定 =====

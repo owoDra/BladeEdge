@@ -4,6 +4,8 @@
 
 #include "Subsystems/GameInstanceSubsystem.h"
 
+#include "Type/OnlineServiceResultTypes.h"
+
 #include "BEHostMigrationSubsystem.generated.h"
 
 class ULobbyCreateRequest;
@@ -51,4 +53,13 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "HostMigration")
     virtual void ClearHostMigrationRequest();
 
+protected:
+    virtual bool Step1_CheckLobbyExist();
+    virtual bool Step2_LeaveLobby();
+    virtual void Step3_LeaveLobbyComplete(FOnlineServiceResult Result);
+    virtual bool Step4_RecreateLobby();
+    virtual void Step5_RecreateLobbyComplete(ULobbyCreateRequest* Request, FOnlineServiceResult Result);
+    virtual bool Step6_ServerTravel();
+
+    virtual void HostMigrationException();
 };
