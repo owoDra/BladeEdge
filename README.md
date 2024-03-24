@@ -27,9 +27,9 @@ Windows10/11
 
 **開発環境**
 
+ - C++
  - Unreal Engine 5 (5.3.2)
  - Visual Studio 2022
- - C++
  - Blender 3D (3.5)
  - Substance 3D Painter 2022
 
