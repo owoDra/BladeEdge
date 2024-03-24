@@ -25,6 +25,15 @@ Windows10/11
 キーボード&マウス または ゲームパッド(コントローラー)
 
 
+**開発環境**
+
+ - Unreal Engine 5 (5.3.2)
+ - Visual Studio 2022
+ - C++
+ - Blender 3D (3.5)
+ - Substance 3D Painter 2022
+
+
 **必要事項**
 
 Epic Games アカウントが必要  (※1)
