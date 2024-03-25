@@ -109,101 +109,6 @@ float UBEGameplayAbility_Melee::ComputeMeleeDamage_Implementation(const FHitResu
 }
 
 
-// Parry
-
-bool UBEGameplayAbility_Melee::CompareParryPower(const FGameplayAbilityTargetDataHandle& TargetData) const
-{
-	// 防御不可能な攻撃の場合
-
-	if (bCannotParry)
-	{
-		return true;
-	}
-
-	// 最初のターゲットデータを取得し
-
-	const auto* Data{ TargetData.Get(0) };
-	if (!Data)
-	{
-		return false;
-	}
-
-	// Actor を取得
-
-	auto Actors{ Data->GetActors() };
-	if (Actors.IsEmpty())
-	{
-		return false;
-	}
-
-	auto* TargetActor{ Actors[0].Get() };
-	auto* MyActor{ GetAvatarActorFromActorInfo() };
-
-	if (!TargetActor || !MyActor)
-	{
-		return false;
-	}
-
-	// ASC を取得する
-
-	auto* TargetASC{ UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(TargetActor) };
-	if (!TargetASC)
-	{
-		return false;
-	}
-
-	auto* MyASC{ GetAbilitySystemComponent() };
-
-	// Parry 値を比較する
-
-	const auto MyFlag{ MyASC->GetGameplayTagCount(TAG_Flag_Parry) };
-	const auto TargetFlag{ TargetASC->GetGameplayTagCount(TAG_Flag_Parry) };
-	const auto Delta{ TargetFlag - MyFlag };
-	const auto AllowDamage_Power{ Delta < ParryPowerThreshold };
-
-	if (AllowDamage_Power)
-	{
-		return true;	// Parry 値が上回っているならばダメージを与えられる
-	}
-
-	// 方向をチェック
-
-	const auto TargetRotation{ TargetActor->GetActorRotation() };
-	const auto MyRotation{ MyActor->GetActorRotation() + FRotator(0.0f, 180.0f, 0.0f) };
-	const auto DeltaRotation{ TargetRotation - MyRotation };
-	const auto AllowDamage_Angle{ FMath::Abs<float>(DeltaRotation.Yaw) >= ParryDirectionThreshold };
-
-	if (AllowDamage_Angle)
-	{
-		return true;	// 角度的にパリー不可能ならばダメージを与えられる
-	}
-
-	return false;
-}
-
-void UBEGameplayAbility_Melee::NotifyParry(const FGameplayAbilityTargetDataHandle& TargetData)
-{
-	const auto* Data{ TargetData.Get(0) };
-	if (!Data)
-	{
-		return;
-	}
-
-	const auto* HitResult{ Data->GetHitResult() };
-	if (!HitResult)
-	{
-		return;
-	}
-
-	FGameplayCueParameters CueParameters;
-	CueParameters.Location = (HitResult->bBlockingHit ? HitResult->ImpactPoint : HitResult->TraceEnd);
-	CueParameters.Normal = HitResult->ImpactNormal;
-	CueParameters.PhysicalMaterial = HitResult->PhysMaterial;
-
-	K2_ExecuteGameplayCueWithParams(TAG_GameplayCue_Parry, CueParameters);
-}
-
-
 // Step1_StartTimer 
 
 void UBEGameplayAbility_Melee::Step1_StartAttackTimer()
@@ -260,14 +165,7 @@ void UBEGameplayAbility_Melee::Step3_Targeting(float InMeleeDirection)
 
 void UBEGameplayAbility_Melee::OnTargetDataReadyNative(const FGameplayAbilityTargetDataHandle& TargetData)
 {
-	if (CompareParryPower(TargetData))
-	{
-		GiveDamage(TargetData);
-	}
-	else
-	{
-		NotifyParry(TargetData);
-	}
+	GiveDamage(TargetData);
 }
 
 void UBEGameplayAbility_Melee::GiveDamage(const FGameplayAbilityTargetDataHandle& TargetData)

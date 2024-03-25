@@ -104,26 +104,6 @@ protected:
 
 
 	///////////////////////////////////////////////////////////
-	// Parry
-protected:
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Parry")
-	bool bCannotParry{ false };
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Parry")
-	float ParryDirectionThreshold{ 45.0f };
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Parry")
-	int32 ParryPowerThreshold{ -10 };
-
-protected:
-	UFUNCTION(BlueprintCallable, BlueprintPure = "false", Category = "Parry")
-	virtual bool CompareParryPower(const FGameplayAbilityTargetDataHandle& TargetData) const;
-
-	UFUNCTION(BlueprintCallable, Category = "Parry")
-	virtual void NotifyParry(const FGameplayAbilityTargetDataHandle& TargetData);
-
-
-	///////////////////////////////////////////////////////////
 	// Step1_StartTimer 
 protected:
 	FTimerHandle AttackTimerHandle;
