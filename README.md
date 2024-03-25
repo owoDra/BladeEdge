@@ -3,7 +3,7 @@
 
 「格闘ゲーム×FPSゲーム」をコンセプトに、自由な武器種とスキルの組み合わせで1対1の勝負ができる対戦ゲームです。
 
-> [LAN版 ダウンロード] [https://drive.google.com/file/d/1cECtueO15NDisMeZ8iiicTT1DmARKLp3/view?usp=drive_link](https://drive.google.com/file/d/1bi6D21Djt9rc49dSg0-5c3dvwjaxHTQu/view?usp=sharing)
+> [LAN版 ダウンロード] https://drive.google.com/file/d/1RgXL27RDBFsa3dwXolHIR3rP-97ymlek/view?usp=sharing
 
 **特徴**
  - 自由度の高い武器・スキルカスタマイズ
