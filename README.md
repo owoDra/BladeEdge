@@ -55,8 +55,8 @@ Epic Games アカウントが必要  (※1)
 > 5. マッチメイキング
 
 ## 1. ゲームプレイ映像
-[![alt設定](http://img.youtube.com/vi/{T7tqwIG-C1Y}/0.jpg)](https://www.youtube.com/watch?v={T7tqwIG-C1Y})
 > [Youtube] https://youtu.be/T7tqwIG-C1Y
+> [GoogleDrive] https://drive.google.com/file/d/15SbaViC09h3hj2ExHFXMmt_loARGNypM/view?usp=drive_link
 
 ## 2. チュートリアル
 ![チュートリアル](https://github.com/owoDra/BladeEdge/blob/main/Docs/%E3%83%81%E3%83%A5%E3%83%BC%E3%83%88%E3%83%AA%E3%82%A2%E3%83%AB.png)
