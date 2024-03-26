@@ -56,6 +56,7 @@ Epic Games アカウントが必要  (※1)
 
 ## 1. ゲームプレイ映像
 > [Youtube] https://youtu.be/T7tqwIG-C1Y
+
 > [GoogleDrive] https://drive.google.com/file/d/15SbaViC09h3hj2ExHFXMmt_loARGNypM/view?usp=drive_link
 
 ## 2. チュートリアル
