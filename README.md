@@ -55,6 +55,7 @@ Epic Games アカウントが必要  (※1)
 > 5. マッチメイキング
 
 ## 1. ゲームプレイ映像
+[![alt設定](http://img.youtube.com/vi/{T7tqwIG-C1Y}/0.jpg)](https://www.youtube.com/watch?v={T7tqwIG-C1Y})
 > [Youtube] https://youtu.be/T7tqwIG-C1Y
 
 ## 2. チュートリアル
