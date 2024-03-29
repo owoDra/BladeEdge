@@ -41,6 +41,10 @@ Windows10/11
 ※ フレームワーク: https://github.com/stars/owoDra/lists/plugin-game-xxx-plugins
 
 
+**製作人数**
+1人
+
+
 **必要事項**
 
 Epic Games アカウントが必要  (※1)
