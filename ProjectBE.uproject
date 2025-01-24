@@ -1,6 +1,6 @@
 {
 	"FileVersion": 3,
-	"EngineAssociation": "{AE50AFBC-4E6D-AF2E-EEE8-2E927CFA87F3}",
+	"EngineAssociation": "5.5",
 	"Category": "",
 	"Description": "",
 	"Modules": [
@@ -171,7 +171,7 @@
 		},
 		{
 			"Name": "FlatNodes",
-			"Enabled": true,
+			"Enabled": false,
 			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/content/b719437f3fb54c259b34227363df8cab"
 		},
 		{
@@ -180,12 +180,12 @@
 		},
 		{
 			"Name": "CommonMaps",
-			"Enabled": true,
+			"Enabled": false,
 			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/product/44d967336ad64ba7ac3f27f384e7d97b"
 		},
 		{
 			"Name": "ActorLocker",
-			"Enabled": true,
+			"Enabled": false,
 			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/product/9280e03740c64592ad81b9fe751cec7e"
 		},
 		{
@@ -198,7 +198,7 @@
 		},
 		{
 			"Name": "TabRestore",
-			"Enabled": true,
+			"Enabled": false,
 			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/product/f5f9d4ce7bac4dd5beec9cf98238a49a"
 		},
 		{
